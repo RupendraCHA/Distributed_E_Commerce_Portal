@@ -1,0 +1,69 @@
+.place-order {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  /* margin-top: 100px; */
+  margin: 0px 50px;
+  background:  #0014dc;
+  color: #fff;
+  padding: 30px;
+  border-radius: 20px;
+}
+.place-order-left {
+  width: 100%;
+  max-width: max(30%, 500px);
+}
+.place-order-left .title {
+  font-size: 30px;
+  margin-bottom: 50px;
+  font-weight: 600;
+}
+.place-order-left input {
+  margin-bottom: 15px;
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #c5c5c5;
+  outline-color: tomato;
+}
+.place-order-left .multi-fields {
+  display: flex;
+  gap: 10px;
+  font-weight: bold;
+}
+.place-order-right {
+  width: 100%;
+  max-width: max(40%, 500px);
+}
+.place-order-right .cart-total button {
+  margin-top: 30px;
+}
+.cart-total .payment-modes h3 {
+  font-size: max(2vw, 22px);
+  color: tomato;
+  text-decoration: underline;
+}
+.cart-total .payment-modes div {
+  margin-top: 20px;
+}
+.cart-total .payment-modes input {
+  margin-right: 5px;
+  width: 20px;
+}
+.cart-total .payment-modes label {
+  font-weight: 500;
+}
+
+.payment1-button{
+  padding: 10px;
+  background-color: green;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 10px;
+}
+
+@media (max-width: 750px) {
+  .place-order {
+    flex-direction: column;
+    gap: 40px;
+  }
+}

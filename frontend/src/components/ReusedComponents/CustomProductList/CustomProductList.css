@@ -1,0 +1,105 @@
+.product-container {
+    display: flex;
+    flex-direction: column; /* Stack items vertically for breadcrumb and title */
+    padding: 20px; /* Add padding around the container */
+    background-color:white;
+}
+
+.productList-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-bottom: 200px; /* Space below the title */
+    color: #fff;
+    text-decoration: underline;
+}
+
+.breadcrumbs {
+    margin-bottom: 20px; /* Space between breadcrumbs and product list */
+    color: black;
+    font-size: 28px;
+}
+
+.routes{
+    font-weight: bold;
+    font-size: 14px;
+    background-color: black;
+    color: #fff;
+    padding: 1px 10px;
+    border-radius: 6px;
+}
+
+.product-price {
+    font-size: 1.5em; /* Increase font size */
+    margin: 10px 0;
+    color: #d32f2f; /* Change to a red color for emphasis */
+    font-weight: bold; /* Make the text bold */
+    background-color: #ffe4e1; /* Optional: Light background for extra emphasis */
+    padding: 5px; /* Add some padding around the price */
+    border-radius: 5px; /* Optional: Rounded corners for the background */
+}
+
+.card {
+    margin-bottom: 20px; /* Space between cards */
+}
+
+.card img {
+    width: auto; /* Full width for images */
+    height: 150px; /* Maintain aspect ratio */
+    border-radius: 8px; /* Rounded corners for images */
+}
+.product-card {
+    border: 1px solid #ddd; /* Subtle border for structure */
+    border-radius: 8px; /* Rounded corners */
+    text-align: center; /* Center-align content */
+    background-color: #3b82f6; /* Initial blue background (#3b82f6 corresponds to Tailwind's bg-blue-500) */
+    color: white; /* White text for contrast */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.3s ease-in-out; /* Smooth transitions */
+}
+
+.product-card:hover {
+    transform: translateY(-5px); /* Slight lift on hover */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Enhanced shadow on hover */
+    background-color: #2563eb; /* Darker blue on hover (#2563eb corresponds to Tailwind's bg-blue-600) */
+}
+
+
+.product-name {
+    font-size: 1.5em;
+    margin: 10px 0;
+    font-weight: bold; /* Make product name bold */
+}
+
+.product-price {
+    font-size: 1.2em;
+    margin: 10px 0;
+    color: #4caf50; /* Green color for price */
+}
+
+.product-description {
+    margin: 10px 0;
+    font-size: 0.9em; /* Slightly smaller font size for description */
+    color: #555; /* Dark gray for description text */
+}
+
+.btn {
+    margin: 5px;
+    min-width: 120px; /* Ensure buttons have a minimum width */
+}
+
+/* Additional styles for responsive design */
+@media (max-width: 600px) {
+    .product-container {
+        padding: 10px; /* Less padding on smaller screens */
+    }
+
+    .produtList-title {
+        font-size: 1.5em; /* Slightly smaller title font size */
+    }
+
+    .btn {
+        min-width: 100px; /* Adjust button size for mobile */
+    }
+}

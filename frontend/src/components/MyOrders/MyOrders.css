@@ -1,0 +1,110 @@
+.my-orders-container{
+    background:  #0014dc;
+    padding: 40px;
+    font-family: "Playfair Display";
+    height: 100vh;
+    overflow: scroll;
+}
+.order-heading{
+    font-size: max(3vw, 16px);
+    color: white;
+    font-weight: bold;
+    text-decoration: underline;
+}
+.my-orders{
+    margin-top: 10px;
+    background-color: white;
+    border-radius: 2px;
+}
+.orders-list{
+    padding: 30px;
+}
+.order-item{
+    background-color: #000000ce;
+    margin: 20px;
+    padding: 40px;
+    border-radius: 10px;
+    color: #fff;
+}
+.order-id{
+    font-size: 18px;
+}
+.total-amt{
+    font-size: max(2vw, 18px);
+    background-color: white;
+    width: 30%;
+    color: black;
+    font-weight: 700;
+    padding: 5px;
+    border-radius: 10px;
+
+}
+.pay-method{
+    font-size: 18px;
+    border: 1px solid #fff;
+    width: 30%;
+    padding: 5px;
+    border-radius: 5px;
+    font-weight: bold;
+    span{
+        color: white;
+    }
+}
+.shipping-address{
+    font-size: 16px;
+
+    span{
+        font-size: 18px;
+        font-weight: bold;
+    }
+}
+.products{
+    background-color: #141413c9;
+    color: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    border: 2px solid #fff;
+
+    h5{
+        font-size: 30px;
+        font-family: "System-ui";
+        text-decoration: underline;
+        margin-bottom: 20px;
+    }
+
+    .product{
+        border: 1px solid #000;
+        background-color: #fff;
+        color: #000;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        font-size: 18px;
+        gap: 20px;
+        border-radius: 20px;
+        margin-top: 20px;
+        padding: 12px;
+        width: 70%;
+
+        .img-container{
+            border-right: 2px solid #000;
+            img{
+                width: 200vw;
+            }
+        }
+        .details{
+            font-size: 14px;
+            font-weight: bold;
+            
+            strong{
+                padding: 0;
+            }
+
+            p{
+                padding: 0;
+                margin: 2px;
+                margin-left: none;
+            }
+        }
+    }
+}

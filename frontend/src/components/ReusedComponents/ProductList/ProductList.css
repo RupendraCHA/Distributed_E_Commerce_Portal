@@ -1,0 +1,110 @@
+.product-container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column; /* Stack items vertically for breadcrumb and title */
+    padding: 20px; /* Add padding around the container */
+}
+
+.produtList-title{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: black;
+  text-decoration: underline;
+  font-size: 34px;
+}
+
+.breadcrumbs {
+    margin-bottom: 20px; /* Space between breadcrumbs and product list */
+    color: white;
+    font-size: 28px;
+}
+.routes{
+    font-weight: bold;
+    font-size: 14px;
+    background-color: #fff;
+    color: #000;
+    padding: 1px 10px;
+    border-radius: 6px;
+}
+.product-card-section{
+    /* background-color: rgb(45, 48, 49); */
+    background:  #0014dc;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    border-radius: 20px;
+    width: 90%;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* margin: 20px; */
+}
+.product-pic{
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+}
+.product-price {
+    font-size: 1.5em; /* Increase font size */
+    margin: 10px 0;
+    color: #d32f2f; /* Change to a red color for emphasis */
+    font-weight: bold; /* Make the text bold */
+    background-color: #ffe4e1; /* Optional: Light background for extra emphasis */
+    padding: 5px; /* Add some padding around the price */
+    border-radius: 5px; /* Optional: Rounded corners for the background */
+}
+
+.grid-container {
+    display: flex;
+    flex-wrap: wrap; /* Allow items to wrap onto the next line */
+    justify-content: space-between; /* Space between items */
+    gap: 20px; /* Gap between grid items */
+}
+
+.product-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: calc(33.333% - 20px); /* Responsive width for 3 items per row with gap */
+    text-align: center;
+    background-color: #fff; /* Ensure a white background for cards */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Add subtle shadow for depth */
+    transition: transform 0.2s; /* Smooth transition on hover */
+}
+
+.product-card:hover {
+    transform: translateY(-5px); /* Slight lift effect on hover */
+}
+
+.product-image {
+    width: 100%;
+    height: 150px; /* Fixed height as per your requirements */
+    object-fit: cover; /* Maintain aspect ratio and cover the area */
+    border-radius: 8px 8px 0 0; /* Rounded corners for the top */
+}
+
+.product-name {
+    font-size: 1.5em;
+    margin: 10px 0;
+    font-weight: bold; /* Make product name bold */
+}
+
+.product-price {
+    font-size: 1.2em;
+    margin: 10px 0;
+    color: #4caf50; /* Green color for price */
+}
+
+.product-description {
+    margin: 10px 0;
+    font-size: 0.9em; /* Slightly smaller font size for description */
+    color: #555; /* Dark gray for description text */
+}
+
+.btn {
+    margin: 5px;
+    min-width: 120px; /* Ensure buttons have a minimum width */
+}

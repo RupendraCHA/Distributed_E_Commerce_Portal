@@ -1,0 +1,22 @@
+
+.payment{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: black;
+    color: #fff;
+
+    div{
+        text-align: center;
+    }
+}
+.payment button{
+    background-color: aquamarine;
+    padding: 20px;
+    font-size: 22px;
+    border-radius: 12px;
+    font-family: "Roboto";
+    color: black;
+    font-weight: bold;
+}

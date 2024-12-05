@@ -1,0 +1,18 @@
+/* Full height layout using Flexbox */
+html, body, #root {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Full viewport height */
+  }
+  
+  .main-content {
+    flex-grow: 1; /* Fill the remaining space */
+    padding: 20px; /* Optional padding */
+  }
+  
