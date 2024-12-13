@@ -38,7 +38,7 @@
 }
 
 .credentials-image{
-  width: 100%;
+  width: 50vw;
   height: 70%;
   border-radius: 30px;
 }
@@ -116,6 +116,14 @@
 
 }
 .initial-image{
+  padding: none;
+  width: 60%;
+  height: 90%;
+  border-radius: 20px;
+  /* filter: brightness(70%); */
+  box-shadow: 5px 5px 3px #868a94;
+}
+.initial-image1{
   padding: none;
   width: 60%;
   height: 90%;

@@ -15,14 +15,14 @@ const Header = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const handleProfileClick = (event) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
-  };
+  }; 
   const handleClose = () => {
     setAnchorEl(null);
   };
 
   return (
     <>
-      <header className="container flex justify-between items-center h-30 px-20 py-2 bg-gradient-to-r from-colorOne to-colorTwo">
+      <header className="container flex justify-between items-center h-30 px-20 py-2 bg-gradient-to-r from-[#86d3e3] to-[#506bf2]">
           <div>
             <Link to="/" className="no-underline">
               <img src='/Posetra_Logo1.jpg' alt='Website Logo' className='h-20 rounded-full'/>
