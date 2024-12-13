@@ -59,14 +59,14 @@ function Login() {
     };
 
     return (
-        <div className='bg-container-login d-flex justify-content-center align-items-center bg-secondary vh-100'>
+        <div className='container bg-container-login d-flex justify-content-center align-items-center bg-secondary bg-gradient-to-r from-[#86d3e3] to-[#506bf2] vh-100'>
             <div
-                className='bg-secondary p-4 text-white rounded-4 login-card'
+                className='bg-[#2d313b] p-4 text-black rounded-4 login-card w-[30vw]'
                 style={{ opacity: '0.9' }}
             >
-                <h2>Login</h2>
+                <h2 className='font-bold text-white bg-[#497cf2] text-3xl p-2 mb-4 text-center'>Login</h2>
                 <form onSubmit={handleSubmit}>
-                    <div className='mb-3'>
+                    <div className='mb-3 bg-[#fff] px-2 py-1 rounded-2'>
                         <label htmlFor='email'>
                             <strong>Email</strong>
                         </label>
@@ -76,13 +76,13 @@ function Login() {
                             autoComplete='off'
                             name='email'
                             required
-                            className='rounded-0 form-control login-user-input'
+                            className='font-[600] border-3 outline-solid border-[#000]-600 rounded-2 form-control login-user-input'
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                         />
                         {errors.email && <p className='error'>{errors.email}</p>}
                     </div>
-                    <div className='mb-3'>
+                    <div className='mb-3 bg-[#fff] px-2 py-1 rounded-2'>
                         <label htmlFor='password'>
                             <strong>Password</strong>
                         </label>
@@ -92,7 +92,7 @@ function Login() {
                             autoComplete='off'
                             required
                             name='password'
-                            className='rounded-0 form-control login-user-input'
+                            className='border-3 outline-solid border-[#000]-600 rounded-2 font-[600] form-control login-user-input'
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                         />
@@ -100,17 +100,17 @@ function Login() {
                     </div>
                     <button
                         type='submit'
-                        className='btn btn-primary bg-primary w-100 rounded-0'
+                        className='btn btn-default hover:bg-[#000] hover:text-white bg-[#fff] w-100 rounded-0'
                         style={{ fontWeight: '600' }}
                     >
                         Login
                     </button>
                 </form>
                 {failed && <p className='text-danger mt-3'>{failed}</p>}
-                <p className='mt-3'>Don't have an account?</p>
+                <p className='mt-3 text-white'>Don't have an account?</p>
                 <Link
                     to='/register'
-                    className='btn btn-default border w-100 bg-warning rounded-0 text-decoration-none'
+                    className='btn btn-default hover:bg-[#000] hover:text-white bg-[#fff] w-100 rounded-0'
                     style={{ fontWeight: '600' }}
                 >
                     Register
