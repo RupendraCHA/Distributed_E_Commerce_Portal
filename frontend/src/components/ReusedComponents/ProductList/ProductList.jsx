@@ -13,10 +13,26 @@ const ProductList = ({ productList, title,  }) => {
   const { enqueueSnackbar } = useSnackbar();
   const [sapData, setSapData] = useState({})
 
-  const handleAddToCart = (product) => {
+  const handleAddToCart = async(product) => {
+    const token = localStorage.getItem('token');
     const productWithQuantity = { ...product, quantity: 1 };
     enqueueSnackbar(`${product.productName} has been added to your cart!`, { variant: 'success' });
     dispatch(addToCart(productWithQuantity));
+    try{
+      const response = await axios.post('http://localhost:3002/addToCart', productWithQuantity, {
+        headers: { Authorization: `Bearer ${token}` }, // Add token to headers
+      });
+  
+      if (response.status === 200) {
+        enqueueSnackbar('Product successfully added to server cart!', { variant: 'success' });
+      } else {
+        enqueueSnackbar('Failed to sync with the server.', { variant: 'warning' });
+      }
+    }
+    catch (error) {
+      console.error('Error adding product to cart:', error);
+      enqueueSnackbar('An error occurred while adding the product to your cart.', { variant: 'error' });
+    }
   };
 
   const handleBuyNow = (product) => {

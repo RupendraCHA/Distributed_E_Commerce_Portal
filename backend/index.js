@@ -1,23 +1,22 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const { EmployeeModel, AddressModel, OrderModel } = require("./Models");
+const { EmployeeModel, AddressModel, OrderModel, CartModel } = require("./Models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const authenticateToken = require("./authentication");
 const app = express();
 app.use(express.json());
-app.use(cors(
-  {
-    origin: ["http://localhost:5173"],
-    methods: ["GET", "POST", "DELETE", "UPDATE"],
-    credentials: true
-}
-));
+app.use(cors({
+  origin: "*",
+  methods: "*",
+  credentials: true
+}));
 
 const JWT_SECRET = "Account_Test"; // You can use environment variables to store this securely
 
-mongoose.connect("mongodb+srv://rupendrachandaluri:R9912192624r@cluster0.iqrea.mongodb.net/Posetra_Database?retryWrites=true&w=majority&appName=Cluster0");
+mongoose.connect("mongodb://127.0.0.1:27017/Visionsoft");
+
 
 const Stripe = require('stripe');
 const stripe = Stripe('sk_test_51Q9ZJ7HC7NaQVzOS1SMqmgTvtTKQOgMSp0BlgI7gUCJTsSTRQw4vOvgFWC8WsDAuDwALyyu59DxfsIOGb3z3isJR005xoAmBGN');
@@ -271,6 +270,7 @@ app.put("/user", authenticateToken, (req, res) => {
 });
 
 app.post("/register", (req, res) => {
+  console.log(req.body)
   const { name, email, password } = req.body;
   bcrypt
     .hash(password, 10)
@@ -282,6 +282,59 @@ app.post("/register", (req, res) => {
     .catch((err) => console.log(err.message));
 });
 
+app.post("/addToCart", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id; // Extract user ID from the token
+    const { productId, quantity } = req.body;
+
+    if (!productId || !quantity) {
+      return res.status(400).json({ error: "Product ID and quantity are required." });
+    }
+
+    // Check if the product already exists in the cart
+    const existingCartItem = await CartModel.findOne({ userId, productId });
+
+    if (existingCartItem) {
+      // Update the quantity if the product already exists
+      existingCartItem.quantity += quantity;
+      await existingCartItem.save();
+      return res.json({ message: "Product quantity updated in cart", cartItem: existingCartItem });
+    }
+
+    // Add a new product to the cart
+    const newCartItem = new CartModel({
+      userId,
+      productId,
+      quantity,
+    });
+
+    const savedCartItem = await newCartItem.save();
+    res.status(201).json({ message: "Product added to cart", cartItem: savedCartItem });
+  } catch (error) {
+    console.error("Error adding product to cart:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.get("/cart", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id; // Extract user ID from the token
+
+    // Fetch all cart items for the user
+    const cartItems = await CartModel.find({ userId }).populate("productId");
+
+    if (!cartItems || cartItems.length === 0) {
+      return res.status(404).json({ message: "No items in the cart" });
+    }
+
+    res.json({ cartItems });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
 app.listen(3002, () => {
-  console.log("Server is running");
+  console.log("3002 Server is running");
 });
