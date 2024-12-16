@@ -284,28 +284,26 @@ app.post("/register", (req, res) => {
 
 app.post("/addToCart", authenticateToken, async (req, res) => {
   try {
-    const userId = req.user.id; // Extract user ID from the token
-    const { productId, quantity } = req.body;
+    const userId = req.user.id;
+    const { productId, quantity, productName, category, brand, price, description, weight, expirationDate, image } = req.body;
 
     if (!productId || !quantity) {
       return res.status(400).json({ error: "Product ID and quantity are required." });
     }
 
-    // Check if the product already exists in the cart
-    const existingCartItem = await CartModel.findOne({ userId, productId });
-
-    if (existingCartItem) {
-      // Update the quantity if the product already exists
-      existingCartItem.quantity += quantity;
-      await existingCartItem.save();
-      return res.json({ message: "Product quantity updated in cart", cartItem: existingCartItem });
-    }
-
-    // Add a new product to the cart
+    // Add the product directly to the cart without any conversion
     const newCartItem = new CartModel({
       userId,
-      productId,
+      productId,  // Store as string directly
       quantity,
+      productName,
+      category,
+      brand,
+      price,
+      description,
+      weight,
+      expirationDate,
+      image,
     });
 
     const savedCartItem = await newCartItem.save();
@@ -316,13 +314,12 @@ app.post("/addToCart", authenticateToken, async (req, res) => {
   }
 });
 
+
 app.get("/cart", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id; // Extract user ID from the token
-
     // Fetch all cart items for the user
-    const cartItems = await CartModel.find({ userId }).populate("productId");
-
+    const cartItems = await CartModel.find({ userId });
     if (!cartItems || cartItems.length === 0) {
       return res.status(404).json({ message: "No items in the cart" });
     }
@@ -333,6 +330,7 @@ app.get("/cart", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
+
 
 
 app.listen(3002, () => {

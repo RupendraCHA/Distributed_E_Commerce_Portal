@@ -5,6 +5,7 @@ import { useNavigate, useLocation, useParams, Link } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { Grid, Card, CardContent, CardMedia, Typography, Button, Breadcrumbs } from '@mui/material';
 import './ProductList.css'; // Keep this for any additional styles
+import axios from "axios";
 
 const ProductList = ({ productList, title,  }) => {
   const dispatch = useDispatch();
@@ -16,16 +17,15 @@ const ProductList = ({ productList, title,  }) => {
   const handleAddToCart = async(product) => {
     const token = localStorage.getItem('token');
     const productWithQuantity = { ...product, quantity: 1 };
-    enqueueSnackbar(`${product.productName} has been added to your cart!`, { variant: 'success' });
     dispatch(addToCart(productWithQuantity));
     try{
       const response = await axios.post('http://localhost:3002/addToCart', productWithQuantity, {
         headers: { Authorization: `Bearer ${token}` }, // Add token to headers
       });
   
-      if (response.status === 200) {
+      if (response.status === 201) {
         enqueueSnackbar('Product successfully added to server cart!', { variant: 'success' });
-      } else {
+      } else {  
         enqueueSnackbar('Failed to sync with the server.', { variant: 'warning' });
       }
     }
