@@ -1,15 +1,38 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'; // Profile icon
 import { Popper, Paper, ClickAwayListener, MenuList, MenuItem } from '@mui/material'; // MUI components
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch  } from 'react-redux';
 import {DashboardsData} from '../../data/PosetraDataPage';
+import { setCartItems } from '../../store/cartSlice'; // Import the setCartItems action
+import axios from "axios"
 
 const Header = () => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const cartItems = useSelector((state) => state.cart.cartItems);
-  
+  const dispatch = useDispatch();
+
+  // Fetch cart items when the component is mounted
+  useEffect(() => {
+    console.log("Called", isLoggedIn)
+    if (isLoggedIn) {
+      const fetchCartItems = async () => {
+        try {
+          const token = localStorage.getItem('token');
+          const response = await axios.get('http://localhost:3002/cart', {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          dispatch(setCartItems(response.data.cartItems)); // Store cart items in Redux store
+        } catch (error) {
+          console.error('Error fetching cart items:', error);
+        }
+      };
+
+      fetchCartItems();
+    }
+  }, [isLoggedIn, dispatch]);
+
   // Calculate total count of items in the cart
   const totalItemsInCart = cartItems.reduce((total, item) => total + item.quantity, 0);
   const [anchorEl, setAnchorEl] = useState(null);
