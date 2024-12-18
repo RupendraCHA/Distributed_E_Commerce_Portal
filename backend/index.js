@@ -1,50 +1,56 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const { EmployeeModel, AddressModel, OrderModel, CartModel } = require("./Models");
+const {
+  EmployeeModel,
+  AddressModel,
+  OrderModel,
+  CartModel,
+} = require("./Models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const authenticateToken = require("./authentication");
 const app = express();
 app.use(express.json());
-app.use(cors({
-  origin: "*",
-  methods: "*",
-  credentials: true
-}));
+app.use(
+  cors({
+    origin: "*",
+    methods: "*",
+    credentials: true,
+  })
+);
 
 const JWT_SECRET = "Account_Test"; // You can use environment variables to store this securely
 
 mongoose.connect("mongodb://127.0.0.1:27017/Visionsoft");
 
+const Stripe = require("stripe");
+const stripe = Stripe(
+  "sk_test_51Q9ZJ7HC7NaQVzOS1SMqmgTvtTKQOgMSp0BlgI7gUCJTsSTRQw4vOvgFWC8WsDAuDwALyyu59DxfsIOGb3z3isJR005xoAmBGN"
+);
 
-const Stripe = require('stripe');
-const stripe = Stripe('sk_test_51Q9ZJ7HC7NaQVzOS1SMqmgTvtTKQOgMSp0BlgI7gUCJTsSTRQw4vOvgFWC8WsDAuDwALyyu59DxfsIOGb3z3isJR005xoAmBGN');
+app.post("/create-checkout-session", async (req, res) => {
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ["card"],
+    line_items: [
+      {
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: "Your Product Name",
+          },
+          unit_amount: 1000, // amount in cents
+        },
+        quantity: 2,
+      },
+    ],
+    mode: "payment",
+    success_url: "http://localhost:5173/my-orders",
+    cancel_url: "http://localhost:5173/",
+  });
 
-
-app.post('/create-checkout-session', async (req, res) => {
-    const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: [
-            {
-                price_data: {
-                    currency: 'usd',
-                    product_data: {
-                        name: 'Your Product Name',
-                    },
-                    unit_amount: 1000, // amount in cents
-                },
-                quantity: 2,
-            },
-        ],
-        mode: 'payment',
-        success_url: 'http://localhost:5173/my-orders',
-        cancel_url: 'http://localhost:5173/',
-    });
-
-    res.json({ id: session.id });
+  res.json({ id: session.id });
 });
-
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -62,7 +68,7 @@ app.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
-      expiresIn: "1h",
+      expiresIn: "4h",
     });
     return res.json({ message: "Success", token });
   } catch (error) {
@@ -270,7 +276,7 @@ app.put("/user", authenticateToken, (req, res) => {
 });
 
 app.post("/register", (req, res) => {
-  console.log(req.body)
+  console.log(req.body);
   const { name, email, password } = req.body;
   bcrypt
     .hash(password, 10)
@@ -285,16 +291,8 @@ app.post("/register", (req, res) => {
 app.post("/addToCart", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
-    const { productId, quantity, productName, category, brand, price, description, weight, expirationDate, image } = req.body;
-
-    if (!productId || !quantity) {
-      return res.status(400).json({ error: "Product ID and quantity are required." });
-    }
-
-    // Add the product directly to the cart without any conversion
-    const newCartItem = new CartModel({
-      userId,
-      productId,  // Store as string directly
+    const {
+      productId,
       quantity,
       productName,
       category,
@@ -304,16 +302,51 @@ app.post("/addToCart", authenticateToken, async (req, res) => {
       weight,
       expirationDate,
       image,
-    });
+    } = req.body;
 
-    const savedCartItem = await newCartItem.save();
-    res.status(201).json({ message: "Product added to cart", cartItem: savedCartItem });
+    // Validate required fields
+    if (!productId || !quantity) {
+      return res
+        .status(400)
+        .json({ error: "Product ID and quantity are required." });
+    }
+
+    // Check if the item already exists in the user's cart
+    const existingCartItem = await CartModel.findOne({ userId, productId });
+
+    if (existingCartItem) {
+      // Update the quantity if the item already exists
+      existingCartItem.quantity += quantity;
+      const updatedCartItem = await existingCartItem.save();
+      return res
+        .status(200)
+        .json({ message: "Cart item updated", cartItem: updatedCartItem });
+    } else {
+      // Add a new item to the cart
+      const newCartItem = new CartModel({
+        userId,
+        productId,
+        quantity,
+        productName,
+        category,
+        brand,
+        price,
+        description,
+        weight,
+        expirationDate,
+        image,
+      });
+
+      const savedCartItem = await newCartItem.save();
+      return res
+        .status(201)
+        .json({ message: "Product added to cart", cartItem: savedCartItem });
+    }
   } catch (error) {
     console.error("Error adding product to cart:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
-
 
 app.get("/cart", authenticateToken, async (req, res) => {
   try {
@@ -330,8 +363,6 @@ app.get("/cart", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
-
 
 app.listen(3002, () => {
   console.log("3002 Server is running");
