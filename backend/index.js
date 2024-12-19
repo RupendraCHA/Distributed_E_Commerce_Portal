@@ -288,6 +288,122 @@ app.post("/register", (req, res) => {
     .catch((err) => console.log(err.message));
 });
 
+app.get("/savedItems", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const savedItems = await SavedItemModel.find({ userId });
+    res.json({ savedItems });
+  } catch (error) {
+    console.error("Error fetching saved items:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/moveToCart/:productId", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const productId = req.params.productId;
+
+    // Get the saved item
+    const savedItem = await SavedItemModel.findOne({ userId, productId });
+    if (!savedItem) {
+      return res.status(404).json({ message: "Saved item not found" });
+    }
+
+    // Create cart item
+    const cartItem = new CartModel({
+      userId,
+      productId,
+      quantity: 1,
+      productName: savedItem.productName,
+      category: savedItem.category,
+      brand: savedItem.brand,
+      price: savedItem.price,
+      description: savedItem.description,
+      weight: savedItem.weight,
+      expirationDate: savedItem.expirationDate,
+      image: savedItem.image,
+    });
+
+    await cartItem.save();
+
+    // Remove from saved items
+    await SavedItemModel.findOneAndDelete({ userId, productId });
+
+    res.json({ message: "Item moved to cart", cartItem });
+  } catch (error) {
+    console.error("Error moving item to cart:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.delete("/savedItems/:productId", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const productId = req.params.productId;
+
+    const deletedItem = await SavedItemModel.findOneAndDelete({
+      userId,
+      productId,
+    });
+    if (!deletedItem) {
+      return res.status(404).json({ message: "Saved item not found" });
+    }
+
+    res.json({ message: "Saved item deleted", deletedItem });
+  } catch (error) {
+    console.error("Error deleting saved item:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.post("/saveForLater/:productId", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const productId = req.params.productId;
+
+    // First, get the item from cart
+    const cartItem = await CartModel.findOne({ userId, productId });
+    if (!cartItem) {
+      return res.status(404).json({ message: "Cart item not found" });
+    }
+
+    // Check if item is already saved
+    const existingSavedItem = await SavedItemModel.findOne({
+      userId,
+      productId,
+    });
+    if (existingSavedItem) {
+      return res.status(400).json({ message: "Item already saved" });
+    }
+
+    // Create new saved item
+    const savedItem = new SavedItemModel({
+      userId,
+      productId,
+      productName: cartItem.productName,
+      category: cartItem.category,
+      brand: cartItem.brand,
+      price: cartItem.price,
+      description: cartItem.description,
+      weight: cartItem.weight,
+      expirationDate: cartItem.expirationDate,
+      image: cartItem.image,
+    });
+
+    // Save the item
+    await savedItem.save();
+
+    // Remove from cart
+    await CartModel.findOneAndDelete({ userId, productId });
+
+    res.status(201).json({ message: "Item saved for later", savedItem });
+  } catch (error) {
+    console.error("Error saving item for later:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.post("/addToCart", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -311,21 +427,29 @@ app.post("/addToCart", authenticateToken, async (req, res) => {
         .json({ error: "Product ID and quantity are required." });
     }
 
-    // Check if the item already exists in the user's cart
-    const existingCartItem = await CartModel.findOne({ userId, productId });
+    // Make sure both userId and productId are properly typed/formatted
+    // Use strict comparison in the query
+    const existingCartItem = await CartModel.findOne({
+      userId: userId.toString(), // Ensure consistent type
+      productId: productId.toString(), // Ensure consistent type
+    });
 
     if (existingCartItem) {
       // Update the quantity if the item already exists
-      existingCartItem.quantity += quantity;
-      const updatedCartItem = await existingCartItem.save();
+      const updatedCartItem = await CartModel.findOneAndUpdate(
+        { userId: userId.toString(), productId: productId.toString() },
+        { $inc: { quantity: quantity } }, // Use $inc operator to increment quantity
+        { new: true } // Return the updated document
+      );
+
       return res
         .status(200)
         .json({ message: "Cart item updated", cartItem: updatedCartItem });
     } else {
       // Add a new item to the cart
       const newCartItem = new CartModel({
-        userId,
-        productId,
+        userId: userId.toString(),
+        productId: productId.toString(),
         quantity,
         productName,
         category,
@@ -344,6 +468,28 @@ app.post("/addToCart", authenticateToken, async (req, res) => {
     }
   } catch (error) {
     console.error("Error adding product to cart:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+app.delete("/cart/:id", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const productId = req.params.id;
+    const getItem = await CartModel.findOne({ userId, productId });
+    if (!getItem) {
+      return res.status(404).json({ message: "Cart item not found" });
+    }
+    const deletedCartItem = await CartModel.findOneAndDelete({
+      userId,
+      productId,
+    });
+    if (!deletedCartItem) {
+      return res.status(404).json({ message: "Cart item not found" });
+    }
+    res.json({ message: "Cart item deleted", cartItem: deletedCartItem });
+  } catch (error) {
+    console.error("Error deleting cart item:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 });
