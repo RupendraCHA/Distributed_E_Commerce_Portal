@@ -154,6 +154,42 @@ app.put("/addresses/:id/primary", authenticateToken, async (req, res) => {
   }
 });
 
+app.put("/addresses/:id", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const addressId = req.params.id;
+    const { addressLine1, addressLine2, city, state, zipCode } = req.body;
+
+    // First verify that this address belongs to the user
+    const existingAddress = await AddressModel.findOne({
+      _id: addressId,
+      userId: userId,
+    });
+
+    if (!existingAddress) {
+      return res.status(404).json({ message: "Address not found" });
+    }
+
+    // Update the address
+    const updatedAddress = await AddressModel.findByIdAndUpdate(
+      addressId,
+      {
+        addressLine1,
+        addressLine2,
+        city,
+        state,
+        zipCode,
+      },
+      { new: true } // This option returns the updated document
+    );
+
+    res.json(updatedAddress);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
 app.delete("/addresses/:id", authenticateToken, async (req, res) => {
   try {
     const addressId = req.params.id;

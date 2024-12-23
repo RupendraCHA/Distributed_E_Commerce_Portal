@@ -83,7 +83,7 @@ export const privateRoutes = [
   },
   {
     path: '/my-address',
-    element: PlaceOrder,
+    element: MyAddress,
   },
   {
     path: '/my-orders',
