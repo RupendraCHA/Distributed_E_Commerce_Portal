@@ -135,7 +135,7 @@ const Cart = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (response.data.length === 0) {
-        navigate('/payment'); // Redirect to add address page if no address exists
+        navigate('/my-address'); // Redirect to add address page if no address exists
       } else {
         navigate('/checkout');
       }

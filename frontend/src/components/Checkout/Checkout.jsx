@@ -1,284 +1,522 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+// import { useEffect, useState } from 'react';
+// import { Link } from 'react-router-dom';
+// import { useDispatch, useSelector } from 'react-redux';
+// import { useNavigate } from 'react-router-dom';
+// import axios from 'axios';
+// import { useSnackbar } from 'notistack'; // Import useSnackbar
+// import { resetCart } from '../../store/cartSlice';
+// import './Checkout.css';
+// const Checkout = () => {
+//   const cartItems = useSelector((state) => state.cart.cartItems);
+//   const [addresses, setAddresses] = useState([]);
+//   const [selectedAddress, setSelectedAddress] = useState(null);
+//   const [paymentMethod, setPaymentMethod] = useState('');
+//   const [debitCardDetails, setDebitCardDetails] = useState({
+//     cardNumber: '',
+//     expiryDate: '',
+//     cvv: '',
+//     cardHolderName: '',
+//   });
+//   const [checkDetails, setCheckDetails] = useState({
+//     checkNumber: '',
+//     bankName: '',
+//   });
+//   const navigate = useNavigate();
+//   const dispatch = useDispatch();
+//   const { enqueueSnackbar } = useSnackbar(); // Use snackbar
+
+//   const totalPrice = cartItems
+//     .reduce((total, item) => {
+//       const price = parseFloat(item.price.replace('$', ''));
+//       return total + price;
+//     }, 0)
+//     .toFixed(2); // Calculate total price
+
+//   useEffect(() => {
+//     const fetchAddresses = async () => {
+//       try {
+//         const token = localStorage.getItem('token');
+//         const response = await axios.get('http://localhost:3002/addresses', {
+//           headers: { Authorization: `Bearer ${token}` },
+//         });
+//         setAddresses(response.data);
+
+//         // Automatically select the primary address if available
+//         const primaryAddress = response.data.find(
+//           (address) => address.isPrimary
+//         );
+//         if (primaryAddress) {
+//           setSelectedAddress(primaryAddress);
+//         } else if (response.data.length > 0) {
+//           setSelectedAddress(response.data[0]); // Default to the first address
+//         }
+//       } catch (err) {
+//         enqueueSnackbar('Failed to fetch addresses', { variant: 'error' });
+//       }
+//     };
+
+//     fetchAddresses();
+//   }, []);
+
+//   if (!addresses.length) {
+//     navigate('/my-address'); // Redirect to add address if no addresses
+//   } else if (!selectedAddress) {
+//     enqueueSnackbar('Please select an address to proceed.', {
+//       variant: 'warning',
+//     });
+//   } else if (!paymentMethod) {
+//     enqueueSnackbar('Please select a payment method.', { variant: 'warning' });
+//   } else if (paymentMethod === 'debit card' && !validateDebitCard()) {
+//     enqueueSnackbar('Please enter valid debit card details.', {
+//       variant: 'warning',
+//     });
+//   } else if (paymentMethod === 'check' && !validateCheckDetails()) {
+//     enqueueSnackbar('Please enter valid check details.', {
+//       variant: 'warning',
+//     });
+//   }
+
+//   const handleProceedToPayment = async () => {
+//     try {
+//       const token = localStorage.getItem('token');
+//       const orderData = {
+//         items: cartItems,
+//         total: totalPrice,
+//         address: selectedAddress,
+//         paymentMethod,
+//         ...(paymentMethod === 'debit card' && { debitCardDetails }),
+//         ...(paymentMethod === 'check' && { checkDetails }),
+//       };
+
+//       // Store the order
+//       await axios.post('http://localhost:3002/orders', orderData, {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
+
+//       enqueueSnackbar('Order successfully created', { variant: 'success' });
+//       // navigate('/my-orders');
+//       navigate('/payment');
+//       dispatch(resetCart());
+//     } catch (error) {
+//       // enqueueSnackbar('Error while creating order', { variant: 'error' });
+//     }
+//     const token = localStorage.getItem('token');
+
+//     if (token) {
+//       navigate('/payment');
+//     }
+//   };
+
+//   const handleDebitCardChange = (e) => {
+//     setDebitCardDetails({
+//       ...debitCardDetails,
+//       [e.target.name]: e.target.value,
+//     });
+//   };
+
+//   const handleCheckDetailsChange = (e) => {
+//     setCheckDetails({
+//       ...checkDetails,
+//       [e.target.name]: e.target.value,
+//     });
+//   };
+
+//   const validateDebitCard = () => {
+//     const { cardNumber, expiryDate, cvv, cardHolderName } = debitCardDetails;
+//     return cardNumber && expiryDate && cvv && cardHolderName;
+//   };
+
+//   const validateCheckDetails = () => {
+//     const { checkNumber, bankName } = checkDetails;
+//     return checkNumber && bankName;
+//   };
+
+//   return (
+//     <div className="checkout-container">
+//       <div className="checkout-bg-container">
+//         <div className="checkout-card">
+//           <div>
+//             <h1 className="card-heading">Checkout:</h1>
+//             <h2 className="total-price">Total Price: ${totalPrice}</h2>
+//             <div className="shipping">
+//               <h3>Your Address Details :</h3>
+//               {addresses.length === 0 ? (
+//                 <p>
+//                   No addresses found.{' '}
+//                   <Link to="/my-address">Add an Address</Link>
+//                 </p>
+//               ) : (
+//                 <div>
+//                   <select
+//                     className="address-info"
+//                     value={selectedAddress ? selectedAddress._id : ''}
+//                     onChange={(e) =>
+//                       setSelectedAddress(
+//                         addresses.find(
+//                           (address) => address._id === e.target.value
+//                         )
+//                       )
+//                     }
+//                   >
+//                     {addresses.map((address) => (
+//                       <option key={address._id} value={address._id}>
+//                         {address.addressLine1}, {address.city}, {address.state},{' '}
+//                         {address.zipCode} {address.isPrimary && '(Primary)'}
+//                       </option>
+//                     ))}
+//                   </select>
+//                 </div>
+//               )}
+//             </div>
+//             <div className="pay-options">
+//               <h3>Payment Options :</h3>
+//               <ul>
+//                 <li className="payment-type">
+//                   <input
+//                     type="radio"
+//                     name="paymentMethod"
+//                     value="debit card"
+//                     onChange={(e) => setPaymentMethod(e.target.value)}
+//                   />
+//                   Debit Card
+//                 </li>
+//                 <li className="payment-type">
+//                   <input
+//                     type="radio"
+//                     name="paymentMethod"
+//                     value="check"
+//                     onChange={(e) => setPaymentMethod(e.target.value)}
+//                   />
+//                   Check
+//                 </li>
+//               </ul>
+//               {paymentMethod === 'debit card' && (
+//                 <div className="debit-card-form">
+//                   <h4>Debit Card Details:</h4>
+//                   <div className="form-group">
+//                     <label>Card Number: </label>
+//                     <input
+//                       type="text"
+//                       name="cardNumber"
+//                       value={debitCardDetails.cardNumber}
+//                       onChange={handleDebitCardChange}
+//                       required
+//                     />
+//                   </div>
+//                   <div className="form-group">
+//                     <label>Expiry Date(MM/YY):</label>
+//                     <input
+//                       type="text"
+//                       name="expiryDate"
+//                       value={debitCardDetails.expiryDate}
+//                       onChange={handleDebitCardChange}
+//                       required
+//                     />
+//                   </div>
+//                   <div className="form-group">
+//                     <label>CVV Number:</label>
+//                     <input
+//                       type="password"
+//                       name="cvv"
+//                       value={debitCardDetails.cvv}
+//                       onChange={handleDebitCardChange}
+//                       required
+//                     />
+//                   </div>
+//                   <div className="form-group">
+//                     <label>Card Holder Name:</label>
+//                     <input
+//                       type="text"
+//                       name="cardHolderName"
+//                       value={debitCardDetails.cardHolderName}
+//                       onChange={handleDebitCardChange}
+//                       required
+//                     />
+//                   </div>
+//                 </div>
+//               )}
+//               {paymentMethod === 'check' && (
+//                 <div className="debit-card-form">
+//                   <h4>Check Details: </h4>
+//                   <div className="form-group">
+//                     <label>Check Number:</label>
+//                     <input
+//                       type="text"
+//                       name="checkNumber"
+//                       value={checkDetails.checkNumber}
+//                       onChange={handleCheckDetailsChange}
+//                       required
+//                     />
+//                   </div>
+//                   <div className="form-group">
+//                     <label>Bank Name:</label>
+//                     <input
+//                       type="text"
+//                       name="bankName"
+//                       value={checkDetails.bankName}
+//                       onChange={handleCheckDetailsChange}
+//                       required
+//                     />
+//                   </div>
+//                 </div>
+//               )}
+//             </div>
+//           </div>
+//           <div className="proceed-to-payment">
+//             <h3 style={{ width: '100%' }}>Your Cart Items:</h3>
+//             {cartItems.length === 0 ? (
+//               <p>Your cart is empty.</p>
+//             ) : (
+//               <ul className="items-bg">
+//                 {cartItems.map((item, index) => (
+//                   <li className="cart-items" key={index}>
+//                     {index + 1} {item.productName} - {item.price}
+//                   </li>
+//                 ))}
+//               </ul>
+//             )}
+//             <button className="confirm-btn" onClick={handleProceedToPayment}>
+//               Confirm to Checkout
+//             </button>
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default Checkout;
+
+import { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import axios from 'axios';
-import { useSnackbar } from 'notistack'; // Import useSnackbar
-import { resetCart } from '../../store/cartSlice';
-import './Checkout.css';
+import { useNavigate } from 'react-router-dom';
+import { loadStripe } from '@stripe/stripe-js';
+
+const stripePromise = loadStripe(
+  'pk_test_51Q9ZJ7HC7NaQVzOSxGKAaAL81sfBbYcMofntt5O1buXa3gOOuujbGc5IWv0eaXi0Uk5kRWmJz6YOpZpE8o1d3aGb00SMK4ehJL'
+);
+
 const Checkout = () => {
-  const cartItems = useSelector((state) => state.cart.cartItems);
   const [addresses, setAddresses] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState('');
-  const [debitCardDetails, setDebitCardDetails] = useState({
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
-    cardHolderName: '',
-  });
-  const [checkDetails, setCheckDetails] = useState({
-    checkNumber: '',
-    bankName: '',
-  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const cartItems = useSelector((state) => state.cart.cartItems);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { enqueueSnackbar } = useSnackbar(); // Use snackbar
 
-  const totalPrice = cartItems
-    .reduce((total, item) => {
-      const price = parseFloat(item.price.replace('$', ''));
-      return total + price;
-    }, 0)
-    .toFixed(2); // Calculate total price
+  // Calculate total price
+  const totalPrice = cartItems.reduce(
+    (total, item) =>
+      total + parseFloat(item.price.replace('$', '')) * item.quantity,
+    0
+  );
 
   useEffect(() => {
-    const fetchAddresses = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3002/addresses', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setAddresses(response.data);
-
-        // Automatically select the primary address if available
-        const primaryAddress = response.data.find(
-          (address) => address.isPrimary
-        );
-        if (primaryAddress) {
-          setSelectedAddress(primaryAddress);
-        } else if (response.data.length > 0) {
-          setSelectedAddress(response.data[0]); // Default to the first address
-        }
-      } catch (err) {
-        enqueueSnackbar('Failed to fetch addresses', { variant: 'error' });
-      }
-    };
-
     fetchAddresses();
   }, []);
 
-  if (!addresses.length) {
-    navigate('/my-address'); // Redirect to add address if no addresses
-  } else if (!selectedAddress) {
-    enqueueSnackbar('Please select an address to proceed.', {
-      variant: 'warning',
-    });
-  } else if (!paymentMethod) {
-    enqueueSnackbar('Please select a payment method.', { variant: 'warning' });
-  } else if (paymentMethod === 'debit card' && !validateDebitCard()) {
-    enqueueSnackbar('Please enter valid debit card details.', {
-      variant: 'warning',
-    });
-  } else if (paymentMethod === 'check' && !validateCheckDetails()) {
-    enqueueSnackbar('Please enter valid check details.', {
-      variant: 'warning',
-    });
-  }
-
-  const handleProceedToPayment = async () => {
+  const fetchAddresses = async () => {
     try {
       const token = localStorage.getItem('token');
-      const orderData = {
-        items: cartItems,
-        total: totalPrice,
-        address: selectedAddress,
-        paymentMethod,
-        ...(paymentMethod === 'debit card' && { debitCardDetails }),
-        ...(paymentMethod === 'check' && { checkDetails }),
-      };
-
-      // Store the order
-      await axios.post('http://localhost:3002/orders', orderData, {
+      const response = await axios.get('http://localhost:3002/addresses', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      enqueueSnackbar('Order successfully created', { variant: 'success' });
-      // navigate('/my-orders');
-      navigate('/payment');
-      dispatch(resetCart());
-    } catch (error) {
-      // enqueueSnackbar('Error while creating order', { variant: 'error' });
+      setAddresses(response.data);
+      // Set primary address as selected by default
+      const primaryAddress = response.data.find((addr) => addr.isPrimary);
+      setSelectedAddress(primaryAddress || response.data[0]);
+      setError(null);
+    } catch (err) {
+      setError('Failed to fetch addresses');
+      console.error('Error fetching addresses:', err);
+    } finally {
+      setLoading(false);
     }
-    const token = localStorage.getItem('token');
+  };
 
-    if (token) {
-      navigate('/payment');
+  const handleAddressChange = (address) => {
+    setSelectedAddress(address);
+  };
+
+  const handleProceedToPayment = async () => {
+    if (!selectedAddress) {
+      setError('Please select a delivery address');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const token = localStorage.getItem('token');
+
+      // Create a line items array for Stripe
+      const lineItems = cartItems.map((item) => ({
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: item.productName,
+            description: item.description,
+          },
+          unit_amount: Math.round(
+            parseFloat(item.price.replace('$', '')) * 100
+          ), // Convert to cents
+        },
+        quantity: item.quantity,
+      }));
+
+      // Create checkout session
+      const response = await axios.post(
+        'http://localhost:3002/create-checkout-session',
+        {
+          lineItems,
+          selectedAddress,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Redirect to Stripe checkout
+      const stripe = await stripePromise;
+      const { error } = await stripe.redirectToCheckout({
+        sessionId: response.data.id,
+      });
+
+      if (error) {
+        setError(error.message);
+      }
+    } catch (err) {
+      setError('Failed to process payment');
+      console.error('Error processing payment:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleDebitCardChange = (e) => {
-    setDebitCardDetails({
-      ...debitCardDetails,
-      [e.target.name]: e.target.value,
-    });
-  };
+  if (loading) {
+    return <div className="text-center py-8">Loading...</div>;
+  }
 
-  const handleCheckDetailsChange = (e) => {
-    setCheckDetails({
-      ...checkDetails,
-      [e.target.name]: e.target.value,
-    });
-  };
-
-  const validateDebitCard = () => {
-    const { cardNumber, expiryDate, cvv, cardHolderName } = debitCardDetails;
-    return cardNumber && expiryDate && cvv && cardHolderName;
-  };
-
-  const validateCheckDetails = () => {
-    const { checkNumber, bankName } = checkDetails;
-    return checkNumber && bankName;
-  };
+  if (cartItems.length === 0) {
+    navigate('/cart');
+    return null;
+  }
 
   return (
-    <div className="checkout-container">
-      <div className="checkout-bg-container">
-        <div className="checkout-card">
-          <div>
-            <h1 className="card-heading">Checkout:</h1>
-            <h2 className="total-price">Total Price: ${totalPrice}</h2>
-            <div className="shipping">
-              <h3>Your Address Details :</h3>
-              {addresses.length === 0 ? (
-                <p>
-                  No addresses found.{' '}
-                  <Link to="/my-address">Add an Address</Link>
-                </p>
-              ) : (
-                <div>
-                  <select
-                    className="address-info"
-                    value={selectedAddress ? selectedAddress._id : ''}
-                    onChange={(e) =>
-                      setSelectedAddress(
-                        addresses.find(
-                          (address) => address._id === e.target.value
-                        )
-                      )
-                    }
-                  >
-                    {addresses.map((address) => (
-                      <option key={address._id} value={address._id}>
-                        {address.addressLine1}, {address.city}, {address.state},{' '}
-                        {address.zipCode} {address.isPrimary && '(Primary)'}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+    <div className="max-w-6xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-6">Checkout</h1>
+
+      {error && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          {error}
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Left Column - Delivery Address */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Delivery Address</h2>
+
+          {addresses.length === 0 ? (
+            <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+              No addresses found. Please add a delivery address.
+              <button
+                onClick={() => navigate('/my-addresses')}
+                className="block mt-2 text-blue-500 hover:text-blue-600"
+              >
+                Add Address
+              </button>
             </div>
-            <div className="pay-options">
-              <h3>Payment Options :</h3>
-              <ul>
-                <li className="payment-type">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="debit card"
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  />
-                  Debit Card
-                </li>
-                <li className="payment-type">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="check"
-                    onChange={(e) => setPaymentMethod(e.target.value)}
-                  />
-                  Check
-                </li>
-              </ul>
-              {paymentMethod === 'debit card' && (
-                <div className="debit-card-form">
-                  <h4>Debit Card Details:</h4>
-                  <div className="form-group">
-                    <label>Card Number: </label>
+          ) : (
+            <div className="space-y-4">
+              {addresses.map((address) => (
+                <div
+                  key={address._id}
+                  className={`border rounded-lg p-4 cursor-pointer ${
+                    selectedAddress?._id === address._id
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-blue-300'
+                  }`}
+                  onClick={() => handleAddressChange(address)}
+                >
+                  <div className="flex items-start">
                     <input
-                      type="text"
-                      name="cardNumber"
-                      value={debitCardDetails.cardNumber}
-                      onChange={handleDebitCardChange}
-                      required
+                      type="radio"
+                      name="address"
+                      checked={selectedAddress?._id === address._id}
+                      onChange={() => handleAddressChange(address)}
+                      className="mt-1 mr-3"
                     />
-                  </div>
-                  <div className="form-group">
-                    <label>Expiry Date(MM/YY):</label>
-                    <input
-                      type="text"
-                      name="expiryDate"
-                      value={debitCardDetails.expiryDate}
-                      onChange={handleDebitCardChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>CVV Number:</label>
-                    <input
-                      type="password"
-                      name="cvv"
-                      value={debitCardDetails.cvv}
-                      onChange={handleDebitCardChange}
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label>Card Holder Name:</label>
-                    <input
-                      type="text"
-                      name="cardHolderName"
-                      value={debitCardDetails.cardHolderName}
-                      onChange={handleDebitCardChange}
-                      required
-                    />
+                    <div>
+                      <p className="font-semibold">{address.addressLine1}</p>
+                      {address.addressLine2 && <p>{address.addressLine2}</p>}
+                      <p>{`${address.city}, ${address.state} ${address.zipCode}`}</p>
+                      {address.isPrimary && (
+                        <span className="inline-block mt-1 text-sm text-blue-600">
+                          Primary Address
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </div>
-              )}
-              {paymentMethod === 'check' && (
-                <div className="debit-card-form">
-                  <h4>Check Details: </h4>
-                  <div className="form-group">
-                    <label>Check Number:</label>
-                    <input
-                      type="text"
-                      name="checkNumber"
-                      value={checkDetails.checkNumber}
-                      onChange={handleCheckDetailsChange}
-                      required
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Right Column - Order Summary */}
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="space-y-4">
+              {cartItems.map((item) => (
+                <div
+                  key={item.productId}
+                  className="flex items-center justify-between"
+                >
+                  <div className="flex items-center">
+                    <img
+                      src={item.image}
+                      alt={item.productName}
+                      className="w-16 h-16 object-cover rounded"
                     />
+                    <div className="ml-4">
+                      <p className="font-semibold">{item.productName}</p>
+                      <p className="text-sm text-gray-600">
+                        Quantity: {item.quantity}
+                      </p>
+                    </div>
                   </div>
-                  <div className="form-group">
-                    <label>Bank Name:</label>
-                    <input
-                      type="text"
-                      name="bankName"
-                      value={checkDetails.bankName}
-                      onChange={handleCheckDetailsChange}
-                      required
-                    />
-                  </div>
+                  <p className="font-semibold">
+                    $
+                    {(
+                      parseFloat(item.price.replace('$', '')) * item.quantity
+                    ).toFixed(2)}
+                  </p>
                 </div>
-              )}
+              ))}
+
+              <div className="border-t pt-4 mt-4">
+                <div className="flex justify-between items-center font-semibold text-lg">
+                  <span>Total</span>
+                  <span>${totalPrice.toFixed(2)}</span>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="proceed-to-payment">
-            <h3 style={{ width: '100%' }}>Your Cart Items:</h3>
-            {cartItems.length === 0 ? (
-              <p>Your cart is empty.</p>
-            ) : (
-              <ul className="items-bg">
-                {cartItems.map((item, index) => (
-                  <li className="cart-items" key={index}>
-                    {index + 1} {item.productName} - {item.price}
-                  </li>
-                ))}
-              </ul>
-            )}
-            <button className="confirm-btn" onClick={handleProceedToPayment}>
-              Confirm to Checkout
-            </button>
-          </div>
+
+          <button
+            onClick={handleProceedToPayment}
+            disabled={loading || !selectedAddress}
+            className={`w-full mt-6 py-3 px-4 text-white font-semibold rounded-lg ${
+              loading || !selectedAddress
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-500 hover:bg-blue-600'
+            }`}
+          >
+            {loading ? 'Processing...' : 'Proceed to Payment'}
+          </button>
         </div>
       </div>
     </div>

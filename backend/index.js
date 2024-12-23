@@ -30,28 +30,100 @@ const stripe = Stripe(
   "sk_test_51Q9ZJ7HC7NaQVzOS1SMqmgTvtTKQOgMSp0BlgI7gUCJTsSTRQw4vOvgFWC8WsDAuDwALyyu59DxfsIOGb3z3isJR005xoAmBGN"
 );
 
-app.post("/create-checkout-session", async (req, res) => {
-  const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
-    line_items: [
-      {
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: "Your Product Name",
-          },
-          unit_amount: 1000, // amount in cents
-        },
-        quantity: 2,
-      },
-    ],
-    mode: "payment",
-    success_url: "http://localhost:5173/my-orders",
-    cancel_url: "http://localhost:5173/",
-  });
+app.post("/create-checkout-session", authenticateToken, async (req, res) => {
+  try {
+    const { lineItems, selectedAddress } = req.body;
 
-  res.json({ id: session.id });
+    // Create Stripe checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: lineItems,
+      mode: "payment",
+      success_url: "http://localhost:5173/my-orders",
+      cancel_url: "http://localhost:5173/checkout",
+      metadata: {
+        userId: req.user.id,
+        addressId: selectedAddress._id,
+        address: JSON.stringify({
+          addressLine1: selectedAddress.addressLine1,
+          addressLine2: selectedAddress.addressLine2,
+          city: selectedAddress.city,
+          state: selectedAddress.state,
+          zipCode: selectedAddress.zipCode,
+        }),
+      },
+    });
+
+    res.json({ id: session.id });
+  } catch (error) {
+    console.error("Error creating checkout session:", error);
+    res.status(500).json({ error: "Failed to create checkout session" });
+  }
 });
+
+// Add this to your backend server file
+const endpointSecret = "your_stripe_webhook_secret"; // Replace with your webhook secret
+
+app.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  async (request, response) => {
+    const sig = request.headers["stripe-signature"];
+
+    let event;
+
+    try {
+      event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+    } catch (err) {
+      response.status(400).send(`Webhook Error: ${err.message}`);
+      return;
+    }
+
+    // Handle the checkout.session.completed event
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object;
+
+      try {
+        // Get user details from metadata
+        const { userId, addressId, address } = session.metadata;
+        const parsedAddress = JSON.parse(address);
+
+        // Get line items from Stripe
+        const lineItems = await stripe.checkout.sessions.listLineItems(
+          session.id
+        );
+
+        // Create new order
+        const newOrder = new OrderModel({
+          userId,
+          items: lineItems.data.map((item) => ({
+            productId: item.price.product,
+            productName: item.description,
+            quantity: item.quantity,
+            price: (item.amount_total / 100).toFixed(2), // Convert from cents to dollars
+          })),
+          total: (session.amount_total / 100).toFixed(2),
+          status: "confirmed",
+          paymentId: session.payment_intent,
+          address: parsedAddress,
+          paymentMethod: "stripe",
+          createdAt: new Date(),
+        });
+
+        await newOrder.save();
+
+        // Clear user's cart after successful order
+        await CartModel.deleteMany({ userId });
+      } catch (error) {
+        console.error("Error processing order:", error);
+        response.status(500).send("Error processing order");
+        return;
+      }
+    }
+
+    response.send();
+  }
+);
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -282,13 +354,6 @@ app.get("/orders", authenticateToken, async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Error fetching orders" });
   }
-});
-
-app.delete("/addresses/:id", authenticateToken, (req, res) => {
-  const addressId = req.params.id;
-  AddressModel.findByIdAndDelete(addressId)
-    .then(() => res.status(204).send())
-    .catch((err) => res.status(500).json({ message: "Internal server error" }));
 });
 
 app.put("/user", authenticateToken, (req, res) => {

@@ -287,7 +287,7 @@ const MyAddress = () => {
       setEditingAddress(null);
       setError(null);
     } catch (err) {
-      setError('Failed to save address');
+      setError(err.response?.data?.message || 'Failed to save address');
       console.error('Error saving address:', err);
     } finally {
       setLoading(false);
