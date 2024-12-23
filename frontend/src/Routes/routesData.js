@@ -31,7 +31,6 @@ const StripePayment = React.lazy(() =>
 );
 const Logout = React.lazy(() => import('../components/Logout/Logout.jsx'));
 
-
 import {
   productsData,
   solutionsData,
@@ -104,10 +103,14 @@ export const privateRoutes = [
   },
   {
     path: '/payment',
-    element: PlaceOrder
+    element: PlaceOrder,
   },
   {
-    path: "/stripePayment",
-    element: StripePayment
-  }
+    path: '/stripePayment',
+    element: StripePayment,
+  },
+  {
+    path: '/my-address',
+    element: MyAddress,
+  },
 ];

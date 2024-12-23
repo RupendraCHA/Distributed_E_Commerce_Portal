@@ -23,7 +23,6 @@ const ProductList = ({ productList, title }) => {
   const [sapData, setSapData] = useState({});
 
   const handleAddToCart = async (product) => {
-    console.log('Product added to cart:', product);
     const token = localStorage.getItem('token');
     const productWithQuantity = { ...product, quantity: 1 };
     dispatch(addToCart(productWithQuantity));
@@ -36,11 +35,12 @@ const ProductList = ({ productList, title }) => {
         }
       );
 
-      if (response.status === 201) {
+      if (response.status === 201 || response.status === 200) {
         enqueueSnackbar('Product successfully added to server cart!', {
           variant: 'success',
         });
       } else {
+        console.error('Failed to sync with the server.', response.status);
         enqueueSnackbar('Failed to sync with the server.', {
           variant: 'warning',
         });

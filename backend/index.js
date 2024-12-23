@@ -6,6 +6,7 @@ const {
   AddressModel,
   OrderModel,
   CartModel,
+  SavedItemModel,
 } = require("./Models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
