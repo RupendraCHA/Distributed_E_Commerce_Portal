@@ -149,93 +149,6 @@ const Cart = () => {
   }
 
   return (
-    // <div className="cart-container">
-    //   <h1 className="yourCart">Your Cart</h1>
-
-    //   {error && <div className="error-message alert alert-danger">{error}</div>}
-
-    //   {cartItems.length === 0 ? (
-    //     <div className="empty-cart">
-    //       <p>Your cart is empty.</p>
-    //       <button
-    //         className="btn btn-primary"
-    //         onClick={() => navigate('/products')}
-    //       >
-    //         Continue Shopping
-    //       </button>
-    //     </div>
-    //   ) : (
-    //     <>
-    //       <ul className="cart-items">
-    //         {cartItems.map((item) => (
-    //           <li key={item.productId} className="cart-item">
-    //             <img
-    //               src={item.image}
-    //               alt={item.productName}
-    //               className="cart-item-image"
-    //             />
-    //             <div className="cart-item-details">
-    //               <h2>{item.productName}</h2>
-    //               <p>
-    //                 <strong>Description:</strong> {item.description}
-    //               </p>
-    //               <p>
-    //                 <strong>Price:</strong> {item.price}
-    //               </p>
-    //               <div className="quantity-controls">
-    //                 <button
-    //                   onClick={() =>
-    //                     dispatch(
-    //                       updateQuantity({
-    //                         productId: item.productId,
-    //                         quantity: item.quantity - 1,
-    //                       })
-    //                     )
-    //                   }
-    //                   disabled={item.quantity <= 1}
-    //                 >
-    //                   -
-    //                 </button>
-    //                 <span> {item.quantity} </span>
-    //                 <button
-    //                   onClick={() =>
-    //                     dispatch(
-    //                       updateQuantity({
-    //                         productId: item.productId,
-    //                         quantity: item.quantity + 1,
-    //                       })
-    //                     )
-    //                   }
-    //                 >
-    //                   +
-    //                 </button>
-    //                 <button
-    //                   onClick={() => handleRemoveItem(item.productId)}
-    //                   className="btn btn-danger remove-btn"
-    //                   disabled={loading}
-    //                 >
-    //                   Remove
-    //                 </button>
-    //               </div>
-    //             </div>
-    //           </li>
-    //         ))}
-    //       </ul>
-    //       <div className="cart-summary">
-    //         <div className="total-price">
-    //           <h3>Total Price: ${totalPrice.toFixed(2)}</h3>
-    //         </div>
-    //         <button
-    //           className="btn btn-primary checkout-btn"
-    //           onClick={handleContinueToPayment}
-    //           disabled={loading}
-    //         >
-    //           Proceed to Checkout
-    //         </button>
-    //       </div>
-    //     </>
-    //   )}
-    // </div>
     <div className="cart-container">
       <h1 className="yourCart">Your Cart</h1>
       {error && <div className="error-message alert alert-danger">{error}</div>}
@@ -385,6 +298,21 @@ const Cart = () => {
             ))}
           </ul>
 
+          {cartItems.length > 0 && (
+            <div className="cart-summary">
+              <div className="total-price">
+                <h3>Total Price: ${totalPrice.toFixed(2)}</h3>
+              </div>
+              <button
+                className="btn btn-primary checkout-btn"
+                onClick={handleContinueToPayment}
+                disabled={loading}
+              >
+                Proceed to Checkout
+              </button>
+            </div>
+          )}
+
           {savedItems.length > 0 && (
             <div className="saved-items-section">
               <h2>Saved for Later</h2>
@@ -412,21 +340,6 @@ const Cart = () => {
                   </li>
                 ))}
               </ul>
-            </div>
-          )}
-
-          {cartItems.length > 0 && (
-            <div className="cart-summary">
-              <div className="total-price">
-                <h3>Total Price: ${totalPrice.toFixed(2)}</h3>
-              </div>
-              <button
-                className="btn btn-primary checkout-btn"
-                onClick={handleContinueToPayment}
-                disabled={loading}
-              >
-                Proceed to Checkout
-              </button>
             </div>
           )}
         </>
