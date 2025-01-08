@@ -10,6 +10,7 @@ const {
 } = require("./Models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const isAdmin = require("./authentication");
 const authenticateToken = require("./authentication");
 const app = express();
 app.use(express.json());
@@ -29,6 +30,81 @@ const Stripe = require("stripe");
 const stripe = Stripe(
   "sk_test_51Q9ZJ7HC7NaQVzOS1SMqmgTvtTKQOgMSp0BlgI7gUCJTsSTRQw4vOvgFWC8WsDAuDwALyyu59DxfsIOGb3z3isJR005xoAmBGN"
 );
+
+app.get("/admin/users", authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const users = await EmployeeModel.find({}, "-password");
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching users" });
+  }
+});
+
+// Update user role
+app.put(
+  "/admin/users/:userId/role",
+  authenticateToken,
+  isAdmin,
+  async (req, res) => {
+    try {
+      const { role } = req.body;
+      const user = await EmployeeModel.findByIdAndUpdate(
+        req.params.userId,
+        { role },
+        { new: true, select: "-password" }
+      );
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Error updating user role" });
+    }
+  }
+);
+
+// Get dashboard stats
+app.get("/admin/dashboard", authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const [totalUsers, totalOrders, recentOrders, userStats] =
+      await Promise.all([
+        EmployeeModel.countDocuments(),
+        OrderModel.countDocuments(),
+        OrderModel.find().sort({ createdAt: -1 }).limit(5),
+        EmployeeModel.aggregate([
+          {
+            $group: {
+              _id: "$role",
+              count: { $sum: 1 },
+            },
+          },
+        ]),
+      ]);
+
+    res.json({
+      totalUsers,
+      totalOrders,
+      recentOrders,
+      userStats,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching dashboard data" });
+  }
+});
+
+// Get all orders (admin view)
+app.get("/admin/orders", authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const orders = await OrderModel.find()
+      .sort({ createdAt: -1 })
+      .populate("userId", "name email");
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching orders" });
+  }
+});
 
 app.post("/create-checkout-session", authenticateToken, async (req, res) => {
   try {
@@ -140,10 +216,19 @@ app.post("/login", async (req, res) => {
       return res.status(401).json({ error: "Password is incorrect." });
     }
 
-    const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
-      expiresIn: "4h",
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role },
+      JWT_SECRET,
+      {
+        expiresIn: "4h",
+      }
+    );
+    return res.json({
+      message: "Success",
+      token,
+      role: user.role,
+      name: user.name,
     });
-    return res.json({ message: "Success", token });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: "Internal server error" });

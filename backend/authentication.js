@@ -22,3 +22,21 @@ const authenticateToken = (req, res, next) => {
 };
 
 module.exports = authenticateToken;
+
+const isAdmin = async (req, res, next) => {
+  try {
+    const user = await EmployeeModel.findById(req.user.id);
+
+    if (!user || user.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Access denied. Admin rights required." });
+    }
+
+    next();
+  } catch (error) {
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+module.exports = isAdmin;

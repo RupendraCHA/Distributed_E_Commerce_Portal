@@ -31,6 +31,23 @@ const StripePayment = React.lazy(() =>
 );
 const Logout = React.lazy(() => import('../components/Logout/Logout.jsx'));
 
+// Admin Routes
+const AdminDashboard = React.lazy(() =>
+  import('../components/Admin/AdminDashboard.jsx')
+);
+// const UserManagement = React.lazy(() =>
+//   import('../components/Admin/UserManagement.jsx')
+// );
+// const OrderManagement = React.lazy(() =>
+//   import('../components/Admin/OrderManagement.jsx')
+// );
+// const ProductManagement = React.lazy(() =>
+//   import('../components/Admin/ProductManagement.jsx')
+// );
+// const CategoryManagement = React.lazy(() =>
+//   import('../components/Admin/CategoryManagement.jsx')
+// );
+
 import {
   productsData,
   solutionsData,
@@ -114,3 +131,55 @@ export const privateRoutes = [
     element: MyAddress,
   },
 ];
+
+export const adminRoutes = [
+  {
+    path: '/admin',
+    element: AdminDashboard,
+  },
+  // {
+  //   path: '/admin/users',
+  //   element: UserManagement,
+  // },
+  // {
+  //   path: '/admin/orders',
+  //   element: OrderManagement,
+  // },
+  // {
+  //   path: '/admin/products',
+  //   element: ProductManagement,
+  // },
+  // {
+  //   path: '/admin/categories',
+  //   element: CategoryManagement,
+  // },
+];
+
+// Admin section data
+export const adminSectionsData = {
+  dashboard: {
+    title: 'Dashboard',
+    path: '/admin',
+    icon: 'dashboard',
+  },
+  // users: {
+  //   title: 'User Management',
+  //   path: '/admin/users',
+  //   icon: 'users',
+  // },
+  // orders: {
+  //   title: 'Order Management',
+  //   path: '/admin/orders',
+  //   icon: 'shopping-cart',
+  // },
+  // products: {
+  //   title: 'Product Management',
+  //   path: '/admin/products',
+  //   icon: 'box',
+  // },
+  // categories: {
+  //   title: 'Category Management',
+  //   path: '/admin/categories',
+  //   icon: 'folder',
+  // },
+};
