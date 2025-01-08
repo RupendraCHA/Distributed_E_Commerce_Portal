@@ -58,8 +58,8 @@ function Login() {
             };
 
             // Dispatch both token and user data
-            dispatch(setToken(response.data.token));
             dispatch(login(user));
+            dispatch(setToken(response.data.token));
 
             navigate('/');
           } else {

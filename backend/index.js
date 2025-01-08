@@ -10,8 +10,8 @@ const {
 } = require("./Models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const isAdmin = require("./authentication");
-const authenticateToken = require("./authentication");
+const { isAdmin } = require("./authentication");
+const { authenticateToken } = require("./authentication");
 const app = express();
 app.use(express.json());
 app.use(
@@ -479,10 +479,12 @@ app.get("/savedItems", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const savedItems = await SavedItemModel.find({ userId });
-    res.json({ savedItems });
+    console.log(savedItems);
+    return res.json({ savedItems });
   } catch (error) {
+    console.log("why am i getting this error");
     console.error("Error fetching saved items:", error);
-    res.status(500).json({ error: "Internal server error" });
+    return res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -685,6 +687,10 @@ app.get("/cart", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id; // Extract user ID from the token
     // Fetch all cart items for the user
+
+    if (!userId) {
+      return res.status(401).json({ message: "User not authenticated" });
+    }
     const cartItems = await CartModel.find({ userId });
     if (!cartItems || cartItems.length === 0) {
       return res.status(404).json({ message: "No items in the cart" });
@@ -693,10 +699,10 @@ app.get("/cart", authenticateToken, async (req, res) => {
     res.json({ cartItems });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: "Internal server error" });
+    returnres.status(500).json({ message: "Internal server error", error });
   }
 });
 
 app.listen(3002, () => {
-  console.log("3002 Server is running");
+  console.log("Server is running, http://localhost:3002");
 });

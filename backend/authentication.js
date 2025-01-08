@@ -21,8 +21,6 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-module.exports = authenticateToken;
-
 const isAdmin = async (req, res, next) => {
   try {
     const user = await EmployeeModel.findById(req.user.id);
@@ -39,4 +37,4 @@ const isAdmin = async (req, res, next) => {
   }
 };
 
-module.exports = isAdmin;
+module.exports = { authenticateToken, isAdmin };
