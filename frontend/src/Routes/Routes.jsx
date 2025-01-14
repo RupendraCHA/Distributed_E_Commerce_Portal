@@ -8,6 +8,7 @@ import {
   pirvateSections,
   Products,
   adminRoutes,
+  distributorRoutes,
 } from './routesData.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Footer from '../components/Footer/Footer';
@@ -15,7 +16,7 @@ import Header from '../components/Header/Header';
 import './routes.css';
 
 // Protected Route Component
-const ProtectedRoute = ({ children, requireAdmin }) => {
+const ProtectedRoute = ({ children, requireAdmin, requireDistributor }) => {
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const userRole = useSelector((state) => state.auth.user?.role);
 
@@ -24,6 +25,10 @@ const ProtectedRoute = ({ children, requireAdmin }) => {
   }
 
   if (requireAdmin && userRole !== 'admin') {
+    return <Navigate to="/" replace />;
+  }
+
+  if (requireDistributor && userRole !== 'distributor') {
     return <Navigate to="/" replace />;
   }
 
@@ -100,6 +105,20 @@ function RoutesComponent() {
                         }
                       />
                     ))}
+
+                  {/* Distributor Routes */}
+                  {userRole === 'distributor' &&
+                    distributorRoutes.map(({ path, element: Element }) => (
+                      <Route
+                        key={path}
+                        path={path}
+                        element={
+                          <ProtectedRoute requireDistributor>
+                            <Element />
+                          </ProtectedRoute>
+                        }
+                      />
+                    ))}
                 </>
               )}
 
@@ -111,40 +130,6 @@ function RoutesComponent() {
         <Footer />
       </div>
     </BrowserRouter>
-    // <BrowserRouter>
-    //   <div className="app-container">
-    //     <Header />
-    //     <Suspense fallback={<div>Loading...</div>}>
-    //       <main className="main-content">
-    //         <Routes>
-    //           {publicRoutes.map(({ path, element: Element }) => (
-    //             <Route key={path} path={path} element={<Element />} />
-    //           ))}
-    //           {isLoggedIn && (
-    //             <>
-    //               {privateRoutes.map(({ path, element: Element }) => (
-    //                 <Route key={path} path={path} element={<Element />} />
-    //               ))}
-    //               {pirvateSections.map(({ path, data, section }) => (
-    //                 <Route
-    //                   key={path}
-    //                   path={path}
-    //                   element={
-    //                     <Products
-    //                       iterationData={data}
-    //                       currentSection={section}
-    //                     />
-    //                   }
-    //                 />
-    //               ))}
-    //             </>
-    //           )}
-    //         </Routes>
-    //       </main>
-    //     </Suspense>
-    //     <Footer />
-    //   </div>
-    // </BrowserRouter>
   );
 }
 
@@ -153,4 +138,5 @@ export default RoutesComponent;
 ProtectedRoute.propTypes = {
   children: PropTypes.node.isRequired,
   requireAdmin: PropTypes.bool,
+  requireDistributor: PropTypes.bool,
 };

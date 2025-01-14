@@ -7,6 +7,7 @@ const {
   OrderModel,
   CartModel,
   SavedItemModel,
+  DistributorModel,
 } = require("./Models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
@@ -462,13 +463,23 @@ app.put("/user", authenticateToken, (req, res) => {
     });
 });
 
-app.post("/register", (req, res) => {
+app.post("/register", async (req, res) => {
   console.log(req.body);
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
+  const existingUser = await EmployeeModel.findOne({ email });
+  if (existingUser) {
+    return res.status(400).json({ message: "User already exists" });
+  }
+
   bcrypt
     .hash(password, 10)
     .then((hash) => {
-      EmployeeModel.create({ name, email, password: hash })
+      EmployeeModel.create({
+        name,
+        email,
+        password: hash,
+        role: role || "user",
+      })
         .then((employees) => res.json(employees))
         .catch((err) => res.json(err));
     })
@@ -702,6 +713,213 @@ app.get("/cart", authenticateToken, async (req, res) => {
     returnres.status(500).json({ message: "Internal server error", error });
   }
 });
+
+// Create new distributor profile
+app.post("/distributor/register", authenticateToken, async (req, res) => {
+  try {
+    const { companyName, contactPerson, warehouse } = req.body;
+
+    // Check if user is a distributor
+    if (req.user.role !== "distributor") {
+      return res
+        .status(403)
+        .json({ message: "Access denied. Distributor role required." });
+    }
+
+    // Generate unique distributor ID
+    const distributorId = await DistributorModel.generateDistributorId();
+
+    // Create new distributor
+    const distributor = new DistributorModel({
+      userId: req.user.id,
+      distributorId,
+      companyName,
+      contactPerson,
+      warehouses: [{ ...warehouse, isPrimary: true }],
+    });
+
+    await distributor.save();
+    res.status(201).json(distributor);
+  } catch (error) {
+    console.error("Error creating distributor:", error);
+    res.status(500).json({ message: "Failed to create distributor profile" });
+  }
+});
+
+// Add warehouse
+app.post("/distributor/warehouses", authenticateToken, async (req, res) => {
+  try {
+    const distributor = await DistributorModel.findOne({ userId: req.user.id });
+    if (!distributor) {
+      return res.status(404).json({ message: "Distributor not found" });
+    }
+
+    distributor.warehouses.push(req.body);
+    await distributor.save();
+    res.json(distributor.warehouses);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to add warehouse" });
+  }
+});
+
+// Update warehouse
+app.put(
+  "/distributor/warehouses/:warehouseId",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { warehouseId } = req.params;
+      const distributor = await DistributorModel.findOne({
+        userId: req.user.id,
+      });
+
+      if (!distributor) {
+        return res.status(404).json({ message: "Distributor not found" });
+      }
+
+      const warehouseIndex = distributor.warehouses.findIndex(
+        (w) => w._id.toString() === warehouseId
+      );
+
+      if (warehouseIndex === -1) {
+        return res.status(404).json({ message: "Warehouse not found" });
+      }
+
+      distributor.warehouses[warehouseIndex] = {
+        ...distributor.warehouses[warehouseIndex],
+        ...req.body,
+      };
+
+      await distributor.save();
+      res.json(distributor.warehouses[warehouseIndex]);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update warehouse" });
+    }
+  }
+);
+
+// Add product to warehouse inventory
+app.post(
+  "/distributor/warehouses/:warehouseId/inventory",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { warehouseId } = req.params;
+      const { productId, quantity } = req.body;
+
+      const distributor = await DistributorModel.findOne({
+        userId: req.user.id,
+      });
+      if (!distributor) {
+        return res.status(404).json({ message: "Distributor not found" });
+      }
+
+      const warehouse = distributor.warehouses.id(warehouseId);
+      if (!warehouse) {
+        return res.status(404).json({ message: "Warehouse not found" });
+      }
+
+      // Check if product already exists in inventory
+      const existingProduct = warehouse.inventory.find(
+        (item) => item.productId.toString() === productId
+      );
+
+      if (existingProduct) {
+        existingProduct.quantity += quantity;
+      } else {
+        warehouse.inventory.push({ productId, quantity });
+      }
+
+      await distributor.save();
+      res.json(warehouse.inventory);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update inventory" });
+    }
+  }
+);
+
+// Get distributor profile
+app.get("/distributor/profile", authenticateToken, async (req, res) => {
+  try {
+    const distributor = await DistributorModel.findOne({
+      userId: req.user.id,
+    }).populate("products.productId");
+
+    if (!distributor) {
+      return res.status(404).json({ message: "Distributor not found" });
+    }
+
+    res.json(distributor);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch distributor profile" });
+  }
+});
+
+// Add product to distributor catalog
+app.post("/distributor/products", authenticateToken, async (req, res) => {
+  try {
+    const { productId, price } = req.body;
+
+    const distributor = await DistributorModel.findOne({ userId: req.user.id });
+    if (!distributor) {
+      return res.status(404).json({ message: "Distributor not found" });
+    }
+
+    // Check if product already exists
+    const existingProduct = distributor.products.find(
+      (p) => p.productId.toString() === productId
+    );
+
+    if (existingProduct) {
+      existingProduct.price = price;
+      existingProduct.active = true;
+    } else {
+      distributor.products.push({ productId, price });
+    }
+
+    await distributor.save();
+    res.json(distributor.products);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to add product" });
+  }
+});
+
+// Update product price
+app.put(
+  "/distributor/products/:productId",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { productId } = req.params;
+      const { price, active } = req.body;
+
+      const distributor = await DistributorModel.findOne({
+        userId: req.user.id,
+      });
+      if (!distributor) {
+        return res.status(404).json({ message: "Distributor not found" });
+      }
+
+      const product = distributor.products.find(
+        (p) => p.productId.toString() === productId
+      );
+
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      product.price = price;
+      if (typeof active !== "undefined") {
+        product.active = active;
+      }
+
+      await distributor.save();
+      res.json(product);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to update product" });
+    }
+  }
+);
 
 app.listen(3002, () => {
   console.log("Server is running, http://localhost:3002");

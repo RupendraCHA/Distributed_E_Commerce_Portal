@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Public Routes
-import SignUp from '../components/SignIn/signUp.jsx';
+import SignUp from '../components/SignUp/signUp.jsx';
 // import Registration from '../components/Registration/Registration.jsx'
 import Login from '../components/Login/Login.jsx';
 import InitialPage from '../components/InitialPage/InitialPage.jsx';
@@ -35,18 +35,19 @@ const Logout = React.lazy(() => import('../components/Logout/Logout.jsx'));
 const AdminDashboard = React.lazy(() =>
   import('../components/Admin/AdminDashboard.jsx')
 );
-// const UserManagement = React.lazy(() =>
-//   import('../components/Admin/UserManagement.jsx')
-// );
-// const OrderManagement = React.lazy(() =>
-//   import('../components/Admin/OrderManagement.jsx')
-// );
-// const ProductManagement = React.lazy(() =>
-//   import('../components/Admin/ProductManagement.jsx')
-// );
-// const CategoryManagement = React.lazy(() =>
-//   import('../components/Admin/CategoryManagement.jsx')
-// );
+
+const DistributorDashboard = React.lazy(() =>
+  import('../components/Distributor/DistributorDashboard.jsx')
+);
+const DistributorRegistration = React.lazy(() =>
+  import('../components/Distributor/DistributorRegistration.jsx')
+);
+const WarehouseManagement = React.lazy(() =>
+  import('../components/Distributor/WarehouseManagement.jsx')
+);
+const InventoryManagement = React.lazy(() =>
+  import('../components/Distributor/InventoryManagement.jsx')
+);
 
 import {
   productsData,
@@ -182,4 +183,43 @@ export const adminSectionsData = {
   //   path: '/admin/categories',
   //   icon: 'folder',
   // },
+};
+
+// Add distributor routes
+export const distributorRoutes = [
+  {
+    path: '/distributor',
+    element: DistributorDashboard,
+  },
+  {
+    path: '/distributor/register',
+    element: DistributorRegistration,
+  },
+  {
+    path: '/distributor/warehouses',
+    element: WarehouseManagement,
+  },
+  {
+    path: '/distributor/inventory',
+    element: InventoryManagement,
+  },
+];
+
+// Add distributor sections data
+export const distributorSectionsData = {
+  dashboard: {
+    title: 'Dashboard',
+    path: '/distributor',
+    icon: 'dashboard',
+  },
+  warehouses: {
+    title: 'Warehouse Management',
+    path: '/distributor/warehouses',
+    icon: 'warehouse',
+  },
+  inventory: {
+    title: 'Inventory Management',
+    path: '/distributor/inventory',
+    icon: 'inventory',
+  },
 };

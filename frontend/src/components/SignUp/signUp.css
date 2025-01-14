@@ -3,6 +3,7 @@
   margin: 0;
   box-sizing: border-box;
 }
+
 /* .bg-container {
   background-image: url("https://res.cloudinary.com/dvxkeeeqs/image/upload/v1724952773/1520180926563_jadgvd.jpg");
   min-height: 100vh;
@@ -17,6 +18,7 @@
   margin: 0;
   box-sizing: border-box;
 }
+
 .bg-container-signup {
   /* background-color: #2525ae91; */
   min-height: 100vh;
@@ -30,10 +32,12 @@
     width: 25%;
   }
 }
+
 .register-user-input {
   font-weight: 500;
   padding-left: 10px;
 }
+
 .checkbox-container {
   display: flex;
   justify-content: flex-start;
@@ -41,12 +45,42 @@
   margin-top: 10px;
   margin-bottom: 10px;
 }
+
 .checkbox {
   width: 15px;
   height: 15px;
   margin-right: 8px;
 }
+
 .checkbox-container p {
   margin: 0;
 }
 
+.register-user-input {
+  background-color: transparent !important;
+  border: none !important;
+  padding: 8px !important;
+  width: 100% !important;
+  font-size: 16px !important;
+}
+
+select.register-user-input {
+  appearance: auto !important;
+  cursor: pointer;
+}
+
+select.register-user-input option {
+  background-color: white;
+  color: black;
+  padding: 8px;
+}
+
+select.register-user-input:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Add hover effect */
+select.register-user-input option:hover {
+  background-color: #f0f0f0;
+}
