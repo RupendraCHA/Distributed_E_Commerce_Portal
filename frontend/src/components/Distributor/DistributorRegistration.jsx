@@ -74,7 +74,7 @@ const DistributorRegistration = () => {
     }
     if (!formData.warehouse.zipCode.trim()) {
       newErrors['warehouse.zipCode'] = 'ZIP code is required';
-    } else if (!/^\d{6}$/.test(formData.warehouse.zipCode)) {
+    } else if (!/^\d{5}$/.test(formData.warehouse.zipCode)) {
       newErrors['warehouse.zipCode'] = 'Invalid ZIP code';
     }
 
@@ -475,8 +475,9 @@ const DistributorRegistration = () => {
                     name="warehouse.zipCode"
                     value={formData.warehouse.zipCode}
                     onChange={handleInputChange}
-                    placeholder="6-digit PIN code"
-                    maxLength="6"
+                    placeholder="5-digit PIN code"
+                    maxLength="5"
+                    minLength="5"
                     className={`mt-1 block w-full rounded-md shadow-sm border-gray-300 
                       focus:border-blue-500 focus:ring-blue-500 ${
                         errors['warehouse.zipCode'] ? 'border-red-500' : ''

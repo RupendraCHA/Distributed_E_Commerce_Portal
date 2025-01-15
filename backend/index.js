@@ -762,6 +762,37 @@ app.post("/distributor/warehouses", authenticateToken, async (req, res) => {
   }
 });
 
+// Delete warehouse
+app.delete(
+  "/distributor/warehouses/:warehouseId",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { warehouseId } = req.params;
+      const distributor = await DistributorModel.findOne({
+        userId: req.user.id,
+      });
+
+      if (!distributor) {
+        return res.status(404).json({ message: "Distributor not found" });
+      }
+
+      const warehouse = distributor.warehouses.findByIdAndDelete(
+        { _id: warehouseId },
+        { new: true }
+      );
+
+      if (!warehouse) {
+        return res.status(404).json({ message: "Warehouse not found" });
+      }
+
+      res.json(warehouse);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete warehouse" });
+    }
+  }
+);
+
 // Update warehouse
 app.put(
   "/distributor/warehouses/:warehouseId",
