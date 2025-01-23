@@ -24,6 +24,15 @@ const warehouseSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  phone: String,
+  capacity: {
+    type: Number,
+    default: 0,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
   inventory: [
     {
       productId: {

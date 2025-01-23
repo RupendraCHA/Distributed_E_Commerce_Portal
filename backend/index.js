@@ -672,6 +672,54 @@ app.post("/addToCart", authenticateToken, async (req, res) => {
   }
 });
 
+app.post("/addToCartInCart", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const {
+      productId,
+      quantity,
+      productName,
+      category,
+      brand,
+      price,
+      description,
+      weight,
+      expirationDate,
+      image,
+    } = req.body;
+
+    // Validate required fields
+    if (!productId || !quantity) {
+      return res
+        .status(400)
+        .json({ error: "Product ID and quantity are required." });
+    }
+
+    // Make sure both userId and productId are properly typed/formatted
+    // Use strict comparison in the query
+    const existingCartItem = await CartModel.findOne({
+      userId: userId.toString(), // Ensure consistent type
+      productId: productId.toString(), // Ensure consistent type
+    });
+
+    if (existingCartItem) {
+      // Update the quantity if the item already exists
+      const updatedCartItem = await CartModel.findOneAndUpdate(
+        { userId: userId.toString(), productId: productId.toString() },
+        { $set: { quantity } },
+        { new: true } // Return the updated document
+      );
+
+      return res
+        .status(200)
+        .json({ message: "Cart item updated", cartItem: updatedCartItem });
+    }
+  } catch (error) {
+    console.error("Error adding product to cart:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 app.delete("/cart/:id", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -746,6 +794,19 @@ app.post("/distributor/register", authenticateToken, async (req, res) => {
   }
 });
 
+//Get Warehouses
+app.get("/distributor/warehouses", authenticateToken, async (req, res) => {
+  try {
+    const distributor = await DistributorModel.findOne({ userId: req.user.id });
+    if (!distributor) {
+      return res.status(404).json({ message: "Distributor not found" });
+    }
+    res.json(distributor.warehouses);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch warehouses" });
+  }
+});
+
 // Add warehouse
 app.post("/distributor/warehouses", authenticateToken, async (req, res) => {
   try {
@@ -763,12 +824,45 @@ app.post("/distributor/warehouses", authenticateToken, async (req, res) => {
 });
 
 // Delete warehouse
+// app.delete(
+//   "/distributor/warehouses/:warehouseId",
+//   authenticateToken,
+//   async (req, res) => {
+//     try {
+//       const { warehouseId } = req.params;
+//       const distributor = await DistributorModel.findOne({
+//         userId: req.user.id,
+//       });
+
+//       if (!distributor) {
+//         return res.status(404).json({ message: "Distributor not found" });
+//       }
+
+//       const warehouse = distributor.warehouses.findByIdAndDelete(
+//         { _id: warehouseId },
+//         { new: true }
+//       );
+
+//       if (!warehouse) {
+//         return res.status(404).json({ message: "Warehouse not found" });
+//       }
+
+//       return res.json(warehouse);
+//     } catch (error) {
+//       return res
+//         .status(500)
+//         .json({ message: "Failed to delete warehouse", error });
+//     }
+//   }
+// );
 app.delete(
   "/distributor/warehouses/:warehouseId",
   authenticateToken,
   async (req, res) => {
     try {
       const { warehouseId } = req.params;
+
+      // Find the distributor by userId
       const distributor = await DistributorModel.findOne({
         userId: req.user.id,
       });
@@ -777,18 +871,27 @@ app.delete(
         return res.status(404).json({ message: "Distributor not found" });
       }
 
-      const warehouse = distributor.warehouses.findByIdAndDelete(
-        { _id: warehouseId },
-        { new: true }
+      // Find the index of the warehouse in the warehouses array
+      const warehouseIndex = distributor.warehouses.findIndex(
+        (w) => w._id.toString() === warehouseId
       );
 
-      if (!warehouse) {
+      if (warehouseIndex === -1) {
         return res.status(404).json({ message: "Warehouse not found" });
       }
 
-      res.json(warehouse);
+      // Remove the warehouse from the array
+      distributor.warehouses.splice(warehouseIndex, 1);
+
+      // Save the updated distributor document
+      await distributor.save();
+
+      return res.json({ message: "Warehouse deleted successfully" });
     } catch (error) {
-      res.status(500).json({ message: "Failed to delete warehouse" });
+      console.error("Error deleting warehouse:", error);
+      return res
+        .status(500)
+        .json({ message: "Failed to delete warehouse", error: error.message });
     }
   }
 );
@@ -825,6 +928,53 @@ app.put(
       res.json(distributor.warehouses[warehouseIndex]);
     } catch (error) {
       res.status(500).json({ message: "Failed to update warehouse" });
+    }
+  }
+);
+
+app.put(
+  "/distributor/warehouses/:warehouseId/primary",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { warehouseId } = req.params;
+
+      // Find the distributor by userId
+      const distributor = await DistributorModel.findOne({
+        userId: req.user.id,
+      });
+
+      if (!distributor) {
+        return res.status(404).json({ message: "Distributor not found" });
+      }
+
+      // Find the warehouse in the warehouses array
+      const warehouse = distributor.warehouses.id(warehouseId);
+
+      if (!warehouse) {
+        return res.status(404).json({ message: "Warehouse not found" });
+      }
+
+      // Reset all warehouses to non-primary
+      distributor.warehouses.forEach((w) => {
+        w.isPrimary = false;
+      });
+
+      // Set the selected warehouse as primary
+      warehouse.isPrimary = true;
+
+      // Save the updated distributor document
+      await distributor.save();
+
+      return res.json({ message: "Primary warehouse updated successfully" });
+    } catch (error) {
+      console.error("Error setting primary warehouse:", error);
+      return res
+        .status(500)
+        .json({
+          message: "Failed to set primary warehouse",
+          error: error.message,
+        });
     }
   }
 );
