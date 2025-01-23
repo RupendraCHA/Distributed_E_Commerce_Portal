@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
   addToCart,
   removeFromCart,
+  updateCartItemQuantityAsync,
   updateQuantity,
 } from '../../store/cartSlice'; // Import the necessary actions
 import axios from 'axios';
@@ -69,6 +70,39 @@ const Cart = () => {
       console.error('Error saving item:', err);
     } finally {
       setSaveLoading(false);
+    }
+  };
+
+  // Handle quantity change
+  const handleQuantityChange = async (productId, value) => {
+    try {
+      // Convert input to number and ensure it's not negative
+      const newQuantity = Math.max(1, parseInt(value) || 1);
+
+      // Dispatch the async thunk and wait for it to complete
+      const resultAction = await dispatch(
+        updateCartItemQuantityAsync({
+          productId,
+          quantity: newQuantity,
+        })
+      );
+
+      // Check if the action was fulfilled
+      if (updateCartItemQuantityAsync.fulfilled.match(resultAction)) {
+        // Update the local state through Redux
+        dispatch(
+          updateQuantity({
+            productId,
+            quantity: newQuantity,
+          })
+        );
+      } else if (updateCartItemQuantityAsync.rejected.match(resultAction)) {
+        // Handle the error case
+        console.error('Failed to update quantity:', resultAction.payload);
+        // You might want to show an error message to the user here
+      }
+    } catch (error) {
+      console.error('Error updating quantity:', error);
     }
   };
 
@@ -211,7 +245,7 @@ const Cart = () => {
                     <strong>Price:</strong> {item.price}
                   </p>
                   <div className="quantity-controls">
-                    <button
+                    {/* <button
                       onClick={() =>
                         dispatch(
                           updateQuantity({
@@ -236,7 +270,31 @@ const Cart = () => {
                       }
                     >
                       +
-                    </button>
+                    </button> */}
+                    <label
+                      htmlFor={`quantity-${item.productId}`}
+                      className="quantity-label"
+                    >
+                      Quantity:
+                    </label>
+                    <input
+                      id={`quantity-${item.productId}`}
+                      type="number"
+                      min="1"
+                      value={item.quantity}
+                      onChange={(e) =>
+                        handleQuantityChange(item.productId, e.target.value)
+                      }
+                      className="quantity-input"
+                      style={{
+                        width: '60px',
+                        padding: '5px',
+                        marginRight: '10px',
+                        borderRadius: '4px',
+                        border: '1px solid #ccc',
+                        color: '#333',
+                      }}
+                    />
                     <button
                       onClick={() => handleRemoveItem(item.productId)}
                       className="btn btn-danger remove-btn"

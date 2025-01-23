@@ -1,5 +1,35 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+// Create async thunk for updating cart item quantity
+export const updateCartItemQuantityAsync = createAsyncThunk(
+  'cart/updateCartItemQuantityAsync',
+  async ({ productId, quantity }, { rejectWithValue }) => {
+    try {
+      const response = await fetch('http://localhost:3002/addToCartInCart', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify({
+          productId,
+          quantity: quantity, // Adjust quantity since backend uses increment
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        return rejectWithValue(error.message);
+      }
+
+      const data = await response.json();
+      return { productId, quantity }; // Return the updated quantity info
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // Create async thunk for removing cart item
 export const removeCartItemAsync = createAsyncThunk(
   'cart/removeCartItemAsync',
@@ -67,6 +97,25 @@ const cartSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      // Handle updateCartItemQuantityAsync
+      .addCase(updateCartItemQuantityAsync.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateCartItemQuantityAsync.fulfilled, (state, action) => {
+        state.loading = false;
+        const { productId, quantity } = action.payload;
+        const item = state.cartItems.find(
+          (item) => item.productId === productId
+        );
+        if (item) {
+          item.quantity = quantity;
+        }
+      })
+      .addCase(updateCartItemQuantityAsync.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       .addCase(removeCartItemAsync.pending, (state) => {
         state.loading = true;
       })

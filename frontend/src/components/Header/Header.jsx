@@ -31,6 +31,10 @@ const Header = () => {
       path: '/distributor',
     },
     {
+      title: 'Registration',
+      path: '/distributor/register',
+    },
+    {
       title: 'Warehouse Management',
       path: '/distributor/warehouses',
     },
