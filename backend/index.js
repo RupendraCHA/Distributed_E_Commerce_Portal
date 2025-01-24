@@ -32,6 +32,170 @@ const stripe = Stripe(
   "sk_test_51Q9ZJ7HC7NaQVzOS1SMqmgTvtTKQOgMSp0BlgI7gUCJTsSTRQw4vOvgFWC8WsDAuDwALyyu59DxfsIOGb3z3isJR005xoAmBGN"
 );
 
+app.post("/create-checkout-session", async (req, res) => {
+  try {
+    const { lineItems, selectedAddress, userId, cartItems } = req.body;
+
+    // Validate input
+    if (!lineItems || !Array.isArray(lineItems) || lineItems.length === 0) {
+      return res.status(400).json({ message: "Invalid line items" });
+    }
+
+    if (!selectedAddress || !selectedAddress._id) {
+      return res.status(400).json({ message: "Invalid delivery address" });
+    }
+
+    // Create Stripe Checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: lineItems,
+      mode: "payment",
+      success_url: `http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}`, // Pass session ID to success URL
+      cancel_url: `http://localhost:5173/cancel`,
+      metadata: {
+        userId,
+        addressId: selectedAddress._id,
+        address: JSON.stringify({
+          addressLine1: selectedAddress.addressLine1,
+          addressLine2: selectedAddress.addressLine2,
+          city: selectedAddress.city,
+          state: selectedAddress.state,
+          zipCode: selectedAddress.zipCode,
+        }),
+        cartItems: JSON.stringify(
+          cartItems.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            price: item.price,
+          }))
+        ), // Include cart items in metadata
+      },
+    });
+
+    // Return the session ID to the frontend
+    res.status(200).json({ id: session.id });
+  } catch (error) {
+    console.error("Error creating Stripe Checkout session:", error);
+    res.status(500).json({
+      message: "Failed to create checkout session",
+      error: error.message,
+    });
+  }
+});
+
+// app.post("/confirm-payment", async (req, res) => {
+//   try {
+//     const { sessionId } = req.body;
+
+//     // Retrieve the Stripe session
+//     const session = await stripe.checkout.sessions.retrieve(sessionId);
+//     console.log(session);
+
+//     // Check if the payment was successful
+//     if (session.payment_status !== "paid") {
+//       console.log("payment not completed");
+//       return res.status(400).json({ message: "Payment not completed" });
+//     }
+
+//     // Get user details and cart items from metadata
+//     const { userId, addressId, address, cartItems } = session.metadata;
+//     const parsedAddress = JSON.parse(address);
+//     const parsedCartItems = JSON.parse(cartItems);
+
+//     // Create new order
+//     const newOrder = new OrderModel({
+//       userId,
+//       items: parsedCartItems.map((item) => ({
+//         product: item.productId, // Match the schema
+//         quantity: item.quantity,
+//       })),
+//       total: (session.amount_total / 100).toFixed(2), // Convert from cents to dollars
+//       status: "confirmed",
+//       paymentId: session.payment_intent,
+//       address: parsedAddress,
+//       paymentMethod: "stripe",
+//       createdAt: new Date(),
+//     });
+
+//     await newOrder.save();
+
+//     // Clear user's cart after successful order
+//     await CartModel.deleteMany({ userId });
+
+//     return res
+//       .status(200)
+//       .json({ message: "Order created successfully", order: newOrder });
+//   } catch (error) {
+//     console.error("Error confirming payment and creating order:", error);
+//     return res.status(500).json({
+//       message: "Failed to confirm payment and create order",
+//       error: error.message,
+//     });
+//   }
+// });
+
+app.post("/confirm-payment", authenticateToken, async (req, res) => {
+  try {
+    console.log("confirm payment route is called");
+    const { sessionId } = req.body;
+    console.log("Session ID:", sessionId);
+
+    // Retrieve the Stripe session
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    console.log(session);
+
+    // Check if the payment was successful
+    if (session.payment_status !== "paid") {
+      return res.status(400).json({ message: "Payment not completed" });
+    }
+
+    const existingOrder = await OrderModel.findOne({
+      paymentId: session.payment_intent,
+    });
+    if (existingOrder) {
+      return res
+        .status(200)
+        .json({ message: "Order already exists", order: existingOrder });
+    }
+
+    // Get user details and cart items from metadata
+    const { userId, addressId, address, cartItems } = session.metadata;
+    const parsedAddress = JSON.parse(address);
+    const parsedCartItems = JSON.parse(cartItems);
+
+    // Create new order
+    const newOrder = new OrderModel({
+      userId,
+      items: parsedCartItems.map((item) => ({
+        product: item.productId, // Match the schema
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      total: (session.amount_total / 100).toFixed(2),
+      status: "confirmed",
+      paymentId: session.payment_intent,
+      address: parsedAddress,
+      paymentMethod: "debit card", // Use an allowed value
+      createdAt: new Date(),
+    });
+
+    await newOrder.save();
+
+    // Clear user's cart after successful order
+    await CartModel.deleteMany({ userId });
+
+    res
+      .status(200)
+      .json({ message: "Order created successfully", order: newOrder });
+  } catch (error) {
+    console.error("Error confirming payment and creating order:", error);
+    res.status(500).json({
+      message: "Failed to confirm payment and create order",
+      error: error.message,
+    });
+  }
+});
+
 app.get("/admin/users", authenticateToken, isAdmin, async (req, res) => {
   try {
     const users = await EmployeeModel.find({}, "-password");
@@ -107,100 +271,100 @@ app.get("/admin/orders", authenticateToken, isAdmin, async (req, res) => {
   }
 });
 
-app.post("/create-checkout-session", authenticateToken, async (req, res) => {
-  try {
-    const { lineItems, selectedAddress } = req.body;
+// app.post("/create-checkout-session", authenticateToken, async (req, res) => {
+//   try {
+//     const { lineItems, selectedAddress } = req.body;
 
-    // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: lineItems,
-      mode: "payment",
-      success_url: "http://localhost:5173/my-orders",
-      cancel_url: "http://localhost:5173/checkout",
-      metadata: {
-        userId: req.user.id,
-        addressId: selectedAddress._id,
-        address: JSON.stringify({
-          addressLine1: selectedAddress.addressLine1,
-          addressLine2: selectedAddress.addressLine2,
-          city: selectedAddress.city,
-          state: selectedAddress.state,
-          zipCode: selectedAddress.zipCode,
-        }),
-      },
-    });
+//     // Create Stripe checkout session
+//     const session = await stripe.checkout.sessions.create({
+//       payment_method_types: ["card"],
+//       line_items: lineItems,
+//       mode: "payment",
+//       success_url: "http://localhost:5173/my-orders",
+//       cancel_url: "http://localhost:5173/checkout",
+//       metadata: {
+//         userId: req.user.id,
+//         addressId: selectedAddress._id,
+//         address: JSON.stringify({
+//           addressLine1: selectedAddress.addressLine1,
+//           addressLine2: selectedAddress.addressLine2,
+//           city: selectedAddress.city,
+//           state: selectedAddress.state,
+//           zipCode: selectedAddress.zipCode,
+//         }),
+//       },
+//     });
 
-    res.json({ id: session.id });
-  } catch (error) {
-    console.error("Error creating checkout session:", error);
-    res.status(500).json({ error: "Failed to create checkout session" });
-  }
-});
+//     res.json({ id: session.id });
+//   } catch (error) {
+//     console.error("Error creating checkout session:", error);
+//     res.status(500).json({ error: "Failed to create checkout session" });
+//   }
+// });
 
-// Add this to your backend server file
-const endpointSecret = "your_stripe_webhook_secret"; // Replace with your webhook secret
+// // Add this to your backend server file
+// const endpointSecret = "your_stripe_webhook_secret"; // Replace with your webhook secret
 
-app.post(
-  "/webhook",
-  express.raw({ type: "application/json" }),
-  async (request, response) => {
-    const sig = request.headers["stripe-signature"];
+// app.post(
+//   "/webhook",
+//   express.raw({ type: "application/json" }),
+//   async (request, response) => {
+//     const sig = request.headers["stripe-signature"];
 
-    let event;
+//     let event;
 
-    try {
-      event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
-    } catch (err) {
-      response.status(400).send(`Webhook Error: ${err.message}`);
-      return;
-    }
+//     try {
+//       event = stripe.webhooks.constructEvent(request.body, sig, endpointSecret);
+//     } catch (err) {
+//       response.status(400).send(`Webhook Error: ${err.message}`);
+//       return;
+//     }
 
-    // Handle the checkout.session.completed event
-    if (event.type === "checkout.session.completed") {
-      const session = event.data.object;
+//     // Handle the checkout.session.completed event
+//     if (event.type === "checkout.session.completed") {
+//       const session = event.data.object;
 
-      try {
-        // Get user details from metadata
-        const { userId, addressId, address } = session.metadata;
-        const parsedAddress = JSON.parse(address);
+//       try {
+//         // Get user details from metadata
+//         const { userId, addressId, address } = session.metadata;
+//         const parsedAddress = JSON.parse(address);
 
-        // Get line items from Stripe
-        const lineItems = await stripe.checkout.sessions.listLineItems(
-          session.id
-        );
+//         // Get line items from Stripe
+//         const lineItems = await stripe.checkout.sessions.listLineItems(
+//           session.id
+//         );
 
-        // Create new order
-        const newOrder = new OrderModel({
-          userId,
-          items: lineItems.data.map((item) => ({
-            productId: item.price.product,
-            productName: item.description,
-            quantity: item.quantity,
-            price: (item.amount_total / 100).toFixed(2), // Convert from cents to dollars
-          })),
-          total: (session.amount_total / 100).toFixed(2),
-          status: "confirmed",
-          paymentId: session.payment_intent,
-          address: parsedAddress,
-          paymentMethod: "stripe",
-          createdAt: new Date(),
-        });
+//         // Create new order
+//         const newOrder = new OrderModel({
+//           userId,
+//           items: lineItems.data.map((item) => ({
+//             productId: item.price.product,
+//             productName: item.description,
+//             quantity: item.quantity,
+//             price: (item.amount_total / 100).toFixed(2), // Convert from cents to dollars
+//           })),
+//           total: (session.amount_total / 100).toFixed(2),
+//           status: "confirmed",
+//           paymentId: session.payment_intent,
+//           address: parsedAddress,
+//           paymentMethod: "stripe",
+//           createdAt: new Date(),
+//         });
 
-        await newOrder.save();
+//         await newOrder.save();
 
-        // Clear user's cart after successful order
-        await CartModel.deleteMany({ userId });
-      } catch (error) {
-        console.error("Error processing order:", error);
-        response.status(500).send("Error processing order");
-        return;
-      }
-    }
+//         // Clear user's cart after successful order
+//         await CartModel.deleteMany({ userId });
+//       } catch (error) {
+//         console.error("Error processing order:", error);
+//         response.status(500).send("Error processing order");
+//         return;
+//       }
+//     }
 
-    response.send();
-  }
-);
+//     response.send();
+//   }
+// );
 
 app.post("/login", async (req, res) => {
   const { email, password } = req.body;
@@ -969,12 +1133,10 @@ app.put(
       return res.json({ message: "Primary warehouse updated successfully" });
     } catch (error) {
       console.error("Error setting primary warehouse:", error);
-      return res
-        .status(500)
-        .json({
-          message: "Failed to set primary warehouse",
-          error: error.message,
-        });
+      return res.status(500).json({
+        message: "Failed to set primary warehouse",
+        error: error.message,
+      });
     }
   }
 );

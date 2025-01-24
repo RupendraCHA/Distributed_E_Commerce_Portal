@@ -9,14 +9,17 @@ const OrderSchema = new mongoose.Schema({
   items: [
     {
       product: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
+        type: String,
         required: true,
       },
       quantity: {
         type: Number,
         required: true,
         default: 1,
+      },
+      price: {
+        type: String,
+        required: true,
       },
     },
   ],
@@ -33,7 +36,7 @@ const OrderSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ["debit card", "check"],
+    enum: ["debit card", "check", "stripe"],
     required: true,
   },
   debitCardDetails: {

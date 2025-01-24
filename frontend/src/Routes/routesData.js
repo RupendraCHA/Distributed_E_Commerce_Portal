@@ -61,6 +61,7 @@ import {
   DashboardsData,
   categories,
 } from '../data/PosetraDataPage.jsx';
+import SuccessPage from '../components/SuccessPage.jsx';
 
 export const pirvateSections = [
   {
@@ -106,6 +107,10 @@ export const privateRoutes = [
   {
     path: '/my-orders',
     element: MyOrders,
+  },
+  {
+    path: '/success',
+    element: SuccessPage,
   },
   {
     path: '/logout',

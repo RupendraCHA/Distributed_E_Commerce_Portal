@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
+import { jwtDecode } from 'jwt-decode';
 
 const stripePromise = loadStripe(
   'pk_test_51Q9ZJ7HC7NaQVzOSxGKAaAL81sfBbYcMofntt5O1buXa3gOOuujbGc5IWv0eaXi0Uk5kRWmJz6YOpZpE8o1d3aGb00SMK4ehJL'
@@ -51,6 +52,60 @@ const Checkout = () => {
     setSelectedAddress(address);
   };
 
+  // const handleProceedToPayment = async () => {
+  //   if (!selectedAddress) {
+  //     setError('Please select a delivery address');
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoading(true);
+  //     const token = localStorage.getItem('token');
+
+  //     // Create a line items array for Stripe
+  //     const lineItems = cartItems.map((item) => ({
+  //       price_data: {
+  //         currency: 'usd',
+  //         product_data: {
+  //           name: item.productName,
+  //           description: item.description,
+  //         },
+  //         unit_amount: Math.round(
+  //           parseFloat(item.price.replace('$', '')) * 100
+  //         ), // Convert to cents
+  //       },
+  //       quantity: item.quantity,
+  //     }));
+
+  //     // Create checkout session
+  //     const response = await axios.post(
+  //       'http://localhost:3002/create-checkout-session',
+  //       {
+  //         lineItems,
+  //         selectedAddress,
+  //       },
+  //       {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       }
+  //     );
+
+  //     // Redirect to Stripe checkout
+  //     const stripe = await stripePromise;
+  //     const { error } = await stripe.redirectToCheckout({
+  //       sessionId: response.data.id,
+  //     });
+
+  //     if (error) {
+  //       setError(error.message);
+  //     }
+  //   } catch (err) {
+  //     setError('Failed to process payment');
+  //     console.error('Error processing payment:', err);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleProceedToPayment = async () => {
     if (!selectedAddress) {
       setError('Please select a delivery address');
@@ -60,6 +115,8 @@ const Checkout = () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
+      const decodedToken = jwtDecode(token);
+      const userId = decodedToken.id; // Extract userId from the token
 
       // Create a line items array for Stripe
       const lineItems = cartItems.map((item) => ({
@@ -82,6 +139,8 @@ const Checkout = () => {
         {
           lineItems,
           selectedAddress,
+          userId, // Include the userId
+          cartItems, // Include the cart items
         },
         {
           headers: { Authorization: `Bearer ${token}` },

@@ -1,4 +1,3 @@
-import React from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, useStripe, useElements } from '@stripe/react-stripe-js';
 import './StripePayment.css';
@@ -43,7 +42,7 @@ const StripeCheckout = () => {
   return (
     <div className="payment">
       <div>
-        <h1>It's our pleasure to have you here, Click below to pay</h1>
+        <h1>It&apos;s our pleasure to have you here, Click below to pay</h1>
         <button onClick={handleCheckout} disabled={!stripe}>
           Pay with Stripe
         </button>
