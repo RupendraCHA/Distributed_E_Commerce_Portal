@@ -161,210 +161,26 @@ const Checkout = () => {
   }
 
   return (
-    // <div className="max-w-6xl mx-auto p-4">
-    //   <h1 className="text-2xl font-bold mb-6">Checkout</h1>
-
-    //   {error && (
-    //     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-    //       {error}
-    //     </div>
-    //   )}
-
-    //   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-    //     {/* Left Column - Delivery Address/Warehouse */}
-    //     <div>
-    //       <h2 className="text-xl font-semibold mb-4">
-    //         {userRole === 'distributor'
-    //           ? 'Select Warehouse'
-    //           : 'Delivery Address'}
-    //       </h2>
-
-    //       {warehouses.length === 0 ? (
-    //         <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-    //           No {userRole === 'distributor' ? 'warehouses' : 'addresses'}{' '}
-    //           found.
-    //           <button
-    //             onClick={() =>
-    //               userRole === 'distributor'
-    //                 ? navigate('/distributor/warehouses')
-    //                 : navigate('/my-addresses')
-    //             }
-    //             className="block mt-2 text-blue-500 hover:text-blue-600"
-    //           >
-    //             Add {userRole === 'distributor' ? 'Warehouse' : 'Address'}
-    //           </button>
-    //         </div>
-    //       ) : (
-    //         <div className="space-y-4">
-    //           {warehouses.map((warehouse) => (
-    //             <div
-    //               key={warehouse._id}
-    //               className={`border rounded-lg p-4 cursor-pointer ${
-    //                 selectedWarehouse?._id === warehouse._id
-    //                   ? 'border-blue-500 bg-blue-50'
-    //                   : 'border-gray-200 hover:border-blue-300'
-    //               }`}
-    //               onClick={() => handleWarehouseChange(warehouse)}
-    //             >
-    //               <div className="flex items-start">
-    //                 <input
-    //                   type="radio"
-    //                   name="warehouse"
-    //                   checked={selectedWarehouse?._id === warehouse._id}
-    //                   onChange={() => handleWarehouseChange(warehouse)}
-    //                   className="mt-1 mr-3"
-    //                 />
-    //                 <div>
-    //                   <p className="font-semibold">{warehouse.addressLine1}</p>
-    //                   {warehouse.addressLine2 && (
-    //                     <p>{warehouse.addressLine2}</p>
-    //                   )}
-    //                   <p>{`${warehouse.city}, ${warehouse.state} ${warehouse.zipCode}`}</p>
-    //                 </div>
-    //               </div>
-    //             </div>
-    //           ))}
-    //         </div>
-    //       )}
-
-    //       {/* Delivery Options */}
-    //       <div className="mt-6">
-    //         <h2 className="text-xl font-semibold mb-4">Delivery Options</h2>
-    //         <div className="space-y-3">
-    //           <div
-    //             className={`border rounded-lg p-4 cursor-pointer ${
-    //               deliveryType === 'normal'
-    //                 ? 'border-blue-500 bg-blue-50'
-    //                 : 'border-gray-200 hover:border-blue-300'
-    //             }`}
-    //             onClick={() => handleDeliveryTypeChange('normal')}
-    //           >
-    //             <div className="flex items-start">
-    //               <input
-    //                 type="radio"
-    //                 name="delivery"
-    //                 checked={deliveryType === 'normal'}
-    //                 onChange={() => handleDeliveryTypeChange('normal')}
-    //                 className="mt-1 mr-3"
-    //               />
-    //               <div>
-    //                 <p className="font-semibold">Normal Delivery</p>
-    //                 <p className="text-sm text-gray-600">Free</p>
-    //               </div>
-    //             </div>
-    //           </div>
-
-    //           <div
-    //             className={`border rounded-lg p-4 cursor-pointer ${
-    //               deliveryType === 'premium'
-    //                 ? 'border-blue-500 bg-blue-50'
-    //                 : 'border-gray-200 hover:border-blue-300'
-    //             }`}
-    //             onClick={() => handleDeliveryTypeChange('premium')}
-    //           >
-    //             <div className="flex items-start">
-    //               <input
-    //                 type="radio"
-    //                 name="delivery"
-    //                 checked={deliveryType === 'premium'}
-    //                 onChange={() => handleDeliveryTypeChange('premium')}
-    //                 className="mt-1 mr-3"
-    //               />
-    //               <div>
-    //                 <p className="font-semibold">Premium Delivery</p>
-    //                 <p className="text-sm text-gray-600">$10.00 extra</p>
-    //               </div>
-    //             </div>
-    //           </div>
-    //         </div>
-    //       </div>
-    //     </div>
-
-    //     {/* Right Column - Order Summary */}
-    //     <div>
-    //       <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-    //       <div className="bg-gray-50 rounded-lg p-4">
-    //         <div className="space-y-4">
-    //           {cartItems.map((item) => (
-    //             <div
-    //               key={item.productId}
-    //               className="flex items-center justify-between"
-    //             >
-    //               <div className="flex items-center">
-    //                 <img
-    //                   src={item.image}
-    //                   alt={item.productName}
-    //                   className="w-16 h-16 object-cover rounded"
-    //                 />
-    //                 <div className="ml-4">
-    //                   <p className="font-semibold">{item.productName}</p>
-    //                   <p className="text-sm text-gray-600">
-    //                     Quantity: {item.quantity}
-    //                   </p>
-    //                 </div>
-    //               </div>
-    //               <p className="font-semibold">
-    //                 $
-    //                 {(
-    //                   parseFloat(item.price.replace('$', '')) * item.quantity
-    //                 ).toFixed(2)}
-    //               </p>
-    //             </div>
-    //           ))}
-
-    //           <div className="border-t pt-4 mt-4">
-    //             <div className="flex justify-between items-center">
-    //               <span>Subtotal</span>
-    //               <span>
-    //                 ${calculateTotal() - (deliveryType === 'premium' ? 10 : 0)}
-    //               </span>
-    //             </div>
-    //             <div className="flex justify-between items-center mt-2">
-    //               <span>Delivery Fee</span>
-    //               <span>${deliveryType === 'premium' ? '10.00' : '0.00'}</span>
-    //             </div>
-    //             <div className="flex justify-between items-center font-semibold text-lg mt-2 pt-2 border-t">
-    //               <span>Total</span>
-    //               <span>${calculateTotal().toFixed(2)}</span>
-    //             </div>
-    //           </div>
-    //         </div>
-    //       </div>
-
-    //       <button
-    //         onClick={handleProceedToPayment}
-    //         disabled={loading || !selectedWarehouse}
-    //         className={`w-full mt-6 py-3 px-4 text-white font-semibold rounded-lg ${
-    //           loading || !selectedWarehouse
-    //             ? 'bg-gray-400 cursor-not-allowed'
-    //             : 'bg-blue-500 hover:bg-blue-600'
-    //         }`}
-    //       >
-    //         {loading ? 'Processing...' : 'Proceed to Payment'}
-    //       </button>
-    //     </div>
-    //   </div>
-    // </div>
-    <div className="container py-4">
-      <h1 className="h3 mb-4">Checkout</h1>
+    <div className="max-w-6xl mx-auto p-4">
+      <h1 className="text-2xl font-bold mb-6">Checkout</h1>
 
       {error && (
-        <div className="alert alert-danger mb-4" role="alert">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
 
-      <div className="row">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Left Column - Delivery Address/Warehouse */}
-        <div className="col-md-6">
-          <h2 className="h5 mb-3">
+        <div>
+          <h2 className="text-xl font-semibold mb-4">
             {userRole === 'distributor'
               ? 'Select Warehouse'
               : 'Delivery Address'}
           </h2>
 
           {warehouses.length === 0 ? (
-            <div className="alert alert-warning">
+            <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
               No {userRole === 'distributor' ? 'warehouses' : 'addresses'}{' '}
               found.
               <button
@@ -373,38 +189,38 @@ const Checkout = () => {
                     ? navigate('/distributor/warehouses')
                     : navigate('/my-addresses')
                 }
-                className="btn btn-link p-0 mt-2"
+                className="block mt-2 text-blue-500 hover:text-blue-600"
               >
                 Add {userRole === 'distributor' ? 'Warehouse' : 'Address'}
               </button>
             </div>
           ) : (
-            <div>
+            <div className="space-y-4">
               {warehouses.map((warehouse) => (
                 <div
                   key={warehouse._id}
-                  className={`card p-3 mb-3 ${
+                  className={`border rounded-lg p-4 cursor-pointer ${
                     selectedWarehouse?._id === warehouse._id
-                      ? 'border-primary'
-                      : ''
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-200 hover:border-blue-300'
                   }`}
                   onClick={() => handleWarehouseChange(warehouse)}
                 >
-                  <div className="form-check">
+                  <div className="flex items-start">
                     <input
                       type="radio"
-                      className="form-check-input"
                       name="warehouse"
                       checked={selectedWarehouse?._id === warehouse._id}
                       onChange={() => handleWarehouseChange(warehouse)}
+                      className="mt-1 mr-3"
                     />
-                    <label className="form-check-label">
-                      <strong>{warehouse.addressLine1}</strong>
+                    <div>
+                      <p className="font-semibold">{warehouse.addressLine1}</p>
                       {warehouse.addressLine2 && (
                         <p>{warehouse.addressLine2}</p>
                       )}
                       <p>{`${warehouse.city}, ${warehouse.state} ${warehouse.zipCode}`}</p>
-                    </label>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -412,117 +228,116 @@ const Checkout = () => {
           )}
 
           {/* Delivery Options */}
-          <h2 className="h5 mt-4">Delivery Options</h2>
-          <div>
-            <div
-              className={`card p-3 mb-3 ${
-                deliveryType === 'normal' ? 'border-primary' : ''
-              }`}
-              onClick={() => handleDeliveryTypeChange('normal')}
-            >
-              <div className="form-check">
-                <input
-                  type="radio"
-                  className="form-check-input"
-                  name="delivery"
-                  checked={deliveryType === 'normal'}
-                  onChange={() => handleDeliveryTypeChange('normal')}
-                />
-                <label className="form-check-label">
-                  <strong>Normal Delivery</strong>
-                  <p className="text-muted">Free</p>
-                </label>
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold mb-4">Delivery Options</h2>
+            <div className="space-y-3">
+              <div
+                className={`border rounded-lg p-4 cursor-pointer ${
+                  deliveryType === 'normal'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-blue-300'
+                }`}
+                onClick={() => handleDeliveryTypeChange('normal')}
+              >
+                <div className="flex items-start">
+                  <input
+                    type="radio"
+                    name="delivery"
+                    checked={deliveryType === 'normal'}
+                    onChange={() => handleDeliveryTypeChange('normal')}
+                    className="mt-1 mr-3"
+                  />
+                  <div>
+                    <p className="font-semibold">Normal Delivery</p>
+                    <p className="text-sm text-gray-600">Free</p>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            <div
-              className={`card p-3 ${
-                deliveryType === 'premium' ? 'border-primary' : ''
-              }`}
-              onClick={() => handleDeliveryTypeChange('premium')}
-            >
-              <div className="form-check">
-                <input
-                  type="radio"
-                  className="form-check-input"
-                  name="delivery"
-                  checked={deliveryType === 'premium'}
-                  onChange={() => handleDeliveryTypeChange('premium')}
-                />
-                <label className="form-check-label">
-                  <strong>Premium Delivery</strong>
-                  <p className="text-muted">$10.00 extra</p>
-                </label>
+              <div
+                className={`border rounded-lg p-4 cursor-pointer ${
+                  deliveryType === 'premium'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-blue-300'
+                }`}
+                onClick={() => handleDeliveryTypeChange('premium')}
+              >
+                <div className="flex items-start">
+                  <input
+                    type="radio"
+                    name="delivery"
+                    checked={deliveryType === 'premium'}
+                    onChange={() => handleDeliveryTypeChange('premium')}
+                    className="mt-1 mr-3"
+                  />
+                  <div>
+                    <p className="font-semibold">Premium Delivery</p>
+                    <p className="text-sm text-gray-600">$10.00 extra</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         {/* Right Column - Order Summary */}
-        <div className="col-md-6">
-          <h2 className="h5 mb-3">Order Summary</h2>
-          <div className="card p-3">
-            {cartItems.map((item) => (
-              <div
-                key={item.productId}
-                className="d-flex justify-content-between mb-3"
-              >
-                <div className="d-flex">
-                  <img
-                    src={item.image}
-                    alt={item.productName}
-                    className="img-thumbnail"
-                    style={{ width: '60px', height: '60px' }}
-                  />
-                  <div className="ms-3">
-                    <p className="mb-1">
-                      <strong>{item.productName}</strong>
-                    </p>
-                    <p className="text-muted mb-0">Quantity: {item.quantity}</p>
+        <div>
+          <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
+          <div className="bg-gray-50 rounded-lg p-4">
+            <div className="space-y-4">
+              {cartItems.map((item) => (
+                <div
+                  key={item.productId}
+                  className="flex items-center justify-between"
+                >
+                  <div className="flex items-center">
+                    <img
+                      src={item.image}
+                      alt={item.productName}
+                      className="w-16 h-16 object-cover rounded"
+                    />
+                    <div className="ml-4">
+                      <p className="font-semibold">{item.productName}</p>
+                      <p className="text-sm text-gray-600">
+                        Quantity: {item.quantity}
+                      </p>
+                    </div>
                   </div>
-                </div>
-                <p>
-                  <strong>
+                  <p className="font-semibold">
                     $
                     {(
                       parseFloat(item.price.replace('$', '')) * item.quantity
                     ).toFixed(2)}
-                  </strong>
-                </p>
+                  </p>
+                </div>
+              ))}
+
+              <div className="border-t pt-4 mt-4">
+                <div className="flex justify-between items-center">
+                  <span>Subtotal</span>
+                  <span>
+                    ${calculateTotal() - (deliveryType === 'premium' ? 10 : 0)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span>Delivery Fee</span>
+                  <span>${deliveryType === 'premium' ? '10.00' : '0.00'}</span>
+                </div>
+                <div className="flex justify-between items-center font-semibold text-lg mt-2 pt-2 border-t">
+                  <span>Total</span>
+                  <span>${calculateTotal().toFixed(2)}</span>
+                </div>
               </div>
-            ))}
-
-            <hr />
-
-            <div className="d-flex justify-content-between">
-              <span>Subtotal</span>
-              <span>
-                $
-                {(
-                  calculateTotal().toFixed(2) -
-                  (deliveryType === 'premium' ? 10 : 0)
-                ).toFixed(2)}
-              </span>
-            </div>
-            <div className="d-flex justify-content-between mt-2">
-              <span>Delivery Fee</span>
-              <span>${deliveryType === 'premium' ? '10.00' : '0.00'}</span>
-            </div>
-            <div className="d-flex justify-content-between mt-3">
-              <span>
-                <strong>Total</strong>
-              </span>
-              <span>
-                <strong>${calculateTotal().toFixed(2)}</strong>
-              </span>
             </div>
           </div>
 
           <button
             onClick={handleProceedToPayment}
             disabled={loading || !selectedWarehouse}
-            className={`btn btn-primary btn-block mt-4 ${
-              loading || !selectedWarehouse ? 'disabled' : ''
+            className={`w-full mt-6 py-3 px-4 text-white font-semibold rounded-lg ${
+              loading || !selectedWarehouse
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-500 hover:bg-blue-600'
             }`}
           >
             {loading ? 'Processing...' : 'Proceed to Payment'}
