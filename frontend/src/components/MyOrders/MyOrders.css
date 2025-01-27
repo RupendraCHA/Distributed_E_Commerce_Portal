@@ -1,35 +1,41 @@
-.my-orders-container{
-    background:  #0014dc;
+/* .my-orders-container {
+    background: #0014dc;
     padding: 40px;
     font-family: "Playfair Display";
     height: 100vh;
     overflow: scroll;
 }
-.order-heading{
+
+.order-heading {
     font-size: max(3vw, 16px);
     color: white;
     font-weight: bold;
     text-decoration: underline;
 }
-.my-orders{
+
+.my-orders {
     margin-top: 10px;
     background-color: white;
     border-radius: 2px;
 }
-.orders-list{
+
+.orders-list {
     padding: 30px;
 }
-.order-item{
+
+.order-item {
     background-color: #000000ce;
     margin: 20px;
     padding: 40px;
     border-radius: 10px;
     color: #fff;
 }
-.order-id{
+
+.order-id {
     font-size: 18px;
 }
-.total-amt{
+
+.total-amt {
     font-size: max(2vw, 18px);
     background-color: white;
     width: 30%;
@@ -39,40 +45,44 @@
     border-radius: 10px;
 
 }
-.pay-method{
+
+.pay-method {
     font-size: 18px;
     border: 1px solid #fff;
     width: 30%;
     padding: 5px;
     border-radius: 5px;
     font-weight: bold;
-    span{
+
+    span {
         color: white;
     }
 }
-.shipping-address{
+
+.shipping-address {
     font-size: 16px;
 
-    span{
+    span {
         font-size: 18px;
         font-weight: bold;
     }
 }
-.products{
+
+.products {
     background-color: #141413c9;
     color: #fff;
     padding: 40px;
     border-radius: 12px;
     border: 2px solid #fff;
 
-    h5{
+    h5 {
         font-size: 30px;
         font-family: "System-ui";
         text-decoration: underline;
         margin-bottom: 20px;
     }
 
-    .product{
+    .product {
         border: 1px solid #000;
         background-color: #fff;
         color: #000;
@@ -86,25 +96,258 @@
         padding: 12px;
         width: 70%;
 
-        .img-container{
+        .img-container {
             border-right: 2px solid #000;
-            img{
+
+            img {
                 width: 200vw;
             }
         }
-        .details{
+
+        .details {
             font-size: 14px;
             font-weight: bold;
-            
-            strong{
+
+            strong {
                 padding: 0;
             }
 
-            p{
+            p {
                 padding: 0;
                 margin: 2px;
                 margin-left: none;
             }
         }
+    }
+} */
+
+.orders-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.page-title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: #2d3748;
+}
+
+.order-card {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    transition: transform 0.2s ease-in-out;
+}
+
+.order-card:hover {
+    transform: translateY(-2px);
+}
+
+.order-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.order-id {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.order-date {
+    font-size: 0.875rem;
+    color: #718096;
+}
+
+.status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-badge.confirmed {
+    background-color: #c6f6d5;
+    color: #22543d;
+}
+
+.status-badge.pending {
+    background-color: #bee3f8;
+    color: #2c5282;
+}
+
+.order-section {
+    margin-bottom: 1.5rem;
+}
+
+.section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #4a5568;
+}
+
+.item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.order-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background-color: #f7fafc;
+    border-radius: 8px;
+}
+
+.item-details {
+    flex: 1;
+}
+
+.item-name {
+    font-weight: 500;
+    color: #2d3748;
+}
+
+.item-quantity {
+    font-size: 0.875rem;
+    color: #718096;
+    margin-top: 0.25rem;
+}
+
+.item-price {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.address-details {
+    font-size: 0.875rem;
+    color: #718096;
+    line-height: 1.5;
+}
+
+.order-summary {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.payment-method {
+    font-size: 0.875rem;
+    color: #718096;
+    margin-top: 0.5rem;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-radius: 50%;
+    border-top-color: #4299e1;
+    animation: spin 1s linear infinite;
+}
+
+.error-container {
+    background-color: #fff5f5;
+    border: 1px solid #fc8181;
+    border-radius: 8px;
+    padding: 1rem;
+    color: #c53030;
+}
+
+.retry-button {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #4299e1;
+    color: white;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.retry-button:hover {
+    background-color: #3182ce;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state-title {
+    font-size: 1.5rem;
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-message {
+    color: #718096;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (max-width: 768px) {
+    .orders-container {
+        padding: 1rem;
+    }
+
+    .order-card {
+        padding: 1rem;
+    }
+
+    .order-header {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .status-badge {
+        align-self: flex-start;
+    }
+
+    .item-list {
+        gap: 0.5rem;
+    }
+
+    .order-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .item-price {
+        align-self: flex-end;
     }
 }

@@ -1371,6 +1371,28 @@ app.put(
   }
 );
 
+app.get("/distributor/details", authenticateToken, async (req, res) => {
+  try {
+    // Find the distributor associated with the logged-in user
+    const distributor = await DistributorModel.findOne({ userId: req.user.id });
+
+    if (!distributor) {
+      return res.status(404).json({ message: "Distributor not found" });
+    }
+
+    // Return the distributor details
+    res.status(200).json(distributor);
+  } catch (error) {
+    console.error("Error fetching distributor details:", error);
+    res
+      .status(500)
+      .json({
+        message: "Failed to fetch distributor details",
+        error: error.message,
+      });
+  }
+});
+
 app.get("/distributor/inventory", authenticateToken, async (req, res) => {
   try {
     // Find the distributor associated with the logged-in user
