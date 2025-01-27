@@ -119,8 +119,8 @@ app.post("/create-checkout-session", async (req, res) => {
 
 //     await newOrder.save();
 
-//     // Clear user's cart after successful order
-//     await CartModel.deleteMany({ userId });
+// // Clear user's cart after successful order
+// await CartModel.deleteMany({ userId });
 
 //     return res
 //       .status(200)
@@ -134,21 +134,169 @@ app.post("/create-checkout-session", async (req, res) => {
 //   }
 // });
 
+// app.post("/confirm-payment", authenticateToken, async (req, res) => {
+//   try {
+//     console.log("confirm payment route is called");
+//     const { sessionId } = req.body;
+//     console.log("Session ID:", sessionId);
+
+//     // Retrieve the Stripe session
+//     const session = await stripe.checkout.sessions.retrieve(sessionId);
+//     console.log(session);
+
+//     // Check if the payment was successful
+//     if (session.payment_status !== "paid") {
+//       return res.status(400).json({ message: "Payment not completed" });
+//     }
+
+//     const existingOrder = await OrderModel.findOne({
+//       paymentId: session.payment_intent,
+//     });
+//     if (existingOrder) {
+//       return res
+//         .status(200)
+//         .json({ message: "Order already exists", order: existingOrder });
+//     }
+
+//     // Get user details and cart items from metadata
+//     const { userId, address, cartItems } = session.metadata;
+//     const parsedAddress = JSON.parse(address);
+//     const parsedCartItems = JSON.parse(cartItems);
+
+//     const warehouse = await DistributorModel.findOne({});
+
+//     // Create new order
+//     const newOrder = new OrderModel({
+//       userId,
+//       items: parsedCartItems.map((item) => ({
+//         product: item.productId, // Match the schema
+//         quantity: item.quantity,
+//         price: item.price,
+//       })),
+//       total: (session.amount_total / 100).toFixed(2),
+//       status: "confirmed",
+//       paymentId: session.payment_intent,
+//       address: parsedAddress,
+//       paymentMethod: "debit card", // Use an allowed value
+//       createdAt: new Date(),
+//     });
+
+//     await newOrder.save();
+
+//     // Clear user's cart after successful order
+//     await CartModel.deleteMany({ userId });
+
+//     res
+//       .status(200)
+//       .json({ message: "Order created successfully", order: newOrder });
+//   } catch (error) {
+//     console.error("Error confirming payment and creating order:", error);
+//     res.status(500).json({
+//       message: "Failed to confirm payment and create order",
+//       error: error.message,
+//     });
+//   }
+// });
+
+// app.post("/confirm-payment", authenticateToken, async (req, res) => {
+//   try {
+//     const { sessionId } = req.body;
+
+//     // Retrieve the Stripe session
+//     const session = await stripe.checkout.sessions.retrieve(sessionId);
+
+//     // Check if the payment was successful
+//     if (session.payment_status !== "paid") {
+//       return res.status(400).json({ message: "Payment not completed" });
+//     }
+
+//     // Check if an order with the same paymentId already exists
+//     const existingOrder = await OrderModel.findOne({
+//       paymentId: session.payment_intent,
+//     });
+//     if (existingOrder) {
+//       return res
+//         .status(200)
+//         .json({ message: "Order already exists", order: existingOrder });
+//     }
+
+//     // Get user details and cart items from metadata
+//     const { userId, addressId, address, cartItems } = session.metadata;
+//     const parsedAddress = JSON.parse(address);
+//     const parsedCartItems = JSON.parse(cartItems);
+
+//     // Find the primary warehouse
+//     const primaryWarehouse = await WarehouseModel.findOne({ isPrimary: true });
+//     if (!primaryWarehouse) {
+//       return res.status(404).json({ message: "Primary warehouse not found" });
+//     }
+
+//     // Update warehouse inventory
+//     for (const item of parsedCartItems) {
+//       const productInWarehouse = primaryWarehouse.inventory.find(
+//         (inv) => inv.productId.toString() === item.productId
+//       );
+
+//       if (productInWarehouse) {
+//         // If the product already exists in the warehouse, update the quantity
+//         productInWarehouse.quantity -= item.quantity;
+//       } else {
+//         // If the product doesn't exist, add it to the warehouse inventory
+//         primaryWarehouse.inventory.push({
+//           productId: item.productId,
+//           quantity: -item.quantity, // Subtract the ordered quantity
+//         });
+//       }
+//     }
+
+//     // Save the updated warehouse inventory
+//     await primaryWarehouse.save();
+
+//     // Create new order
+//     const newOrder = new OrderModel({
+//       userId,
+//       items: parsedCartItems.map((item) => ({
+//         product: item.productId,
+//         quantity: item.quantity,
+//       })),
+//       total: (session.amount_total / 100).toFixed(2),
+//       status: "confirmed",
+//       paymentId: session.payment_intent,
+//       address: parsedAddress,
+//       paymentMethod: "debit card",
+//       createdAt: new Date(),
+//     });
+
+//     await newOrder.save();
+
+//     // Clear user's cart after successful order
+//     await CartModel.deleteMany({ userId });
+
+//     res
+//       .status(200)
+//       .json({ message: "Order created successfully", order: newOrder });
+//   } catch (error) {
+//     console.error("Error confirming payment and creating order:", error);
+//     res.status(500).json({
+//       message: "Failed to confirm payment and create order",
+//       error: error.message,
+//     });
+//   }
+// });
+
 app.post("/confirm-payment", authenticateToken, async (req, res) => {
   try {
-    console.log("confirm payment route is called");
     const { sessionId } = req.body;
-    console.log("Session ID:", sessionId);
 
     // Retrieve the Stripe session
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    console.log(session);
 
     // Check if the payment was successful
     if (session.payment_status !== "paid") {
       return res.status(400).json({ message: "Payment not completed" });
     }
 
+    // Check if an order with the same paymentId already exists
     const existingOrder = await OrderModel.findOne({
       paymentId: session.payment_intent,
     });
@@ -158,35 +306,117 @@ app.post("/confirm-payment", authenticateToken, async (req, res) => {
         .json({ message: "Order already exists", order: existingOrder });
     }
 
-    // Get user details and cart items from metadata
+    // Get metadata from the session
     const { userId, addressId, address, cartItems } = session.metadata;
-    const parsedAddress = JSON.parse(address);
     const parsedCartItems = JSON.parse(cartItems);
+    const parsedAddress = JSON.parse(address);
 
-    // Create new order
-    const newOrder = new OrderModel({
-      userId,
-      items: parsedCartItems.map((item) => ({
-        product: item.productId, // Match the schema
-        quantity: item.quantity,
-        price: item.price,
-      })),
-      total: (session.amount_total / 100).toFixed(2),
-      status: "confirmed",
-      paymentId: session.payment_intent,
-      address: parsedAddress,
-      paymentMethod: "debit card", // Use an allowed value
-      createdAt: new Date(),
-    });
+    // Find the user to check their role
+    const user = await EmployeeModel.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    await newOrder.save();
+    // Logic for Distributors (Restocking Warehouse)
+    if (user.role === "distributor") {
+      // Find the distributor associated with the user
+      const distributor = await DistributorModel.findOne({ userId });
+      if (!distributor) {
+        return res.status(404).json({ message: "Distributor not found" });
+      }
 
-    // Clear user's cart after successful order
-    await CartModel.deleteMany({ userId });
+      // Find the warehouse using the addressId from metadata
+      const warehouse = distributor.warehouses.find(
+        (warehouse) => warehouse._id.toString() === addressId
+      );
+      console.log(warehouse);
+      if (!warehouse) {
+        return res.status(404).json({ message: "Warehouse not found" });
+      }
 
-    res
-      .status(200)
-      .json({ message: "Order created successfully", order: newOrder });
+      // Update warehouse inventory (restock items)
+      for (const item of parsedCartItems) {
+        const productInWarehouse = warehouse.inventory.find(
+          (inv) => inv.productId.toString() === item.productId
+        );
+
+        if (productInWarehouse) {
+          // If the product already exists in the warehouse, increase the quantity
+          productInWarehouse.quantity += item.quantity;
+        } else {
+          // If the product doesn't exist, add it to the warehouse inventory
+          warehouse.inventory.push({
+            productId: item.productId,
+            quantity: item.quantity, // Add the ordered quantity
+          });
+        }
+      }
+
+      // Save the updated distributor with the modified warehouse inventory
+      await distributor.save();
+
+      // Create a new order record for the restocking
+      const newOrder = new OrderModel({
+        userId,
+        items: parsedCartItems.map((item) => ({
+          product: item.productId,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        total: (session.amount_total / 100).toFixed(2),
+        status: "confirmed",
+        paymentId: session.payment_intent,
+        address: parsedAddress, // Use warehouse address
+        paymentMethod: "debit card",
+        createdAt: new Date(),
+        orderType: "warehouse_restock", // Indicate this is a restocking order
+      });
+
+      await newOrder.save();
+
+      // Clear user's cart after successful order
+      await CartModel.deleteMany({ userId });
+
+      return res.status(200).json({
+        message: "Warehouse restocking order created successfully",
+        order: newOrder,
+      });
+    }
+
+    // Logic for Normal Customers (Create Order and Clear Cart)
+    else if (user.role === "user") {
+      // Create a new order for the customer
+      const newOrder = new OrderModel({
+        userId,
+        items: parsedCartItems.map((item) => ({
+          product: item.productId,
+          quantity: item.quantity,
+          price: item.price,
+        })),
+        total: (session.amount_total / 100).toFixed(2),
+        status: "confirmed",
+        paymentId: session.payment_intent,
+        address: parsedAddress,
+        paymentMethod: "debit card",
+        createdAt: new Date(),
+        orderType: "customer_order", // Indicate this is a customer order
+      });
+
+      await newOrder.save();
+
+      // Clear the customer's cart
+      await CartModel.deleteMany({ userId });
+
+      return res.status(200).json({
+        message: "Customer order created successfully",
+        order: newOrder,
+      });
+    }
+
+    // If the user role is neither distributor nor customer
+    else {
+      return res.status(400).json({ message: "Invalid user role" });
+    }
   } catch (error) {
     console.error("Error confirming payment and creating order:", error);
     res.status(500).json({
@@ -1141,125 +1371,125 @@ app.put(
   }
 );
 
-// Add product to warehouse inventory
+app.get("/distributor/inventory", authenticateToken, async (req, res) => {
+  try {
+    // Find the distributor associated with the logged-in user
+    const distributor = await DistributorModel.findOne({ userId: req.user.id });
+
+    if (!distributor) {
+      return res.status(404).json({ message: "Distributor not found" });
+    }
+
+    // Fetch product details for all products in the inventory
+    const productIds = distributor.warehouses.flatMap((warehouse) =>
+      warehouse.inventory.map((item) => item.productId)
+    );
+
+    // const products = await ProductModel.find({
+    //   _id: { $in: productIds },
+    // });
+
+    // // Create a map of productId to product details for quick lookup
+    // const productMap = products.reduce((map, product) => {
+    //   map[product._id.toString()] = product;
+    //   return map;
+    // }, {});
+
+    // Flatten the inventory data for all warehouses
+    const inventory = distributor.warehouses.flatMap((warehouse) =>
+      warehouse.inventory.map((item) => {
+        // const product = productMap[item.productId];
+        return {
+          _id: item._id,
+          productId: item.productId,
+          productName: item.productId, // Fallback if product not found
+          warehouseId: warehouse._id,
+          warehouseName: warehouse.city,
+          warehouseLocation: warehouse.addressLine1,
+          quantity: item.quantity,
+          minimumStock: item.minimumStock || 0, // Default to 0 if not set
+          reorderPoint: item.reorderPoint || 0, // Default to 0 if not set
+        };
+      })
+    );
+
+    // Return the inventory data
+    res.status(200).json(inventory);
+  } catch (error) {
+    console.error("Error fetching inventory:", error);
+    res
+      .status(500)
+      .json({ message: "Failed to fetch inventory", error: error.message });
+  }
+});
+
 app.post(
-  "/distributor/warehouses/:warehouseId/inventory",
+  "/warehouses/:warehouseId/products",
   authenticateToken,
   async (req, res) => {
     try {
       const { warehouseId } = req.params;
       const { productId, quantity } = req.body;
 
-      const distributor = await DistributorModel.findOne({
-        userId: req.user.id,
-      });
-      if (!distributor) {
-        return res.status(404).json({ message: "Distributor not found" });
+      // Validate input
+      if (!productId || !quantity || quantity <= 0) {
+        return res
+          .status(400)
+          .json({ message: "Invalid productId or quantity" });
       }
 
-      const warehouse = distributor.warehouses.id(warehouseId);
+      // Find the distributor that contains the warehouse
+      const distributor = await DistributorModel.findOne({
+        "warehouses._id": warehouseId,
+      });
+      if (!distributor) {
+        return res.status(404).json({ message: "Warehouse not found" });
+      }
+
+      // Find the specific warehouse within the distributor
+      const warehouse = distributor.warehouses.find(
+        (warehouse) => warehouse._id.toString() === warehouseId
+      );
+
       if (!warehouse) {
         return res.status(404).json({ message: "Warehouse not found" });
       }
 
-      // Check if product already exists in inventory
-      const existingProduct = warehouse.inventory.find(
-        (item) => item.productId.toString() === productId
+      // Check if the product already exists in the warehouse
+      const productInWarehouse = warehouse.inventory.find(
+        (inv) => inv.productId.toString() === productId
       );
 
-      if (existingProduct) {
-        existingProduct.quantity += quantity;
+      if (productInWarehouse) {
+        // If the product exists, update the quantity
+        productInWarehouse.quantity += quantity;
       } else {
+        // If the product doesn't exist, add it to the warehouse inventory
         warehouse.inventory.push({ productId, quantity });
       }
 
+      // Save the updated distributor
       await distributor.save();
-      res.json(warehouse.inventory);
+
+      // Return success response
+      res
+        .status(200)
+        .json({ message: "Product added to warehouse", warehouse });
     } catch (error) {
-      res.status(500).json({ message: "Failed to update inventory" });
-    }
-  }
-);
+      console.error("Error adding product to warehouse:", error);
 
-// Get distributor profile
-app.get("/distributor/profile", authenticateToken, async (req, res) => {
-  try {
-    const distributor = await DistributorModel.findOne({
-      userId: req.user.id,
-    }).populate("products.productId");
+      // Handle specific errors
+      if (error.name === "CastError") {
+        return res
+          .status(400)
+          .json({ message: "Invalid warehouseId or productId" });
+      }
 
-    if (!distributor) {
-      return res.status(404).json({ message: "Distributor not found" });
-    }
-
-    res.json(distributor);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch distributor profile" });
-  }
-});
-
-// Add product to distributor catalog
-app.post("/distributor/products", authenticateToken, async (req, res) => {
-  try {
-    const { productId, price } = req.body;
-
-    const distributor = await DistributorModel.findOne({ userId: req.user.id });
-    if (!distributor) {
-      return res.status(404).json({ message: "Distributor not found" });
-    }
-
-    // Check if product already exists
-    const existingProduct = distributor.products.find(
-      (p) => p.productId.toString() === productId
-    );
-
-    if (existingProduct) {
-      existingProduct.price = price;
-      existingProduct.active = true;
-    } else {
-      distributor.products.push({ productId, price });
-    }
-
-    await distributor.save();
-    res.json(distributor.products);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to add product" });
-  }
-});
-
-// Update product price
-app.put(
-  "/distributor/products/:productId",
-  authenticateToken,
-  async (req, res) => {
-    try {
-      const { productId } = req.params;
-      const { price, active } = req.body;
-
-      const distributor = await DistributorModel.findOne({
-        userId: req.user.id,
+      // Generic error response
+      res.status(500).json({
+        message: "Failed to add product to warehouse",
+        error: error.message,
       });
-      if (!distributor) {
-        return res.status(404).json({ message: "Distributor not found" });
-      }
-
-      const product = distributor.products.find(
-        (p) => p.productId.toString() === productId
-      );
-
-      if (!product) {
-        return res.status(404).json({ message: "Product not found" });
-      }
-
-      product.price = price;
-      if (typeof active !== "undefined") {
-        product.active = active;
-      }
-
-      await distributor.save();
-      res.json(product);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to update product" });
     }
   }
 );

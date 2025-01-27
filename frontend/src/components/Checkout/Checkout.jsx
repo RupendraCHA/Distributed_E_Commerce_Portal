@@ -10,35 +10,57 @@ const stripePromise = loadStripe(
 );
 
 const Checkout = () => {
-  const [addresses, setAddresses] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState(null);
+  const [warehouses, setWarehouses] = useState([]);
+  const [selectedWarehouse, setSelectedWarehouse] = useState(null);
+  const [deliveryType, setDeliveryType] = useState('normal'); // 'normal' or 'premium'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [userRole, setUserRole] = useState(null);
   const cartItems = useSelector((state) => state.cart.cartItems);
   const navigate = useNavigate();
 
-  // Calculate total price
-  const totalPrice = cartItems.reduce(
-    (total, item) =>
-      total + parseFloat(item.price.replace('$', '')) * item.quantity,
-    0
-  );
+  // Calculate total price including delivery fee
+  const calculateTotal = () => {
+    const itemsTotal = cartItems.reduce(
+      (total, item) =>
+        total + parseFloat(item.price.replace('$', '')) * item.quantity,
+      0
+    );
+    const deliveryFee = deliveryType === 'premium' ? 10 : 0;
+    return itemsTotal + deliveryFee;
+  };
 
   useEffect(() => {
-    fetchAddresses();
+    const token = localStorage.getItem('token');
+    if (token) {
+      const decodedToken = jwtDecode(token);
+      setUserRole(decodedToken.role);
+      fetchAddresses(decodedToken.role);
+    }
   }, []);
 
-  const fetchAddresses = async () => {
+  const fetchAddresses = async (role) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3002/addresses', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      let response;
 
-      setAddresses(response.data);
-      // Set primary address as selected by default
-      const primaryAddress = response.data.find((addr) => addr.isPrimary);
-      setSelectedAddress(primaryAddress || response.data[0]);
+      if (role === 'distributor') {
+        response = await axios.get(
+          'http://localhost:3002/distributor/warehouses',
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        setWarehouses(response.data);
+        setSelectedWarehouse(response.data[0]); // Select first warehouse by default
+      } else {
+        response = await axios.get('http://localhost:3002/addresses', {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setWarehouses(response.data);
+        const primaryAddress = response.data.find((addr) => addr.isPrimary);
+        setSelectedWarehouse(primaryAddress || response.data[0]);
+      }
       setError(null);
     } catch (err) {
       setError('Failed to fetch addresses');
@@ -48,66 +70,16 @@ const Checkout = () => {
     }
   };
 
-  const handleAddressChange = (address) => {
-    setSelectedAddress(address);
+  const handleWarehouseChange = (warehouse) => {
+    setSelectedWarehouse(warehouse);
   };
 
-  // const handleProceedToPayment = async () => {
-  //   if (!selectedAddress) {
-  //     setError('Please select a delivery address');
-  //     return;
-  //   }
-
-  //   try {
-  //     setLoading(true);
-  //     const token = localStorage.getItem('token');
-
-  //     // Create a line items array for Stripe
-  //     const lineItems = cartItems.map((item) => ({
-  //       price_data: {
-  //         currency: 'usd',
-  //         product_data: {
-  //           name: item.productName,
-  //           description: item.description,
-  //         },
-  //         unit_amount: Math.round(
-  //           parseFloat(item.price.replace('$', '')) * 100
-  //         ), // Convert to cents
-  //       },
-  //       quantity: item.quantity,
-  //     }));
-
-  //     // Create checkout session
-  //     const response = await axios.post(
-  //       'http://localhost:3002/create-checkout-session',
-  //       {
-  //         lineItems,
-  //         selectedAddress,
-  //       },
-  //       {
-  //         headers: { Authorization: `Bearer ${token}` },
-  //       }
-  //     );
-
-  //     // Redirect to Stripe checkout
-  //     const stripe = await stripePromise;
-  //     const { error } = await stripe.redirectToCheckout({
-  //       sessionId: response.data.id,
-  //     });
-
-  //     if (error) {
-  //       setError(error.message);
-  //     }
-  //   } catch (err) {
-  //     setError('Failed to process payment');
-  //     console.error('Error processing payment:', err);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const handleDeliveryTypeChange = (type) => {
+    setDeliveryType(type);
+  };
 
   const handleProceedToPayment = async () => {
-    if (!selectedAddress) {
+    if (!selectedWarehouse) {
       setError('Please select a delivery address');
       return;
     }
@@ -116,9 +88,8 @@ const Checkout = () => {
       setLoading(true);
       const token = localStorage.getItem('token');
       const decodedToken = jwtDecode(token);
-      const userId = decodedToken.id; // Extract userId from the token
+      const userId = decodedToken.id;
 
-      // Create a line items array for Stripe
       const lineItems = cartItems.map((item) => ({
         price_data: {
           currency: 'usd',
@@ -128,26 +99,41 @@ const Checkout = () => {
           },
           unit_amount: Math.round(
             parseFloat(item.price.replace('$', '')) * 100
-          ), // Convert to cents
+          ),
         },
         quantity: item.quantity,
       }));
 
-      // Create checkout session
+      // Add delivery fee if premium
+      if (deliveryType === 'premium') {
+        lineItems.push({
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Premium Delivery Fee',
+              description: 'Express delivery service',
+            },
+            unit_amount: 1000, // $10.00 in cents
+          },
+          quantity: 1,
+        });
+      }
+
       const response = await axios.post(
         'http://localhost:3002/create-checkout-session',
         {
           lineItems,
-          selectedAddress,
-          userId, // Include the userId
-          cartItems, // Include the cart items
+          selectedAddress: selectedWarehouse,
+          addressId: selectedWarehouse._id,
+          userId,
+          cartItems,
+          deliveryType,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
-      // Redirect to Stripe checkout
       const stripe = await stripePromise;
       const { error } = await stripe.redirectToCheckout({
         sessionId: response.data.id,
@@ -184,55 +170,113 @@ const Checkout = () => {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Left Column - Delivery Address */}
+        {/* Left Column - Delivery Address/Warehouse */}
         <div>
-          <h2 className="text-xl font-semibold mb-4">Delivery Address</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            {userRole === 'distributor'
+              ? 'Select Warehouse'
+              : 'Delivery Address'}
+          </h2>
 
-          {addresses.length === 0 ? (
+          {warehouses.length === 0 ? (
             <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
-              No addresses found. Please add a delivery address.
+              No {userRole === 'distributor' ? 'warehouses' : 'addresses'}{' '}
+              found.
               <button
-                onClick={() => navigate('/my-addresses')}
+                onClick={() =>
+                  userRole === 'distributor'
+                    ? navigate('/distributor/warehouses')
+                    : navigate('/my-addresses')
+                }
                 className="block mt-2 text-blue-500 hover:text-blue-600"
               >
-                Add Address
+                Add {userRole === 'distributor' ? 'Warehouse' : 'Address'}
               </button>
             </div>
           ) : (
             <div className="space-y-4">
-              {addresses.map((address) => (
+              {warehouses.map((warehouse) => (
                 <div
-                  key={address._id}
+                  key={warehouse._id}
                   className={`border rounded-lg p-4 cursor-pointer ${
-                    selectedAddress?._id === address._id
+                    selectedWarehouse?._id === warehouse._id
                       ? 'border-blue-500 bg-blue-50'
                       : 'border-gray-200 hover:border-blue-300'
                   }`}
-                  onClick={() => handleAddressChange(address)}
+                  onClick={() => handleWarehouseChange(warehouse)}
                 >
                   <div className="flex items-start">
                     <input
                       type="radio"
-                      name="address"
-                      checked={selectedAddress?._id === address._id}
-                      onChange={() => handleAddressChange(address)}
+                      name="warehouse"
+                      checked={selectedWarehouse?._id === warehouse._id}
+                      onChange={() => handleWarehouseChange(warehouse)}
                       className="mt-1 mr-3"
                     />
                     <div>
-                      <p className="font-semibold">{address.addressLine1}</p>
-                      {address.addressLine2 && <p>{address.addressLine2}</p>}
-                      <p>{`${address.city}, ${address.state} ${address.zipCode}`}</p>
-                      {address.isPrimary && (
-                        <span className="inline-block mt-1 text-sm text-blue-600">
-                          Primary Address
-                        </span>
+                      <p className="font-semibold">{warehouse.addressLine1}</p>
+                      {warehouse.addressLine2 && (
+                        <p>{warehouse.addressLine2}</p>
                       )}
+                      <p>{`${warehouse.city}, ${warehouse.state} ${warehouse.zipCode}`}</p>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
           )}
+
+          {/* Delivery Options */}
+          <div className="mt-6">
+            <h2 className="text-xl font-semibold mb-4">Delivery Options</h2>
+            <div className="space-y-3">
+              <div
+                className={`border rounded-lg p-4 cursor-pointer ${
+                  deliveryType === 'normal'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-blue-300'
+                }`}
+                onClick={() => handleDeliveryTypeChange('normal')}
+              >
+                <div className="flex items-start">
+                  <input
+                    type="radio"
+                    name="delivery"
+                    checked={deliveryType === 'normal'}
+                    onChange={() => handleDeliveryTypeChange('normal')}
+                    className="mt-1 mr-3"
+                  />
+                  <div>
+                    <p className="font-semibold">Normal Delivery</p>
+                    <p className="text-sm text-gray-600">Free</p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={`border rounded-lg p-4 cursor-pointer ${
+                  deliveryType === 'premium'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-blue-300'
+                }`}
+                onClick={() => handleDeliveryTypeChange('premium')}
+              >
+                <div className="flex items-start">
+                  <input
+                    type="radio"
+                    name="delivery"
+                    checked={deliveryType === 'premium'}
+                    onChange={() => handleDeliveryTypeChange('premium')}
+                    className="mt-1 mr-3"
+                  />
+                  <div>
+                    <p className="font-semibold">Premium Delivery</p>
+                    <p className="text-sm text-gray-600">$10.00 extra</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Right Column - Order Summary */}
@@ -268,9 +312,19 @@ const Checkout = () => {
               ))}
 
               <div className="border-t pt-4 mt-4">
-                <div className="flex justify-between items-center font-semibold text-lg">
+                <div className="flex justify-between items-center">
+                  <span>Subtotal</span>
+                  <span>
+                    ${calculateTotal() - (deliveryType === 'premium' ? 10 : 0)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center mt-2">
+                  <span>Delivery Fee</span>
+                  <span>${deliveryType === 'premium' ? '10.00' : '0.00'}</span>
+                </div>
+                <div className="flex justify-between items-center font-semibold text-lg mt-2 pt-2 border-t">
                   <span>Total</span>
-                  <span>${totalPrice.toFixed(2)}</span>
+                  <span>${calculateTotal().toFixed(2)}</span>
                 </div>
               </div>
             </div>
@@ -278,9 +332,9 @@ const Checkout = () => {
 
           <button
             onClick={handleProceedToPayment}
-            disabled={loading || !selectedAddress}
+            disabled={loading || !selectedWarehouse}
             className={`w-full mt-6 py-3 px-4 text-white font-semibold rounded-lg ${
-              loading || !selectedAddress
+              loading || !selectedWarehouse
                 ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-blue-500 hover:bg-blue-600'
             }`}

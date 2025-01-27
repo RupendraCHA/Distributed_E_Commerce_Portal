@@ -36,8 +36,7 @@ const warehouseSchema = new mongoose.Schema({
   inventory: [
     {
       productId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
+        type: String,
       },
       quantity: {
         type: Number,
