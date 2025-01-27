@@ -838,6 +838,7 @@ const InventoryManagement = () => {
   const [loading, setLoading] = useState(true);
   const [sortOrder, setSortOrder] = useState('asc'); // 'asc' or 'desc'
 
+
   useEffect(() => {
     fetchInventoryData();
   }, []);
@@ -918,8 +919,19 @@ const InventoryManagement = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {inventory.map((item) => (
-                <tr key={item._id} className="hover:bg-gray-50">
+              {inventory.map((item) => {
+                  let itemCountColor = "bg-yellow-100 text-yellow-800";
+                  if(item.quantity < 10) {
+                    itemCountColor = "bg-red-100 text-white-800";
+                  }
+                  if(item.quantity < 10 && item.quantity > 20) {
+                    itemCountColor = "bg-orange-100 text-white-800";
+                  }
+                  
+                  if(item.quantity > 20) {
+                    itemCountColor = "bg-green-100 text-white-800";
+                  }
+                return <tr key={item._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <FaBox className="text-gray-400 mr-2" />
@@ -953,7 +965,7 @@ const InventoryManagement = () => {
                     <span
                       className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         item.quantity > item.reorderPoint
-                          ? 'bg-green-100 text-green-800'
+                          ? itemCountColor
                           : 'bg-yellow-100 text-yellow-800'
                       }`}
                     >
@@ -963,7 +975,9 @@ const InventoryManagement = () => {
                     </span>
                   </td>
                 </tr>
-              ))}
+              
+            })
+            }
             </tbody>
           </table>
         </div>

@@ -248,7 +248,7 @@ const Checkout = () => {
                     className="mt-1 mr-3"
                   />
                   <div>
-                    <p className="font-semibold">Normal Delivery</p>
+                    <p className="font-semibold">Regular Shipping (5-7 days)</p>
                     <p className="text-sm text-gray-600">Free</p>
                   </div>
                 </div>
@@ -271,7 +271,7 @@ const Checkout = () => {
                     className="mt-1 mr-3"
                   />
                   <div>
-                    <p className="font-semibold">Premium Delivery</p>
+                    <p className="font-semibold">Expedited Shipping (3-5 days)</p>
                     <p className="text-sm text-gray-600">$10.00 extra</p>
                   </div>
                 </div>
