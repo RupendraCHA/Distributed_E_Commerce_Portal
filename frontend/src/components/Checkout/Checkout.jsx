@@ -27,7 +27,13 @@ const Checkout = () => {
         total + parseFloat(item.price.replace('$', '')) * item.quantity,
       0
     );
-    const deliveryFee = deliveryType === 'premium' ? 10 : 0;
+
+    let deliveryFee = 0;
+    if (deliveryType === 'premium') {
+      deliveryFee = 10;
+    } else if (deliveryType === 'airMail') {
+      deliveryFee = 100;
+    }
     return itemsTotal + deliveryFee;
   };
 
@@ -115,6 +121,18 @@ const Checkout = () => {
               description: 'Express delivery service',
             },
             unit_amount: 1000, // $10.00 in cents
+          },
+          quantity: 1,
+        });
+      } else if (deliveryType === 'airmail') {
+        lineItems.push({
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Premium Delivery Fee',
+              description: 'Express delivery service',
+            },
+            unit_amount: 10000, // $10.00 in cents
           },
           quantity: 1,
         });
@@ -271,8 +289,33 @@ const Checkout = () => {
                     className="mt-1 mr-3"
                   />
                   <div>
-                    <p className="font-semibold">Expedited Shipping (3-5 days)</p>
+                    <p className="font-semibold">
+                      Expedited Shipping (3-5 days)
+                    </p>
                     <p className="text-sm text-gray-600">$10.00 extra</p>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                className={`border rounded-lg p-4 cursor-pointer ${
+                  deliveryType === 'airMail'
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-blue-300'
+                }`}
+                onClick={() => handleDeliveryTypeChange('airMail')}
+              >
+                <div className="flex items-start">
+                  <input
+                    type="radio"
+                    name="delivery"
+                    checked={deliveryType === 'airMail'}
+                    onChange={() => handleDeliveryTypeChange('airMail')}
+                    className="mt-1 mr-3"
+                  />
+                  <div>
+                    <p className="font-semibold">Air Shipping (1 day)</p>
+                    <p className="text-sm text-gray-600">$100.00 extra</p>
                   </div>
                 </div>
               </div>
@@ -316,12 +359,25 @@ const Checkout = () => {
                 <div className="flex justify-between items-center">
                   <span>Subtotal</span>
                   <span>
-                    ${calculateTotal() - (deliveryType === 'premium' ? 10 : 0)}
+                    $
+                    {calculateTotal() -
+                      (deliveryType === 'premium'
+                        ? 10
+                        : deliveryType === 'airMail'
+                        ? 100
+                        : 0)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mt-2">
                   <span>Delivery Fee</span>
-                  <span>${deliveryType === 'premium' ? '10.00' : '0.00'}</span>
+                  <span>
+                    $
+                    {deliveryType === 'premium'
+                      ? '10.00'
+                      : deliveryType === 'airMail'
+                      ? '100.00'
+                      : '0.00'}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center font-semibold text-lg mt-2 pt-2 border-t">
                   <span>Total</span>
