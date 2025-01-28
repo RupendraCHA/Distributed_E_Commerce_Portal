@@ -124,7 +124,7 @@ const Checkout = () => {
           },
           quantity: 1,
         });
-      } else if (deliveryType === 'airmail') {
+      } else if (deliveryType === 'airMail') {
         lineItems.push({
           price_data: {
             currency: 'usd',
