@@ -148,8 +148,9 @@ function SignUp() {
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
               >
-                <option value="user">User</option>
+                <option value="user">Consumer</option>
                 <option value="distributor">Distributor</option>
+                <option value="manufacturer">Manufacturer</option>
                 <option value="reseller">Reseller</option>
                 <option value="admin">Admin</option>
               </select>

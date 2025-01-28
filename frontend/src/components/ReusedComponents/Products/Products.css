@@ -32,7 +32,7 @@
     width: 250px;
     height: 400px;
     /* background-color: #fff; */
-    background:  #0014dc;
+    background:  #506bf2;
     border: 1px solid #0014dc;
     color: #fff;
     margin: 12px;
@@ -45,6 +45,11 @@
     gap: 30px;
     margin: 10px;
 
+    h2{
+        font-size:28px;
+        font-weight:bold;
+        
+    }
     .card-text{
         font-size: 16px;
     }

@@ -103,6 +103,22 @@ const Header = () => {
               {/* Your existing navigation items */}
               <li className="">
                 <Link
+                  // to="/products"
+                  className="text-xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                >
+                  Manufacturing
+                </Link>
+              </li>
+              <li className="">
+                <Link
+                  // to="/products"
+                  className="text-xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                >
+                  Sourcing
+                </Link>
+              </li>
+              <li className="">
+                <Link
                   to="/products"
                   className="text-xl text-whiteColor border-solid hover:border-b-4 pb-1"
                 >

@@ -145,7 +145,7 @@ const ProductList = ({ productList, title }) => {
       <Breadcrumbs
         aria-label="breadcrumb"
         className="breadcrumbs"
-        sx={{ marginBottom: 2 }}
+        // sx={{ marginBottom: 2 }}
       >
         {breadcrumbs.map((item, index) => (
           <Link
@@ -158,17 +158,17 @@ const ProductList = ({ productList, title }) => {
         ))}
       </Breadcrumbs>
 
-      <Typography
+      {/* <Typography
         variant="h5"
         component="h2"
         gutterBottom
         className="produtList-title"
       >
         {title}
-      </Typography>
+      </Typography> */}
       <Grid container spacing={2}>
         {productList.map((product, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
+          <Grid item xs={12} sm={6} md={3} key={index}>
             <Card className="product-card-section">
               <img
                 src={product.image}
@@ -204,6 +204,8 @@ const ProductList = ({ productList, title }) => {
                 >
                   <Button
                     variant="contained"
+                    style={{ fontSize:"12px" }}
+                    
                     color="success"
                     onClick={() => handleBuyNow(product)}
                   >
@@ -211,7 +213,7 @@ const ProductList = ({ productList, title }) => {
                   </Button>
                   <Button
                     variant="outlined"
-                    style={{ color: 'white', border: '1px solid white' }}
+                    style={{ color: 'white',fontSize:"12px", border: '1px solid white' }}
                     onClick={() => handleAddToCart(product)}
                   >
                     Add to Cart

@@ -1,14 +1,15 @@
 export const productsData = [
+  'Chocolates',
   'Salt',
   'Fries',
   'Medicines',
   'Equipment',
-  'Haneya',
-  'DMAG',
-  'Hanelytics',
-  'Curatum',
-  'Posetra',
-  'Chocolates',
+  'Odata'
+  // 'Haneya',
+  // 'DMAG',
+  // 'Hanelytics',
+  // 'Curatum',
+  // 'Posetra',
 ];
 export const solutionsData = ['Industry', 'Use Case'];
 export const pricingData = [

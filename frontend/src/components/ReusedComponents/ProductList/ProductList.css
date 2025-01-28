@@ -2,7 +2,7 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: column; /* Stack items vertically for breadcrumb and title */
-    padding: 20px; /* Add padding around the container */
+    padding: 10px; /* Add padding around the container */
 }
 
 .produtList-title{
@@ -30,13 +30,13 @@
 }
 .product-card-section{
     /* background-color: rgb(45, 48, 49); */
-    background:  #0014dc;
+    background:  #506bf2;
     color: #fff;
-    padding: 20px;
+    padding: 12px;
     text-align: center;
     border-radius: 20px;
-    width: 90%;
-    height: 70vh;
+    width: 80%;
+    height: 60vh; 
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -44,8 +44,8 @@
     /* margin: 20px; */
 }
 .product-pic{
-    width: 150px;
-    height: 150px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
 }
 .product-price {
