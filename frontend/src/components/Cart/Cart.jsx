@@ -84,6 +84,7 @@ const Cart = () => {
         updateCartItemQuantityAsync({
           productId,
           quantity: newQuantity,
+          // quantity: 0,
         })
       );
 

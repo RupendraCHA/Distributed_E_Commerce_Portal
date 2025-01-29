@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux';
 import { addToCart } from '../../../store/cartSlice';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
+import { FaSearch } from "react-icons/fa";
 import {
   Grid,
   Card,
@@ -21,6 +22,8 @@ const ProductList = ({ productList, title }) => {
   const location = useLocation(); // Get the current location
   const { enqueueSnackbar } = useSnackbar();
   const [sapData, setSapData] = useState({});
+  const [searchItem, setSearchItem] = useState("")
+  const [productDataList, setDataList] = useState(productList)
 
   const handleAddToCart = async (product) => {
     const token = localStorage.getItem('token');
@@ -137,11 +140,42 @@ const ProductList = ({ productList, title }) => {
     }
   }
 
+
+
   // Call the function to fetch data
   fetchSapData();
+
+
+  const getSelectedItemsOnly = () => {
+    console.log("Search Items Here")
+    let productsDataList = productList.filter((product) =>
+      product.productName.toLowerCase().includes(searchItem.toLowerCase())
+    );
+    setDataList(productsDataList)
+  }
+
+  const getAllProducts = () => {
+    setDataList(productList)
+    setSearchItem("")
+
+  }
+
+  let categoryName = (productList[0].category).toUpperCase()
+
+
   return (
     <div className="product-container">
       {/* Breadcrumbs */}
+      <div className='search-item-container'>
+        <div>
+          <label htmlFor='searchItem' className='search-input-label'>Search items related to <span style={{color: "#506bf2"}}>{categoryName}</span> here</label>
+          <div className='search-icon-input-container'>
+            <input value={searchItem} className='search-item-input' id='searchItem' type='text'  onChange={(e) => setSearchItem(e.target.value)} placeholder='Enter item name ...'/>
+            <FaSearch className='search-icon-symbol' onClick={getSelectedItemsOnly}/>
+          </div>
+          <div style={{textAlign: "right"}} onClick={getAllProducts}><button className='removing-input-text'>Clear All</button></div>
+        </div>
+      </div>
       <Breadcrumbs
         aria-label="breadcrumb"
         className="breadcrumbs"
@@ -166,8 +200,8 @@ const ProductList = ({ productList, title }) => {
       >
         {title}
       </Typography> */}
-      <Grid container spacing={2}>
-        {productList.map((product, index) => (
+      {productDataList.length > 0 ? <Grid container spacing={2}>
+        {productDataList.map((product, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
             <Card className="product-card-section">
               <img
@@ -219,32 +253,18 @@ const ProductList = ({ productList, title }) => {
                     Add to Cart
                   </Button>
                 </div>
-
-                {/* <Grid container spacing={2}>
-                  <Grid item>
-                    <Button
-                      variant="contained"
-                      color="success"
-                      onClick={() => handleBuyNow(product)}
-                    >
-                      Buy Now
-                    </Button>
-                  </Grid>
-                  <Grid item>
-                    <Button
-                      variant="outlined"
-                      color="warning"
-                      onClick={() => handleAddToCart(product)}
-                    >
-                      Add to Cart
-                    </Button>
-                  </Grid>
-                </Grid> */}
               </CardContent>
             </Card>
           </Grid>
         ))}
-      </Grid>
+      </Grid> : (
+        <div className='no-items-text-container'>
+          <div>
+            <h1>There are no items available with the name you entered..</h1>
+            <button onClick={getAllProducts}>View All Products</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

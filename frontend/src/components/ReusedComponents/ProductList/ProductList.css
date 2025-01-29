@@ -108,3 +108,85 @@
     margin: 5px;
     min-width: 120px; /* Ensure buttons have a minimum width */
 }
+.search-item-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 20px;
+
+    .search-input-label{
+        font-size: 26px;
+        font-weight: bold;
+    }
+    .search-icon-input-container{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        border: 2px solid #000;
+        width: 40vw;
+        padding: 6px 10px;
+        border-radius: 10px;
+        /* background-color: #8080801e; */
+
+        input{
+            background-color: transparent;
+            width: 75%;
+            border: none;
+            outline: none;
+            font-weight: bold;
+            color: #000;
+            font-size: 18px;
+            /* text-align: center; */
+        }
+        .search-icon-symbol{
+            width: 25px;
+            height: 25px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+    }
+    .removing-input-text{
+        font-size: 16px;
+        margin-top: 4px;
+        background-color: #000;
+        color: #fff;
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-weight: bold;
+        box-shadow: 2px 2px 5px #000;
+        cursor: pointer;
+    }
+}
+@media (max-width: 768px){
+    .search-item-container{
+
+        .search-icon-input-container{
+            width: 60vw;
+        }
+    }
+}
+.no-items-text-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    text-align: center;
+    height: 20vh;
+    
+    h1{
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+    button{
+        border: 2px solid #506bf2;
+        padding: 10px;
+        border-radius: 6px;
+        background-color: #506bf2;
+        color: #fff;
+        font-weight: bold;
+        box-shadow: 2px 2px 5px #000;
+    }
+}
