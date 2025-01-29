@@ -26,6 +26,7 @@ const ProductList = ({ productList, title }) => {
   const [productDataList, setDataList] = useState(productList)
 
   const handleAddToCart = async (product) => {
+    console.log(product)
     const token = localStorage.getItem('token');
     const productWithQuantity = { ...product, quantity: 1 };
     dispatch(addToCart(productWithQuantity));
@@ -164,16 +165,16 @@ const ProductList = ({ productList, title }) => {
 
 
   return (
-    <div className="product-container">
+    <div className="container product-container">
       {/* Breadcrumbs */}
       <div className='search-item-container'>
         <div>
-          <label htmlFor='searchItem' className='search-input-label'>Search items related to <span style={{color: "#506bf2"}}>{categoryName}</span> here</label>
+          {/* <label htmlFor='searchItem' className='search-input-label'>Search items related to <span style={{color: "#506bf2"}}>{categoryName}</span> here</label> */}
           <div className='search-icon-input-container'>
             <input value={searchItem} className='search-item-input' id='searchItem' type='text'  onChange={(e) => setSearchItem(e.target.value)} placeholder='Enter item name ...'/>
             <FaSearch className='search-icon-symbol' onClick={getSelectedItemsOnly}/>
           </div>
-          <div style={{textAlign: "right"}} onClick={getAllProducts}><button className='removing-input-text'>Clear All</button></div>
+          {searchItem && <div style={{textAlign: "right"}} onClick={getAllProducts}><button className='removing-input-text'>Clear All</button></div>}
         </div>
       </div>
       <Breadcrumbs

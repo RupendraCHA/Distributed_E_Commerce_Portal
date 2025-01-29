@@ -2,7 +2,8 @@
     display: flex;
     flex-wrap: wrap;
     flex-direction: column; /* Stack items vertically for breadcrumb and title */
-    padding: 10px; /* Add padding around the container */
+    /* padding: 10px; */
+     /* Add padding around the container */
 }
 
 .produtList-title{
@@ -30,7 +31,7 @@
 }
 .product-card-section{
     /* background-color: rgb(45, 48, 49); */
-    background:  #506bf2;
+    background:  #506bf2d3;
     color: #fff;
     padding: 12px;
     text-align: center;
@@ -44,8 +45,8 @@
     /* margin: 20px; */
 }
 .product-pic{
-    width: 100px;
-    height: 100px;
+    width: 155px;
+    height: 155px;
     border-radius: 50%;
 }
 .product-price {
@@ -113,7 +114,7 @@
     justify-content: center;
     align-items: center;
     text-align: center;
-    margin-bottom: 20px;
+    margin-bottom: 5px;
 
     .search-input-label{
         font-size: 26px;
@@ -125,7 +126,7 @@
         align-items: center;
         gap: 20px;
         border: 2px solid #000;
-        width: 40vw;
+        width: 30vw;
         padding: 6px 10px;
         border-radius: 10px;
         /* background-color: #8080801e; */

@@ -553,7 +553,128 @@ const fries = [
       }
     
   ];
-
+const Odata = [
+  {
+    productId: 'p001',
+    productName: 'AGRPUMP',
+    category: 'pump',
+    brand: '',
+    description: 'Agricultural water pump for irrigation',
+    price: '100 usd',
+    weight: '15.000',
+    stock: '75',
+    expirationDate: '00000000',
+    image: ''
+  },
+  {
+    productId: 'p002',
+    productName: 'BENALIUM',
+    category: 'chemical',
+    brand: '',
+    description: 'Benalium compound used in metallurgical processes',
+    price: '200 usd',
+    weight: '50.000',
+    stock: '80',
+    expirationDate: '20251231',
+    image: ''
+  },
+  {
+    productId: 'p003',
+    productName: 'BRASS',
+    category: 'metal',
+    brand: '',
+    description: 'High-quality brass used for industrial and decorative purposes',
+    price: '50 usd',
+    weight: '30.000',
+    stock: '70',
+    expirationDate: '00000000',
+    image: ''
+  },
+  {
+    productId: 'p004',
+    productName: 'LED',
+    category: 'lighting',
+    brand: '',
+    description: 'Energy-efficient LED light for home and office use',
+    price: '5 usd/unit',
+    weight: '1.200',
+    stock: '90',
+    expirationDate: '00000000',
+    image: ''
+  },
+  {
+    productId: 'p005',
+    productName: 'MNIPICKAXES',
+    category: 'tools',
+    brand: '',
+    description: 'Durable mining pickaxes for industrial and personal use',
+    price: '25 usd/unit',
+    weight: '4.800',
+    stock: '85',
+    expirationDate: '00000000',
+    image: ''
+  },
+  {
+    productId: 'p006',
+    productName: 'SITTAPER',
+    category: 'adhesives',
+    brand: '',
+    description: 'High-strength adhesive tape for industrial packaging',
+    price: '2 usd/roll',
+    weight: '1.000',
+    stock: '90',
+    expirationDate: '00000000',
+    image: ''
+  },
+  {
+    productId: 'p007',
+    productName: 'SULPHUR',
+    category: 'chemicals',
+    brand: '',
+    description: 'High-purity sulphur for agricultural and industrial use',
+    price: '10 usd/kg',
+    weight: '1.200',
+    stock: '80',
+    expirationDate: '00000000',
+    image: ''
+  },
+  {
+    productId: 'p008',
+    productName: 'THORIUM',
+    category: 'radioactive elements',
+    brand: '',
+    description: 'High-purity thorium for nuclear research and industrial use',
+    price: '500 usd/kg',
+    weight: '5.500',
+    stock: '70',
+    expirationDate: '00000000',
+    image: ''
+  },
+  {
+    productId: 'p009',
+    productName: 'TIE',
+    category: 'fashion accessories',
+    brand: '',
+    description: 'High-quality silk ties for formal occasions',
+    price: '20 usd/piece',
+    weight: '0.250',
+    stock: '95',
+    expirationDate: '00000000',
+    image: ''
+  },
+  {
+    productId: 'p010',
+    productName: 'TILE',
+    category: 'flooring',
+    brand: '',
+    description: 'Durable ceramic tiles for flooring and walls',
+    price: '15 USD/M²',
+    weight: '3.000',
+    stock: '85',
+    expirationDate: '00000000',
+    image: ''
+  }
+]
 const curatum = {
   customProduct: true,
   content: {
@@ -918,4 +1039,5 @@ export const categories = {
   haneya,
   posetra,
   chocolates,
+  Odata
 };
