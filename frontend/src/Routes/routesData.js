@@ -63,6 +63,7 @@ import {
   DashboardsData,
   categories,
 } from '../data/PosetraDataPage.jsx';
+import Inventory from '../components/Inventory/Inventory.jsx';
 
 export const pirvateSections = [
   {
@@ -73,7 +74,12 @@ export const pirvateSections = [
   { path: '/products', data: productsData, section: 'Products' },
   { path: '/solutions', data: solutionsData, section: 'Solutions' },
   { path: '/pricing', data: pricingData, section: 'Pricing' },
-  { path: '/inventory', data: InventoryData, section: 'Inventory' },
+  {
+    path: '/inventory',
+    data: InventoryData,
+    section: 'Inventory',
+    element: Inventory,
+  },
   { path: '/quotation', data: QuotationData, section: 'Quotation' },
   { path: '/order', data: OrderData, section: 'Order' },
   { path: '/ship', data: ShipData, section: 'Ship', element: Ship },

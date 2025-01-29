@@ -24,7 +24,7 @@ export const pricingData = [
   'Trade Prices',
 ];
 export const InventoryData = [
-  'Planned Inventory',
+  'Inventory Management',
   'Safety Stock',
   'Consigned Inventory',
   'Transit Inventory',
