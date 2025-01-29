@@ -62,6 +62,7 @@ import {
   categories,
 } from '../data/PosetraDataPage.jsx';
 import SuccessPage from '../components/SuccessPage.jsx';
+import Ship from '../components/Ship/Ship.jsx';
 
 export const pirvateSections = [
   {
@@ -75,7 +76,7 @@ export const pirvateSections = [
   { path: '/inventory', data: InventoryData, section: 'Inventory' },
   { path: '/quotation', data: QuotationData, section: 'Quotation' },
   { path: '/order', data: OrderData, section: 'Order' },
-  { path: '/ship', data: ShipData, section: 'Ship' },
+
   { path: '/invoice', data: InvoiceData, section: 'Invoice' },
   { path: '/dashboards', data: DashboardsData, section: 'Dashboards' },
 ];
@@ -207,6 +208,11 @@ export const distributorRoutes = [
   {
     path: '/distributor/inventory',
     element: InventoryManagement,
+  },
+  {
+    path: '/ship',
+    element: Ship,
+    data: ShipData,
   },
 ];
 

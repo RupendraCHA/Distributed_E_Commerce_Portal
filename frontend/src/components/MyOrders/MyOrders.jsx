@@ -239,10 +239,19 @@ const Orders = () => {
             {order.items.map((item, index) => (
               <div key={index} className="order-item">
                 <div className="item-details">
-                  <p className="item-name">{item.productName}</p>
+                  {console.log(item)}
+                  <p className="item-name">{item.product}</p>
                   <p className="item-quantity">Quantity: {item.quantity}</p>
                 </div>
-                <p className="item-price">{item.price}</p>
+                <p className="item-price">
+                  $
+                  {item.price
+                    ? (
+                        parseFloat(item.price.replace(/[^0-9.]/g, '')) *
+                        item.quantity
+                      ).toFixed(2)
+                    : 'N/A'}
+                </p>
               </div>
             ))}
           </div>
@@ -262,7 +271,7 @@ const Orders = () => {
         <div className="order-summary">
           <div className="total-row">
             <span>Total</span>
-            <span>${order.total}</span>
+            <span>${order.total.toFixed(2)}</span>
           </div>
           <p className="payment-method">Paid via {order.paymentMethod}</p>
         </div>

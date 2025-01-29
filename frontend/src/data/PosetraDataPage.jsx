@@ -4,7 +4,7 @@ export const productsData = [
   'Fries',
   'Medicines',
   'Equipment',
-  'Odata'
+  'Odata',
   // 'Haneya',
   // 'DMAG',
   // 'Hanelytics',
@@ -48,6 +48,7 @@ export const OrderData = [
   'Status',
 ];
 export const ShipData = [
+  'Warehouses',
   'shipping',
   'Transportation',
   'Bulk',
@@ -335,224 +336,245 @@ const fries = [
   },
 ];
 
-  const chocolates = [
-    {
-      productId: 'CHC001',
-      productName: 'Ferrero Rocher',
-      category: 'chocolate',
-      brand: 'Ferrero',
-      weight: '5.3 oz',
-      price: '$10',
-      description:
-        'A spherical chocolate treat with a crisp wafer shell, creamy hazelnut filling, and a whole hazelnut center, wrapped in golden foil.',
-      dosage: 'N/A',
-      stock: 100,
-      expirationDate: '2025-12-31',
-      image:
-        'https://res.cloudinary.com/dppznstlh/image/upload/v1729225005/choc_1_onqmpn.webp',
-    },
-    {
-      productId: 'CHC002',
-      productName: 'Lindor',
-      category: 'chocolate',
-      brand: 'Lindt & Sprüngli',
-      weight: '3.5 oz',
-      price: '$7',
-      description:
-        'Premium Swiss chocolate available in various varieties such as milk, dark, and white chocolate, known for its smooth and rich texture.',
-      dosage: 'N/A',
-      stock: 150,
-      expirationDate: '2026-01-15',
-      image:
-        'https://res.cloudinary.com/dppznstlh/image/upload/v1729225004/lindor_mlcxgc.webp',
-    },
-    
-      {
-        productId: 'CHC003',
-        productName: 'Hershey\'s Milk Chocolate Bar',
-        category: 'chocolate',
-        brand: 'Hershey\'s',
-        weight: '1.55 oz',
-        price: '$1.50',
-        description: 'Classic American milk chocolate bar with a creamy and sweet taste.',
-        dosage: 'N/A',
-        stock: 200,
-        expirationDate: '2025-12-01',
-        image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094465/Hershey_27s_Milk_Chocolate_rgbolq.webp'
-      },
-      {
-        productId: 'CHC004',
-        productName: 'Ghirardelli Dark Chocolate Squares',
-        category: 'chocolate',
-        brand: 'Ghirardelli',
-        weight: '5.32 oz',
-        price: '$8',
-        description: 'Rich and intense dark chocolate squares, perfect for indulging in a luxurious treat.',
-        dosage: 'N/A',
-        stock: 120,
-        expirationDate: '2025-11-30',
-        // image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094587/GHIRARDELLIINTENSE86_DARKCHOCOLATESQUARES_1024x1024_o1weap.webp'
-        image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094655/darkchocmintsquares_lockup_xayur5.webp'
-      },
-      {
-        productId: 'CHC005',
-        productName: 'Reese\'s Peanut Butter Cups',
-        category: 'chocolate',
-        brand: 'Hershey\'s',
-        weight: '1.6 oz',
-        price: '$1.25',
-        description: 'Iconic peanut butter cups covered in smooth milk chocolate.',
-        dosage: 'N/A',
-        stock: 300,
-        expirationDate: '2025-10-20',
-        image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094768/Reeses-Peanut-Butter-Cup_i0eqah.jpg'
-      },
-      {
-        productId: 'CHC006',
-        productName: 'Kit Kat',
-        category: 'chocolate',
-        brand: 'Nestlé',
-        weight: '1.5 oz',
-        price: '$1.20',
-        description: 'Crispy wafer layers covered in smooth milk chocolate.',
-        dosage: 'N/A',
-        stock: 250,
-        expirationDate: '2025-09-15',
-        image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094842/kk-chunky-480.jpg_e688sy.webp'
-      },
-      {
-        productId: 'CHC007',
-        productName: 'Snickers',
-        category: 'chocolate',
-        brand: 'Mars',
-        weight: '1.86 oz',
-        price: '$1.50',
-        description: 'Chocolate bar filled with nougat, caramel, and peanuts.',
-        dosage: 'N/A',
-        stock: 180,
-        expirationDate: '2025-08-25',
-        image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094911/Snickers-unveil-new-coffee-flavour_c5sgn0.png'
-      },
-      {
-        productId: 'CHC008',
-        productName: 'Twix',
-        category: 'chocolate',
-        brand: 'Mars',
-        weight: '1.79 oz',
-        price: '$1.30',
-        description: 'Cookie bars topped with caramel and coated in milk chocolate.',
-        dosage: 'N/A',
-        stock: 220,
-        expirationDate: '2025-07-30',
-        image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094987/639c53c9bc255e57865ce0f9-twix-twin-chocolate-bars-50g-pack-of_zpenek.jpg'
-      },
-      {
-        productId: 'CHC009',
-        productName: 'M&M\'s Milk Chocolate',
-        category: 'chocolate',
-        brand: 'Mars',
-        weight: '1.69 oz',
-        price: '$1.00',
-        description: 'Colorful candy shells with milk chocolate inside.',
-        dosage: 'N/A',
-        stock: 400,
-        expirationDate: '2025-06-20',
-        image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095062/MMs-Milk-Chocolate-100-g-150_yt698u.jpg'
-      },
-      {
-        productId: 'CHC010',
-        productName: 'Dove Dark Chocolate Promises',
-        category: 'chocolate',
-        brand: 'Dove',
-        weight: '9.5 oz',
-        price: '$6',
-        description: 'Smooth and silky dark chocolate promises, perfect for sharing or indulging.',
-        dosage: 'N/A',
-        stock: 100,
-        expirationDate: '2025-05-15',
-        image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095167/66413191d4a6eb73e53f3ede-dove-candy-dark-chocolate-bars-full_n4cavx.jpg'
-      },
-      {
-        productId: 'CHC011',
-        productName: 'Cadbury Dairy Milk',
-        category: 'chocolate',
-        brand: 'Cadbury',
-        weight: '4.4 oz',
-        price: '$4',
-        description: 'Creamy and smooth milk chocolate bar, a classic favorite.',
-        dosage: 'N/A',
-        stock: 150,
-        expirationDate: '2025-04-10',
-        // image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095261/40157245_13-cadbury-dairy-milk-silk-hazelnut-chocolate-bar_iz3gxk.webp'
-        image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095330/71w7ppkACUL._AC_UF894_1000_QL80__lcwy8l.jpg'
-      },
-      {
-        productId: 'CHC012',
-        productName: 'Milky Way',
-        category: 'chocolate',
-        brand: 'Mars',
-        weight: '1.84 oz',
-        price: '$1.20',
-        description: 'Chocolate bar with nougat and caramel, covered in milk chocolate.',
-        dosage: 'N/A',
-        stock: 200,
-        expirationDate: '2025-03-25',
-        image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095427/milky_way_nougat_milk_chocolate_snack_bars_multipack_12_x_215g_51028_T596_chznag.jpg'
-      },
-      {
-        productId: 'CHC013',
-        productName: '3 Musketeers',
-        category: 'chocolate',
-        brand: 'Mars',
-        weight: '1.92 oz',
-        price: '$1.10',
-        description: 'Fluffy and light chocolate bar filled with whipped nougat.',
-        dosage: 'N/A',
-        stock: 180,
-        expirationDate: '2025-02-20',
-        image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095509/3_Musketeers_Chocolate_Bars_pic_uy7qmv.webp'
-      },
-      {
-        productId: 'CHC014',
-        productName: 'Toblerone',
-        category: 'chocolate',
-        brand: 'Mondelez International',
-        weight: '3.52 oz',
-        price: '$5',
-        description: 'Swiss chocolate with honey and almond nougat, shaped in unique triangular pieces.',
-        dosage: 'N/A',
-        stock: 90,
-        expirationDate: '2025-01-15',
-        image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095582/51LOF8Tp3mL_lkbdzi.jpg'
-      },
-      {
-        productId: 'CHC015',
-        productName: 'Godiva Dark Chocolate Truffles',
-        category: 'chocolate',
-        brand: 'Godiva',
-        weight: '4.5 oz',
-        price: '$12',
-        description: 'Luxurious dark chocolate truffles with a rich and velvety texture.',
-        dosage: 'N/A',
-        stock: 80,
-        expirationDate: '2024-12-31',
-        image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095643/718cNtzMxpL._AC_UF894_1000_QL80__tgkmxz.jpg'
-      },
-      {
-        productId: 'CHC016',
-        productName: 'Russell Stover Assorted Chocolates',
-        category: 'chocolate',
-        brand: 'Russell Stover',
-        weight: '12 oz',
-        price: '$10',
-        description: 'Assorted box of chocolates with various fillings, perfect for gifting.',
-        dosage: 'N/A',
-        stock: 70,
-        expirationDate: '2024-11-30',
-        image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095704/077260044006_4400_1000_mkthvc.webp'
-      }
-    
-  ];
+const chocolates = [
+  {
+    productId: 'CHC001',
+    productName: 'Ferrero Rocher',
+    category: 'chocolate',
+    brand: 'Ferrero',
+    weight: '5.3 oz',
+    price: '$10',
+    description:
+      'A spherical chocolate treat with a crisp wafer shell, creamy hazelnut filling, and a whole hazelnut center, wrapped in golden foil.',
+    dosage: 'N/A',
+    stock: 100,
+    expirationDate: '2025-12-31',
+    image:
+      'https://res.cloudinary.com/dppznstlh/image/upload/v1729225005/choc_1_onqmpn.webp',
+  },
+  {
+    productId: 'CHC002',
+    productName: 'Lindor',
+    category: 'chocolate',
+    brand: 'Lindt & Sprüngli',
+    weight: '3.5 oz',
+    price: '$7',
+    description:
+      'Premium Swiss chocolate available in various varieties such as milk, dark, and white chocolate, known for its smooth and rich texture.',
+    dosage: 'N/A',
+    stock: 150,
+    expirationDate: '2026-01-15',
+    image:
+      'https://res.cloudinary.com/dppznstlh/image/upload/v1729225004/lindor_mlcxgc.webp',
+  },
+
+  {
+    productId: 'CHC003',
+    productName: "Hershey's Milk Chocolate Bar",
+    category: 'chocolate',
+    brand: "Hershey's",
+    weight: '1.55 oz',
+    price: '$1.50',
+    description:
+      'Classic American milk chocolate bar with a creamy and sweet taste.',
+    dosage: 'N/A',
+    stock: 200,
+    expirationDate: '2025-12-01',
+    image:
+      'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094465/Hershey_27s_Milk_Chocolate_rgbolq.webp',
+  },
+  {
+    productId: 'CHC004',
+    productName: 'Ghirardelli Dark Chocolate Squares',
+    category: 'chocolate',
+    brand: 'Ghirardelli',
+    weight: '5.32 oz',
+    price: '$8',
+    description:
+      'Rich and intense dark chocolate squares, perfect for indulging in a luxurious treat.',
+    dosage: 'N/A',
+    stock: 120,
+    expirationDate: '2025-11-30',
+    // image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094587/GHIRARDELLIINTENSE86_DARKCHOCOLATESQUARES_1024x1024_o1weap.webp'
+    image:
+      'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094655/darkchocmintsquares_lockup_xayur5.webp',
+  },
+  {
+    productId: 'CHC005',
+    productName: "Reese's Peanut Butter Cups",
+    category: 'chocolate',
+    brand: "Hershey's",
+    weight: '1.6 oz',
+    price: '$1.25',
+    description: 'Iconic peanut butter cups covered in smooth milk chocolate.',
+    dosage: 'N/A',
+    stock: 300,
+    expirationDate: '2025-10-20',
+    image:
+      'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094768/Reeses-Peanut-Butter-Cup_i0eqah.jpg',
+  },
+  {
+    productId: 'CHC006',
+    productName: 'Kit Kat',
+    category: 'chocolate',
+    brand: 'Nestlé',
+    weight: '1.5 oz',
+    price: '$1.20',
+    description: 'Crispy wafer layers covered in smooth milk chocolate.',
+    dosage: 'N/A',
+    stock: 250,
+    expirationDate: '2025-09-15',
+    image:
+      'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094842/kk-chunky-480.jpg_e688sy.webp',
+  },
+  {
+    productId: 'CHC007',
+    productName: 'Snickers',
+    category: 'chocolate',
+    brand: 'Mars',
+    weight: '1.86 oz',
+    price: '$1.50',
+    description: 'Chocolate bar filled with nougat, caramel, and peanuts.',
+    dosage: 'N/A',
+    stock: 180,
+    expirationDate: '2025-08-25',
+    image:
+      'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094911/Snickers-unveil-new-coffee-flavour_c5sgn0.png',
+  },
+  {
+    productId: 'CHC008',
+    productName: 'Twix',
+    category: 'chocolate',
+    brand: 'Mars',
+    weight: '1.79 oz',
+    price: '$1.30',
+    description:
+      'Cookie bars topped with caramel and coated in milk chocolate.',
+    dosage: 'N/A',
+    stock: 220,
+    expirationDate: '2025-07-30',
+    image:
+      'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094987/639c53c9bc255e57865ce0f9-twix-twin-chocolate-bars-50g-pack-of_zpenek.jpg',
+  },
+  {
+    productId: 'CHC009',
+    productName: "M&M's Milk Chocolate",
+    category: 'chocolate',
+    brand: 'Mars',
+    weight: '1.69 oz',
+    price: '$1.00',
+    description: 'Colorful candy shells with milk chocolate inside.',
+    dosage: 'N/A',
+    stock: 400,
+    expirationDate: '2025-06-20',
+    image:
+      'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095062/MMs-Milk-Chocolate-100-g-150_yt698u.jpg',
+  },
+  {
+    productId: 'CHC010',
+    productName: 'Dove Dark Chocolate Promises',
+    category: 'chocolate',
+    brand: 'Dove',
+    weight: '9.5 oz',
+    price: '$6',
+    description:
+      'Smooth and silky dark chocolate promises, perfect for sharing or indulging.',
+    dosage: 'N/A',
+    stock: 100,
+    expirationDate: '2025-05-15',
+    image:
+      'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095167/66413191d4a6eb73e53f3ede-dove-candy-dark-chocolate-bars-full_n4cavx.jpg',
+  },
+  {
+    productId: 'CHC011',
+    productName: 'Cadbury Dairy Milk',
+    category: 'chocolate',
+    brand: 'Cadbury',
+    weight: '4.4 oz',
+    price: '$4',
+    description: 'Creamy and smooth milk chocolate bar, a classic favorite.',
+    dosage: 'N/A',
+    stock: 150,
+    expirationDate: '2025-04-10',
+    // image: 'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095261/40157245_13-cadbury-dairy-milk-silk-hazelnut-chocolate-bar_iz3gxk.webp'
+    image:
+      'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095330/71w7ppkACUL._AC_UF894_1000_QL80__lcwy8l.jpg',
+  },
+  {
+    productId: 'CHC012',
+    productName: 'Milky Way',
+    category: 'chocolate',
+    brand: 'Mars',
+    weight: '1.84 oz',
+    price: '$1.20',
+    description:
+      'Chocolate bar with nougat and caramel, covered in milk chocolate.',
+    dosage: 'N/A',
+    stock: 200,
+    expirationDate: '2025-03-25',
+    image:
+      'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095427/milky_way_nougat_milk_chocolate_snack_bars_multipack_12_x_215g_51028_T596_chznag.jpg',
+  },
+  {
+    productId: 'CHC013',
+    productName: '3 Musketeers',
+    category: 'chocolate',
+    brand: 'Mars',
+    weight: '1.92 oz',
+    price: '$1.10',
+    description: 'Fluffy and light chocolate bar filled with whipped nougat.',
+    dosage: 'N/A',
+    stock: 180,
+    expirationDate: '2025-02-20',
+    image:
+      'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095509/3_Musketeers_Chocolate_Bars_pic_uy7qmv.webp',
+  },
+  {
+    productId: 'CHC014',
+    productName: 'Toblerone',
+    category: 'chocolate',
+    brand: 'Mondelez International',
+    weight: '3.52 oz',
+    price: '$5',
+    description:
+      'Swiss chocolate with honey and almond nougat, shaped in unique triangular pieces.',
+    dosage: 'N/A',
+    stock: 90,
+    expirationDate: '2025-01-15',
+    image:
+      'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095582/51LOF8Tp3mL_lkbdzi.jpg',
+  },
+  {
+    productId: 'CHC015',
+    productName: 'Godiva Dark Chocolate Truffles',
+    category: 'chocolate',
+    brand: 'Godiva',
+    weight: '4.5 oz',
+    price: '$12',
+    description:
+      'Luxurious dark chocolate truffles with a rich and velvety texture.',
+    dosage: 'N/A',
+    stock: 80,
+    expirationDate: '2024-12-31',
+    image:
+      'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095643/718cNtzMxpL._AC_UF894_1000_QL80__tgkmxz.jpg',
+  },
+  {
+    productId: 'CHC016',
+    productName: 'Russell Stover Assorted Chocolates',
+    category: 'chocolate',
+    brand: 'Russell Stover',
+    weight: '12 oz',
+    price: '$10',
+    description:
+      'Assorted box of chocolates with various fillings, perfect for gifting.',
+    dosage: 'N/A',
+    stock: 70,
+    expirationDate: '2024-11-30',
+    image:
+      'https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738095704/077260044006_4400_1000_mkthvc.webp',
+  },
+];
 const Odata = [
   {
     productId: 'p001',
@@ -564,7 +586,7 @@ const Odata = [
     weight: '15.000',
     stock: '75',
     expirationDate: '00000000',
-    image: ''
+    image: '',
   },
   {
     productId: 'p002',
@@ -576,19 +598,20 @@ const Odata = [
     weight: '50.000',
     stock: '80',
     expirationDate: '20251231',
-    image: ''
+    image: '',
   },
   {
     productId: 'p003',
     productName: 'BRASS',
     category: 'metal',
     brand: '',
-    description: 'High-quality brass used for industrial and decorative purposes',
+    description:
+      'High-quality brass used for industrial and decorative purposes',
     price: '50 usd',
     weight: '30.000',
     stock: '70',
     expirationDate: '00000000',
-    image: ''
+    image: '',
   },
   {
     productId: 'p004',
@@ -600,7 +623,7 @@ const Odata = [
     weight: '1.200',
     stock: '90',
     expirationDate: '00000000',
-    image: ''
+    image: '',
   },
   {
     productId: 'p005',
@@ -612,7 +635,7 @@ const Odata = [
     weight: '4.800',
     stock: '85',
     expirationDate: '00000000',
-    image: ''
+    image: '',
   },
   {
     productId: 'p006',
@@ -624,7 +647,7 @@ const Odata = [
     weight: '1.000',
     stock: '90',
     expirationDate: '00000000',
-    image: ''
+    image: '',
   },
   {
     productId: 'p007',
@@ -636,7 +659,7 @@ const Odata = [
     weight: '1.200',
     stock: '80',
     expirationDate: '00000000',
-    image: ''
+    image: '',
   },
   {
     productId: 'p008',
@@ -648,7 +671,7 @@ const Odata = [
     weight: '5.500',
     stock: '70',
     expirationDate: '00000000',
-    image: ''
+    image: '',
   },
   {
     productId: 'p009',
@@ -660,7 +683,7 @@ const Odata = [
     weight: '0.250',
     stock: '95',
     expirationDate: '00000000',
-    image: ''
+    image: '',
   },
   {
     productId: 'p010',
@@ -672,9 +695,9 @@ const Odata = [
     weight: '3.000',
     stock: '85',
     expirationDate: '00000000',
-    image: ''
-  }
-]
+    image: '',
+  },
+];
 const curatum = {
   customProduct: true,
   content: {
@@ -1039,5 +1062,5 @@ export const categories = {
   haneya,
   posetra,
   chocolates,
-  Odata
+  Odata,
 };
