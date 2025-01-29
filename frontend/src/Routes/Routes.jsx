@@ -76,7 +76,7 @@ function RoutesComponent() {
                     />
                   ))}
 
-                  {/* Product Section Routes */}
+                  {/* Product Section Routes
                   {pirvateSections.map(({ path, data, section }) => (
                     <Route
                       key={path}
@@ -90,7 +90,32 @@ function RoutesComponent() {
                         </ProtectedRoute>
                       }
                     />
-                  ))}
+                  ))} */}
+
+                  {/* Product Section Routes */}
+                  {pirvateSections.map(
+                    ({ path, data, section, element: CustomElement }) => (
+                      <Route
+                        key={path}
+                        path={path}
+                        element={
+                          <ProtectedRoute>
+                            {CustomElement ? (
+                              <CustomElement
+                                iterationData={data}
+                                currentSection={section}
+                              />
+                            ) : (
+                              <Products
+                                iterationData={data}
+                                currentSection={section}
+                              />
+                            )}
+                          </ProtectedRoute>
+                        }
+                      />
+                    )
+                  )}
 
                   {/* Admin Routes */}
                   {userRole === 'admin' &&
