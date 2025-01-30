@@ -74,12 +74,6 @@ const Orders = () => {
     }
   };
 
-  const getDeliveryDate = (createdAt, days) => {
-    const date = new Date(createdAt);
-    date.setDate(date.getDate() + days);
-    return date.toDateString(); // Formats as "Day Mon DD YYYY"
-  };
-
   const OrderDetails = ({ order }) => (
     <div className="order-card">
       <div className="order-header">
@@ -137,26 +131,16 @@ const Orders = () => {
           <h4 className="section-title">Delivery Type</h4>
           <p className="delivery-type">
             {order.deliveryType === 'standard'
-              ? `Order will be delivered on ${getDeliveryDate(
-                  order.createdAt,
-                  6
-                )}`
+              ? 'Order will be delivered to you within 6 days'
               : order.deliveryType === 'premium'
-              ? `Order will be delivered on ${getDeliveryDate(
-                  order.createdAt,
-                  3
-                )}`
+              ? 'Order will be delivered to you within 3 days'
               : order.deliveryType === 'airWalk'
-              ? `Order will be delivered on ${getDeliveryDate(
-                  order.createdAt,
-                  1
-                )}`
+              ? 'Order will be delivered to you within 1 day'
               : 'Invalid delivery type'}
           </p>
 
           {userRole === 'user' && (
             <div>
-              <p>Will be delivered from xxxxxxx company located in xxxxxx</p>
             </div>
           )}
         </div>

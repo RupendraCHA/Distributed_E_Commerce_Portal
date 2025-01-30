@@ -997,7 +997,7 @@ app.post("/saveForLater/:productId", authenticateToken, async (req, res) => {
     }
 
     // Create new saved item
-    const savedItem = new SavedItemModel({
+    const savedItem = await new SavedItemModel({
       userId,
       productId,
       productName: cartItem.productName,

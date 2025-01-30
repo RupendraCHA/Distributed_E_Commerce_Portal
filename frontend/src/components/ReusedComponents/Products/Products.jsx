@@ -200,7 +200,7 @@ const Products = ({ iterationData, currentSection }) => {
             >
               {/* {eachName} */}
               <h2>{eachName}</h2>
-              <p className="card-text">Greetings, Explore our Items</p>
+              <p className="card-text"></p>
               <button>View</button>
             </li>
           );

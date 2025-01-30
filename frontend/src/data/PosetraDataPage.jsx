@@ -49,7 +49,7 @@ export const OrderData = [
 ];
 export const ShipData = [
   'Warehouses',
-  'shipping',
+  'Shipping',
   'Transportation',
   'Bulk',
   'LTL',
