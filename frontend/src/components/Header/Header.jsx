@@ -126,7 +126,7 @@ const Header = () => {
                   to="/products"
                   className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
                 >
-                  Products Categories
+                  Product Categories
                 </Link>
               </li>
               <li>
