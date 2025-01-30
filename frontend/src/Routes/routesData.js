@@ -52,6 +52,18 @@ const InventoryManagement = React.lazy(() =>
   import('../components/Distributor/InventoryManagement.jsx')
 );
 
+const posetraAllProducts = React.lazy(() => 
+  import('../components/ReusedComponents/AllProducts/AllProducts.jsx')
+)
+
+const inventoryOrders = React.lazy(() => 
+import('../components/InventoryAndOrders/InventoryOrders.jsx')
+)
+const TrackShipping = React.lazy(() => 
+import('../components/TrackShipping/TrackShipping.jsx')
+)
+
+
 import {
   productsData,
   solutionsData,
@@ -144,6 +156,18 @@ export const privateRoutes = [
     path: '/my-address',
     element: MyAddress,
   },
+  {
+    path: '/viewProducts',
+    element: posetraAllProducts
+  },
+  {
+    path: '/inventoryOrders',
+    element: inventoryOrders
+  },
+  {
+    path: '/trackShipping',
+    element: TrackShipping
+  }
 ];
 
 export const adminRoutes = [

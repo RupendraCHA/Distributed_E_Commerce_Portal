@@ -1,0 +1,17 @@
+.inventory-orders-container{
+    display: flex;
+    overflow: auto;
+
+    .inventory-sub-section{
+        flex: 1;
+    overflow: auto;
+    margin-top: 40px;
+
+    }
+
+    .orders-sub-section{
+        flex: 1;
+    overflow: auto;
+
+    }
+}

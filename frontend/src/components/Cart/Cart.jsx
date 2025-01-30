@@ -184,7 +184,7 @@ const Cart = () => {
   }
 
   return (
-    <div className="cart-container">
+    <div className="container cart-container">
       <h1 className="yourCart">Your Cart</h1>
       {error && <div className="error-message alert alert-danger">{error}</div>}
 

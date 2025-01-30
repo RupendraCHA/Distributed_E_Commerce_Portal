@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../../../store/cartSlice';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
@@ -13,17 +13,28 @@ import {
   Button,
   Breadcrumbs,
 } from '@mui/material';
-import './ProductList.css'; // Keep this for any additional styles
+import './AllProducts.css'; // Keep this for any additional styles
 import axios from 'axios';
 
-const ProductList = ({ productList, title }) => {
+import {posetraProducts} from "../../../data/PosetraDataPage"
+
+const AllProducts = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation(); // Get the current location
   const { enqueueSnackbar } = useSnackbar();
   const [sapData, setSapData] = useState({});
   const [searchItem, setSearchItem] = useState("")
-  const [productDataList, setDataList] = useState(productList)
+  const [productDataList, setDataList] = useState(posetraProducts)
+
+
+  useEffect(() => {
+    getSelectedItemsOnly(productNameInput)
+  },[])
+
+
+  const productNameInput = useSelector((state) => state.allProducts.searchName)
+  console.log("Product Name Input", productNameInput)
 
   const handleAddToCart = async (product) => {
     console.log(product)
@@ -80,89 +91,123 @@ const ProductList = ({ productList, title }) => {
   // Define the URL and credentials
 
   // Create a function to fetch data
-  async function fetchData() {
-    const url =
-      'http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/MaterialSet?$format=json';
-    const username = 'NikhilA';
-    const password = 'Nikhil@12345';
-    // Encode the credentials in base64 for Basic Authentication
-    const headers = new Headers();
-    headers.set('Authorization', 'Basic ' + btoa(username + ':' + password));
+  // async function fetchData() {
+  //   const url =
+  //     'http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/MaterialSet?$format=json';
+  //   const username = 'NikhilA';
+  //   const password = 'Nikhil@12345';
+  //   // Encode the credentials in base64 for Basic Authentication
+  //   const headers = new Headers();
+  //   headers.set('Authorization', 'Basic ' + btoa(username + ':' + password));
 
-    try {
-      // Make the request to the OData service
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: headers,
-      });
+  //   try {
+  //     // Make the request to the OData service
+  //     const response = await fetch(url, {
+  //       method: 'GET',
+  //       headers: headers,
+  //     });
 
-      // Check if the response is okay
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data.d.results[0]); // Handle the data, perhaps display it on the frontend
-        setSapData(data.d.results[0]);
-      } else {
-        console.error('Failed to fetch data', response.status);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
-
-  // Call the function to fetch data
-  fetchData();
-
-  async function fetchSapData() {
-    const url =
-      'http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/MaterialSet?$format=json';
-    const username = 'NikhilA';
-    const password = 'Nikhil@12345';
-    // Encode the credentials in base64 for Basic Authentication
-    const headers = new Headers();
-    headers.set('Authorization', 'Basic ' + btoa(username + ':' + password));
-
-    try {
-      // Make the request to the OData service
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: headers,
-      });
-
-      // Check if the response is okay
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data.d.results[0]); // Handle the data, perhaps display it on the frontend
-        setSapData(data.d.results[0]);
-      } else {
-        console.error('Failed to fetch data', response.status);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
-
-
+  //     // Check if the response is okay
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       console.log(data.d.results[0]); // Handle the data, perhaps display it on the frontend
+  //       setSapData(data.d.results[0]);
+  //     } else {
+  //       console.error('Failed to fetch data', response.status);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //   }
+  // }
 
   // Call the function to fetch data
-  fetchSapData();
+  // fetchData();
+
+  // async function fetchSapData() {
+  //   const url =
+  //     'http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/MaterialSet?$format=json';
+  //   const username = 'NikhilA';
+  //   const password = 'Nikhil@12345';
+  //   // Encode the credentials in base64 for Basic Authentication
+  //   const headers = new Headers();
+  //   headers.set('Authorization', 'Basic ' + btoa(username + ':' + password));
+
+  //   try {
+  //     // Make the request to the OData service
+  //     const response = await fetch(url, {
+  //       method: 'GET',
+  //       headers: headers,
+  //     });
+
+  //     // Check if the response is okay
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       console.log(data.d.results[0]); // Handle the data, perhaps display it on the frontend
+  //       setSapData(data.d.results[0]);
+  //     } else {
+  //       console.error('Failed to fetch data', response.status);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //   }
+  // }
 
 
-  const getSelectedItemsOnly = () => {
+
+  // Call the function to fetch data
+  // fetchSapData();
+
+  
+
+  const getSelectedItemsOnly = (value) => {
     console.log("Search Items Here")
-    let productsDataList = productList.filter((product) =>
-      product.productName.toLowerCase().includes(searchItem.toLowerCase()) || 
+
+    
+    if (value !== ""){
+    setSearchItem(productNameInput)
+
+      let productsDataList = posetraProducts.filter((product) =>
+        product.productName.toLowerCase().includes(value.toLowerCase()) || 
+    product.description.toLowerCase().includes(value.toLowerCase())
+
+      );
+      setDataList(productsDataList)
+    }
+    // else if (value === ""){
+    //   let productsDataList = posetraProducts.filter((product) =>
+    //     product.productName.toLowerCase().includes(searchItem.toLowerCase())
+    //   );
+    //   setDataList(productsDataList)
+    // }
+  }
+
+  const getSelectedItemsFromSearch = () => {
+    // setSearchItem(productNameInput)
+    let productsDataList = posetraProducts.filter((product) =>
+      product.productName.toLowerCase().includes(searchItem.toLowerCase()) ||
     product.description.toLowerCase().includes(searchItem.toLowerCase())
+
     );
     setDataList(productsDataList)
   }
 
+  const handleInputChange = (e) => {
+    setSearchItem(e.target.value)
+    if (e.target.value === ""){
+
+      setDataList(posetraProducts)
+    }
+
+  }
+
   const getAllProducts = () => {
-    setDataList(productList)
+    setDataList(posetraProducts)
     setSearchItem("")
 
   }
 
-  // let categoryName = (productList[0].category).toUpperCase()
+
+//   let categoryName = (productList[0].category).toUpperCase()
 
 
   return (
@@ -170,14 +215,12 @@ const ProductList = ({ productList, title }) => {
       {/* Breadcrumbs */}
       <div className='search-item-container'>
         <div>
-          {/* <label htmlFor='searchItem' className='search-input-label'>Search items related to <span style={{color: "#506bf2"}}>{categoryName}</span> here</label> */}
           <div className='search-icon-input-container'>
-            <input value={searchItem} className='search-item-input' id='searchItem' type='text'  onChange={(e) => setSearchItem(e.target.value)} placeholder='Enter item name ...'/>
-            <FaSearch className='search-icon-symbol' onClick={getSelectedItemsOnly}/>
+            <input value={searchItem} className='search-item-input' id='searchItem' type='text'  onChange={handleInputChange} placeholder='*Search Product...'/>
+            <FaSearch className='search-icon-symbol' onClick={getSelectedItemsFromSearch}/>
           </div>
-          {searchItem && <div style={{textAlign: "right", marginLeft: "5px"}} onClick={getAllProducts}><button className='removing-input-text'>Clear</button></div>}
-
         </div>
+          {searchItem && <div style={{textAlign: "right", marginLeft: "5px"}} onClick={getAllProducts}><button className='removing-input-text'>Clear</button></div>}
       </div>
       <Breadcrumbs
         aria-label="breadcrumb"
@@ -190,7 +233,8 @@ const ProductList = ({ productList, title }) => {
             to={item.path}
             style={{ textDecoration: 'none', color: 'inherit' }}
           >
-            <Typography className="routes" style={{backgroundColor: "#000", color: "#fff"}}>{item.label}</Typography>
+            {/* <Typography className="routes">{item.label}</Typography> */}
+            {/* <Typography className="routes" style={{fontSize: "20px", backgroundColor: "#000", color: "#fff"}}>Available Products</Typography> */}
           </Link>
         ))}
       </Breadcrumbs>
@@ -203,7 +247,7 @@ const ProductList = ({ productList, title }) => {
       >
         {title}
       </Typography> */}
-      {productDataList.length > 0 ? <Grid container spacing={2}>
+      {productDataList.length > 0  && <Grid container spacing={2}>
         {productDataList.map((product, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
             <Card className="product-card-section">
@@ -260,20 +304,21 @@ const ProductList = ({ productList, title }) => {
             </Card>
           </Grid>
         ))}
-      </Grid> : (
+      </Grid>}
+      {productDataList.length <= 0 &&
         <div className='no-items-text-container'>
           <div>
             <h1>There are no items available with the name you entered..</h1>
             <button onClick={getAllProducts}>View All Products</button>
           </div>
         </div>
-      )}
+      }
     </div>
   );
 };
 
-export default ProductList;
-ProductList.propTypes = {
+export default AllProducts;
+posetraProducts.propTypes = {
   productList: PropTypes.array.isRequired,
   title: PropTypes.string.isRequired,
 };

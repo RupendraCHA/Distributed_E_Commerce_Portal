@@ -6,13 +6,19 @@ import CustomProductList from '../CustomProductList/CustomProductList';
 import { FaSearch } from 'react-icons/fa';
 import { useState } from 'react';
 
+import { setItemName } from '../../../store/viewProductsSlice';
+import { useDispatch } from 'react-redux';
+
 const Products = ({ iterationData, currentSection }) => {
   const { productcategory } = useParams(); // Get the dynamic category from URL
 
   const [categoriesData, setCategoriesData] = useState(iterationData);
   const [categoryName, setCategoryName] = useState('');
+  const [showInputError, setInputError] = useState(false)
   console.log(currentSection);
   console.log(iterationData);
+
+  const dispatch = useDispatch()
 
   const navigate = useNavigate();
   const handleProductSelection = (product) => {
@@ -136,43 +142,60 @@ const Products = ({ iterationData, currentSection }) => {
     }
   };
 
+  const goToAllProducts = () => {
+
+    if (categoryName !== ""){
+      dispatch(setItemName(categoryName))
+      navigate('/viewProducts');
+    }
+  }
+
+  const removeInputText = () => {
+    setCategoryName("")
+  }
+
+  const handleInputChange = (e) => {
+    setCategoryName(e.target.value)
+  }
+
+  const getCategoryName = (currentSection) => {
+
+    if (currentSection === "Products"){
+      return "Product Categories"
+    }else {
+      return currentSection
+    }
+  }
+
+
   return (
     <section id="products" className=" container content-section">
       <div className="products-section-categories-container">
         <div className="categories-section">
-          <h2 className="product-title category">{currentSection}</h2>
+          <h2 className="product-title category">
+          {getCategoryName(currentSection)}
+          </h2>
           <div className="search-category-with-input">
             <div className="search-category-section">
               <input
                 type="text"
-                placeholder="Enter Category name..."
-                onChange={(e) => setCategoryName(e.target.value)}
+                placeholder="*Search Product..."
+                value={categoryName}
+                onChange={handleInputChange}
+                style={{ cursor: 'pointer' }}
+
               />
               <FaSearch
                 className="categories-icon"
                 style={{ cursor: 'pointer' }}
-                onClick={getOnlySelectedCategory}
+                // onClick={getOnlySelectedCategory}
+                onClick={goToAllProducts}
               />
             </div>
-            {/* <select
-        id="dropdown"
-        className="search-category-section"
-        value={categoryName}
-        onChange={(e) => setCategoryName(e.target.value)}
-      >
-        <option value="">
-          Select Category
-        </option>
-        {options.map((option1, index) => (
-        <option key={index}
-        onClick={getOnlySelectedCategory}
-
-         value={option1} >
-            {option1}
-          </option>
-        ))}
-      </select> */}
+          {categoryName && <div style={{textAlign: "right"}} onClick={removeInputText}><button className='removing-input-text1'>X</button></div>}
+            
           </div>
+
         </div>
       </div>
 

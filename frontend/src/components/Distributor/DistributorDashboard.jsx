@@ -55,7 +55,7 @@ const DistributorDashboard = () => {
   }
 
   return (
-    <div className="p-6">
+    <div className="container">
       <h1 className="text-2xl font-bold mb-6 flex items-center">
         <FaBuilding className="mr-2" />
         Distributor Dashboard

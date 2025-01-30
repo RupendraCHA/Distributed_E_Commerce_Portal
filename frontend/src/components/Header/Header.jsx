@@ -23,6 +23,7 @@ const Header = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [distributorAnchorEl, setDistributorAnchorEl] = useState(null);
+  const [text, setText] = useState('')
 
   // Distribution routes
   const distributorRoutes = [
@@ -84,6 +85,9 @@ const Header = () => {
   const handleDistributorClose = () => {
     setDistributorAnchorEl(null);
   };
+  // const underlineText = (text) => {
+  //   setText(text)
+  // }
 
   return (
     <>
@@ -101,10 +105,10 @@ const Header = () => {
           <nav>
             <ul className="flex gap-4 font-semibold">
               {/* Your existing navigation items */}
-              <li className="">
+              <li className=''>
                 <Link
                   // to="/products"
-                  className="text-xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
                 >
                   Manufacturing
                 </Link>
@@ -112,7 +116,7 @@ const Header = () => {
               <li className="">
                 <Link
                   // to="/products"
-                  className="text-xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
                 >
                   Sourcing
                 </Link>
@@ -120,15 +124,15 @@ const Header = () => {
               <li className="">
                 <Link
                   to="/products"
-                  className="text-xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
                 >
-                  Products
+                  Products Categories
                 </Link>
               </li>
               <li>
                 <Link
                   to="/solutions"
-                  className="text-xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
                 >
                   Solutions
                 </Link>
@@ -136,7 +140,7 @@ const Header = () => {
               <li>
                 <Link
                   to="/pricing"
-                  className="text-xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
                 >
                   Pricing
                 </Link>
@@ -144,7 +148,7 @@ const Header = () => {
               <li>
                 <Link
                   to="/inventory"
-                  className="text-xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
                 >
                   Inventory
                 </Link>
@@ -152,7 +156,7 @@ const Header = () => {
               <li>
                 <Link
                   to="/quotation"
-                  className="text-xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
                 >
                   Quotation
                 </Link>
@@ -160,7 +164,7 @@ const Header = () => {
               <li>
                 <Link
                   to="/order"
-                  className="text-xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
                 >
                   Order
                 </Link>
@@ -168,7 +172,7 @@ const Header = () => {
               <li>
                 <Link
                   to="/ship"
-                  className="text-xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
                 >
                   Ship
                 </Link>
@@ -176,7 +180,7 @@ const Header = () => {
               <li>
                 <Link
                   to="/invoice"
-                  className="text-xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
                 >
                   Invoice
                 </Link>
@@ -286,12 +290,20 @@ const Header = () => {
                             onClick={handleClose}
                             className="text-blue-500"
                           >
-                            <Link
+                            {option !== "Shipped Orders" && <Link
                               className="font-bold text-red-500 text-0.3xl cursor-pointer"
                               to={`/${option.replace(' ', '-').toLowerCase()}`}
                             >
+                            {/* {console.log(option)} */}
                               {option}
-                            </Link>
+                            </Link>}
+                            {option === "Shipped Orders" && <Link
+                              className="font-bold text-red-500 text-0.3xl cursor-pointer"
+                              to='/trackShipping'
+                            >
+                            {/* {console.log(option)} */}
+                              {option}
+                            </Link>}
                           </MenuItem>
                         ))}
                       </MenuList>
