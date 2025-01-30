@@ -500,12 +500,38 @@ app.get("/admin/dashboard", authenticateToken, isAdmin, async (req, res) => {
 
 // Get all orders (admin view)
 app.get("/admin/orders", authenticateToken, isAdmin, async (req, res) => {
+  // try {
+  //   const orders = await OrderModel.find()
+  //     .sort({ createdAt: -1 })
+  //     .populate("userId", "name email");
+  //   res.json(orders);
+  // } catch (error) {
+  //   res.status(500).json({ message: "Error fetching orders" });
+  // }
   try {
-    const orders = await OrderModel.find()
-      .sort({ createdAt: -1 })
-      .populate("userId", "name email");
+    const userId = req.user.id; // Corrected to use req.user.id
+    const orders = await OrderModel.find({}); // Fetch orders by user ID
     res.json(orders);
   } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching orders" });
+  }
+});
+app.get("/allorders",async (req, res) => {
+  // try {
+  //   const orders = await OrderModel.find()
+  //     .sort({ createdAt: -1 })
+  //     .populate("userId", "name email");
+  //   res.json(orders);
+  // } catch (error) {
+  //   res.status(500).json({ message: "Error fetching orders" });
+  // }
+  try {
+     // Corrected to use req.user.id
+    const orders = await OrderModel.find({}); // Fetch orders by user ID
+    res.json(orders);
+  } catch (error) {
+    console.error(error);
     res.status(500).json({ message: "Error fetching orders" });
   }
 });

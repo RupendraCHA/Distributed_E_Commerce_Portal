@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { format } from 'date-fns';
 import PropTypes from 'prop-types';
-import './MyOrders.css';
+import './AllOrders.css';
 import { useSelector } from 'react-redux';
 
 const Orders = () => {
@@ -19,9 +19,7 @@ const Orders = () => {
     try {
       const token = localStorage.getItem('token');
       // const orderUrl = userRole === "Consumer" ? 'http://localhost:3002/orders' : 'http://localhost:3002/admin/orders'
-      const response = await axios.get('http://localhost:3002/orders', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const response = await axios.get('http://localhost:3002/allorders');
 
       const sortedOrders = response.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
