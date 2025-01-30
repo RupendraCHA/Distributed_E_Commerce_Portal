@@ -2,11 +2,14 @@ import { useEffect, useRef } from 'react';
 import axios from 'axios';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { resetCart } from '../store/cartSlice';
+import { useDispatch } from 'react-redux';
 
 const SuccessPage = () => {
   const [searchParams] = useSearchParams();
   const sessionId = searchParams.get('session_id');
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const isProcessed = useRef(false); // Track if the payment has been processed
 
   useEffect(() => {
@@ -23,6 +26,8 @@ const SuccessPage = () => {
           { sessionId },
           { headers: { Authorization: `Bearer ${token}` } }
         );
+
+        dispatch(resetCart());
 
         toast.success('Payment confirmed and order created successfully!');
         navigate('/my-orders'); // Redirect to the orders page

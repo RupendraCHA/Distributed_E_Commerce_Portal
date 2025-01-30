@@ -13,7 +13,7 @@ const stripePromise = loadStripe(
 const Checkout = () => {
   const [warehouses, setWarehouses] = useState([]);
   const [selectedWarehouse, setSelectedWarehouse] = useState(null);
-  const [deliveryType, setDeliveryType] = useState('normal'); // 'normal' or 'premium'
+  const [deliveryType, setDeliveryType] = useState('standard'); // 'normal' or 'premium'
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userRole, setUserRole] = useState(null);
@@ -251,22 +251,24 @@ const Checkout = () => {
             <div className="space-y-3">
               <div
                 className={`border rounded-lg p-4 cursor-pointer ${
-                  deliveryType === 'normal'
+                  deliveryType === 'standard'
                     ? 'border-blue-500 bg-blue-50'
                     : 'border-gray-200 hover:border-blue-300'
                 }`}
-                onClick={() => handleDeliveryTypeChange('normal')}
+                onClick={() => handleDeliveryTypeChange('standard')}
               >
                 <div className="flex items-start">
                   <input
                     type="radio"
                     name="delivery"
-                    checked={deliveryType === 'normal'}
-                    onChange={() => handleDeliveryTypeChange('normal')}
+                    checked={deliveryType === 'standard'}
+                    onChange={() => handleDeliveryTypeChange('standard')}
                     className="mt-1 mr-3"
                   />
                   <div>
-                    <p className="font-semibold">Regular Shipping (5-7 days)</p>
+                    <p className="font-semibold">
+                      Standard Shipping (5-7 days)
+                    </p>
                     <p className="text-sm text-gray-600">Free</p>
                   </div>
                 </div>

@@ -1,194 +1,15 @@
-// import { useState, useEffect } from 'react';
-// import axios from 'axios';
-// import { format } from 'date-fns';
-// import PropTypes from 'prop-types';
-
-// const Orders = () => {
-//   const [orders, setOrders] = useState([]);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   useEffect(() => {
-//     fetchOrders();
-//   }, []);
-
-//   const fetchOrders = async () => {
-//     try {
-//       const token = localStorage.getItem('token');
-//       const response = await axios.get('http://localhost:3002/orders', {
-//         headers: { Authorization: `Bearer ${token}` },
-//       });
-
-//       // Sort orders by date, most recent first
-//       const sortedOrders = response.data.sort(
-//         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-//       );
-
-//       setOrders(sortedOrders);
-//       setError(null);
-//     } catch (err) {
-//       setError('Failed to fetch orders. Please try again later.');
-//       console.error('Error fetching orders:', err);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   const OrderDetails = ({ order }) => (
-//     <div className="bg-white shadow-md rounded-lg p-6 mb-4">
-//       <div className="flex justify-between items-start mb-4">
-//         <div>
-//           <h3 className="text-lg font-semibold">
-//             Order #{order._id.slice(-8).toUpperCase()}
-//           </h3>
-//           <p className="text-sm text-gray-600">
-//             Placed on {format(new Date(order.createdAt), 'MMM dd, yyyy')}
-//           </p>
-//         </div>
-//         <span
-//           className={`px-3 py-1 rounded-full text-sm ${
-//             order.status === 'confirmed'
-//               ? 'bg-green-100 text-green-800'
-//               : 'bg-blue-100 text-blue-800'
-//           }`}
-//         >
-//           {order.status}
-//         </span>
-//       </div>
-
-//       <div className="space-y-4">
-//         {/* Order Items */}
-//         <div>
-//           <h4 className="font-medium mb-2">Items</h4>
-//           <div className="space-y-2">
-//             {order.items.map((item, index) => (
-//               <div key={index} className="flex justify-between items-center">
-//                 <div>
-//                   <p className="font-medium">{item.productName}</p>
-//                   <p className="text-sm text-gray-600">
-//                     Quantity: {item.quantity}
-//                   </p>
-//                 </div>
-//                 <p className="font-medium">{item.price}</p>
-//               </div>
-//             ))}
-//           </div>
-//         </div>
-
-//         {/* Delivery Address */}
-//         <div>
-//           <h4 className="font-medium mb-2">Delivery Address</h4>
-//           <div className="text-sm text-gray-600">
-//             <p>{order.address.addressLine1}</p>
-//             {order.address.addressLine2 && <p>{order.address.addressLine2}</p>}
-//             <p>{`${order.address.city}, ${order.address.state} ${order.address.zipCode}`}</p>
-//           </div>
-//         </div>
-
-//         {/* Order Summary */}
-//         <div className="border-t pt-4">
-//           <div className="flex justify-between items-center font-semibold">
-//             <span>Total</span>
-//             <span>${order.total}</span>
-//           </div>
-//           <p className="text-sm text-gray-600 mt-1">
-//             Paid via {order.paymentMethod}
-//           </p>
-//         </div>
-//       </div>
-//     </div>
-//   );
-
-//   if (loading) {
-//     return (
-//       <div className="max-w-6xl mx-auto p-4">
-//         <div className="flex justify-center items-center h-64">
-//           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-//           <span className="ml-2 text-gray-600">Loading orders...</span>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   if (error) {
-//     return (
-//       <div className="max-w-6xl mx-auto p-4">
-//         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-//           {error}
-//         </div>
-//         <button
-//           onClick={fetchOrders}
-//           className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-//         >
-//           Retry
-//         </button>
-//       </div>
-//     );
-//   }
-
-//   if (orders.length === 0) {
-//     return (
-//       <div className="max-w-6xl mx-auto p-4">
-//         <h1 className="text-2xl font-bold mb-6">My Orders</h1>
-//         <div className="text-center py-12">
-//           <h2 className="text-xl font-medium text-gray-600">No orders found</h2>
-//           <p className="text-gray-500 mt-2">
-//             Looks like you haven&apos;t placed any orders yet.
-//           </p>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   return (
-//     <div className="max-w-6xl mx-auto p-4">
-//       <h1 className="text-2xl font-bold mb-6">My Orders</h1>
-
-//       <div className="space-y-6">
-//         {orders.map((order) => (
-//           <OrderDetails key={order._id} order={order} />
-//         ))}
-//       </div>
-//     </div>
-//   );
-// };
-
-// Orders.propTypes = {
-//   order: PropTypes.shape({
-//     _id: PropTypes.string.isRequired,
-//     createdAt: PropTypes.string.isRequired,
-//     status: PropTypes.string.isRequired,
-//     items: PropTypes.arrayOf(
-//       PropTypes.shape({
-//         productName: PropTypes.string.isRequired,
-//         quantity: PropTypes.number.isRequired,
-//         price: PropTypes.number.isRequired,
-//       })
-//     ).isRequired,
-//     address: PropTypes.shape({
-//       addressLine1: PropTypes.string.isRequired,
-//       addressLine2: PropTypes.string,
-//       city: PropTypes.string.isRequired,
-//       state: PropTypes.string.isRequired,
-//       zipCode: PropTypes.string.isRequired,
-//     }).isRequired,
-//     total: PropTypes.number.isRequired,
-//     paymentMethod: PropTypes.string.isRequired,
-//   }).isRequired,
-// };
-
-// export default Orders;
-
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 import './MyOrders.css';
+import { useSelector } from 'react-redux';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const userRole = useSelector((state) => state.auth.user?.role);
 
   useEffect(() => {
     fetchOrders();
@@ -197,6 +18,7 @@ const Orders = () => {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem('token');
+
       const response = await axios.get('http://localhost:3002/orders', {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -205,13 +27,50 @@ const Orders = () => {
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
 
-      setOrders(sortedOrders);
+      // Automatically update status from "confirmed" to "processing" after 10 seconds
+      // and from "processing" to "delivered" after 1 hour
+      const updatedOrders = sortedOrders.map((order) => {
+        if (order.status === 'confirmed') {
+          setTimeout(() => {
+            updateOrderStatus(order._id, 'processing');
+          }, 10000); // 10 seconds
+        } else if (order.status === 'processing') {
+          setTimeout(() => {
+            updateOrderStatus(order._id, 'delivered');
+          }, 3600000); // 1 hour (3600000 milliseconds)
+        }
+        return order;
+      });
+
+      setOrders(updatedOrders);
       setError(null);
     } catch (err) {
       setError('Failed to fetch orders. Please try again later.');
       console.error('Error fetching orders:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.patch(
+        `http://localhost:3002/orders/${orderId}/status`,
+        { status: newStatus },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Update the local state to reflect the new status
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order._id === orderId ? { ...order, status: newStatus } : order
+        )
+      );
+    } catch (err) {
+      console.error('Error updating order status:', err);
     }
   };
 
@@ -240,7 +99,7 @@ const Orders = () => {
               <div key={index} className="order-item">
                 <div className="item-details">
                   {console.log(item)}
-                  <p className="item-name">{item.product}</p>
+                  <p className="item-name">{item.name}</p>
                   <p className="item-quantity">Quantity: {item.quantity}</p>
                 </div>
                 <p className="item-price">
@@ -265,6 +124,26 @@ const Orders = () => {
             {order.address.addressLine2 && <p>{order.address.addressLine2}</p>}
             <p>{`${order.address.city}, ${order.address.state} ${order.address.zipCode}`}</p>
           </div>
+        </div>
+
+        {/* Delivery Type */}
+        <div className="order-section">
+          <h4 className="section-title">Delivery Type</h4>
+          <p className="delivery-type">
+            {order.deliveryType === 'standard'
+              ? 'Order will be delivered to you within 6 days'
+              : order.deliveryType === 'premium'
+              ? 'Order will be delivered to you within 3 days'
+              : order.deliveryType === 'airWalk'
+              ? 'Order will be delivered to you within 1 day'
+              : 'Invalid delivery type'}
+          </p>
+
+          {userRole === 'user' && (
+            <div>
+              <p>Will be delivered from xxxxxxx company located in xxxxxx</p>
+            </div>
+          )}
         </div>
 
         {/* Order Summary */}
@@ -348,6 +227,7 @@ Orders.propTypes = {
     }).isRequired,
     total: PropTypes.number.isRequired,
     paymentMethod: PropTypes.string.isRequired,
+    deliveryType: PropTypes.string.isRequired, // Add deliveryType to PropTypes
   }).isRequired,
 };
 

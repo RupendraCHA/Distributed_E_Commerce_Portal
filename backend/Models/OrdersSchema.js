@@ -12,6 +12,11 @@ const OrderSchema = new mongoose.Schema({
         type: String,
         required: true,
       },
+      name: {
+        type: String,
+        required: true,
+        default: "schema changed",
+      },
       quantity: {
         type: Number,
         required: true,
@@ -51,6 +56,12 @@ const OrderSchema = new mongoose.Schema({
   status: {
     type: String,
     default: "pending",
+  },
+  deliveryDate: Date,
+  deliveryType: {
+    type: String,
+    enum: ["standard", "premium", "airMail"],
+    default: "standard",
   },
   createdAt: {
     type: Date,

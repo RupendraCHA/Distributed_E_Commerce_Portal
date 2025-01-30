@@ -7,6 +7,7 @@ import Login from '../components/Login/Login.jsx';
 import InitialPage from '../components/InitialPage/InitialPage.jsx';
 
 // Private Routes
+import SuccessPage from '../components/SuccessPage.jsx';
 export const Products = React.lazy(() =>
   import('../components/ReusedComponents/Products/Products.jsx')
 );
@@ -95,6 +96,10 @@ export const publicRoutes = [
   {
     path: '/register',
     element: SignUp,
+  },
+  {
+    path: '/success',
+    element: SuccessPage,
   },
   {
     path: '/login',

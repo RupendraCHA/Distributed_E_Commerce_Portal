@@ -34,7 +34,8 @@ const stripe = Stripe(
 
 app.post("/create-checkout-session", async (req, res) => {
   try {
-    const { lineItems, selectedAddress, userId, cartItems } = req.body;
+    const { lineItems, selectedAddress, userId, cartItems, deliveryType } =
+      req.body;
 
     // Validate input
     if (!lineItems || !Array.isArray(lineItems) || lineItems.length === 0) {
@@ -62,11 +63,13 @@ app.post("/create-checkout-session", async (req, res) => {
           state: selectedAddress.state,
           zipCode: selectedAddress.zipCode,
         }),
+        deliveryType,
         cartItems: JSON.stringify(
           cartItems.map((item) => ({
             productId: item.productId,
             quantity: item.quantity,
             price: item.price,
+            productName: item.productName,
           }))
         ), // Include cart items in metadata
       },
@@ -307,7 +310,9 @@ app.post("/confirm-payment", authenticateToken, async (req, res) => {
     }
 
     // Get metadata from the session
-    const { userId, addressId, address, cartItems } = session.metadata;
+    console.log(session.metadata);
+    const { userId, addressId, address, cartItems, deliveryType, lineItems } =
+      session.metadata;
     const parsedCartItems = JSON.parse(cartItems);
     const parsedAddress = JSON.parse(address);
 
@@ -362,12 +367,14 @@ app.post("/confirm-payment", authenticateToken, async (req, res) => {
           product: item.productId,
           quantity: item.quantity,
           price: item.price,
+          name: item.productName,
         })),
         total: (session.amount_total / 100).toFixed(2),
         status: "confirmed",
         paymentId: session.payment_intent,
         address: parsedAddress, // Use warehouse address
         paymentMethod: "debit card",
+        deliveryType: deliveryType,
         createdAt: new Date(),
         orderType: "warehouse_restock", // Indicate this is a restocking order
       });
@@ -392,12 +399,14 @@ app.post("/confirm-payment", authenticateToken, async (req, res) => {
           product: item.productId,
           quantity: item.quantity,
           price: item.price,
+          name: item.productName,
         })),
         total: (session.amount_total / 100).toFixed(2),
         status: "confirmed",
         paymentId: session.payment_intent,
         address: parsedAddress,
         paymentMethod: "debit card",
+        deliveryType: deliveryType,
         createdAt: new Date(),
         orderType: "customer_order", // Indicate this is a customer order
       });
@@ -855,6 +864,22 @@ app.put("/user", authenticateToken, (req, res) => {
       console.error(err);
       res.status(500).json({ message: "Internal server error" });
     });
+});
+
+app.patch("/orders/:orderId/status", async (req, res) => {
+  const { orderId } = req.params;
+  const { status } = req.body;
+
+  try {
+    const updatedOrder = await OrderModel.findByIdAndUpdate(
+      orderId,
+      { status },
+      { new: true }
+    );
+    res.status(200).json(updatedOrder);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to update order status", error });
+  }
 });
 
 app.post("/register", async (req, res) => {
@@ -1384,12 +1409,10 @@ app.get("/distributor/details", authenticateToken, async (req, res) => {
     res.status(200).json(distributor);
   } catch (error) {
     console.error("Error fetching distributor details:", error);
-    res
-      .status(500)
-      .json({
-        message: "Failed to fetch distributor details",
-        error: error.message,
-      });
+    res.status(500).json({
+      message: "Failed to fetch distributor details",
+      error: error.message,
+    });
   }
 });
 

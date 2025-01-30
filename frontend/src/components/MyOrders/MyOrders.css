@@ -351,3 +351,30 @@
         align-self: flex-end;
     }
 }
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.status-badge.confirmed {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge.processing {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge.shipped {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.status-badge.delivered {
+    background-color: #dcfce7;
+    color: #166534;
+}
