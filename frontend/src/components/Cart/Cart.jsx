@@ -349,7 +349,7 @@ const Cart = () => {
                       className="btn btn-secondary"
                       disabled={saveLoading}
                     >
-                      Save Later
+                      Save for Later
                     </button>
                   </div>
                 </div>
