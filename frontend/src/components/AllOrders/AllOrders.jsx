@@ -196,7 +196,7 @@ const Orders = () => {
         {order.status === "processing" && userRole === "distributor" && shippedStatus === "" ? <button className='fullfill-order-btn' onClick={() => handleOrderFullfillment(order._id, order)}>Fullfill Order</button> : 
         <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",}}>
           <span className={`status-badge1 ${order.status.toLowerCase()}`}>
-            shipped
+            Shipped on
           </span>
           <p style={{fontSize: "13px", fontWeight: "600"}}>{new Date(order.createdAt).toLocaleDateString()}</p>
         </div>
