@@ -316,7 +316,7 @@ const Orders = () => {
 
   return (
     <div className="orders-container">
-      <h1 className="page-title"> Users Orders</h1>
+      <h1 className="page-title"> Consumers Orders</h1>
       <div className="orders-list">
         {orders.map((order) => (
           <OrderDetails key={order._id} order={order} />
