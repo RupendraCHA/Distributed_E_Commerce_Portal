@@ -243,7 +243,7 @@ const Orders = () => {
 
         {/* Delivery Type */}
         <div className="order-section">
-          <h4 className="section-title">Delivery Type</h4>
+          <h4 className="section-title">Estimated Delivery on</h4>
           <p className="delivery-type">
             {order.deliveryType === 'standard'
               ? `Order will be delivered on ${getDeliveryDate(

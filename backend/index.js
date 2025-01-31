@@ -626,7 +626,7 @@ app.put("/order/:id/status", async (req, res) => {
   const updateOrderData = await OrderModel.findById(id)
   console.log(updateOrderData)
 
-  updateOrderData.status = "shipped"
+  updateOrderData.status = "Shipped on"
   updateOrderData.createdAt = new Date()
   updateOrderData.save()
   res.status(200).json({status: updateOrderData.status, id : updateOrderData._id, createdAt: updateOrderData.createdAt})
