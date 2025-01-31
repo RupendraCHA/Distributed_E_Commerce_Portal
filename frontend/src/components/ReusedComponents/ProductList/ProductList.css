@@ -4,6 +4,7 @@
     flex-direction: column; /* Stack items vertically for breadcrumb and title */
     /* padding: 10px; */
      /* Add padding around the container */
+     margin-top: 0;
 }
 
 .produtList-title{
@@ -17,7 +18,8 @@
 }
 
 .breadcrumbs {
-    margin-bottom: 20px; /* Space between breadcrumbs and product list */
+    /* margin-bottom: 20px;  */
+    /* Space between breadcrumbs and product list */
     color: white;
     font-size: 28px;
 }
@@ -26,7 +28,7 @@
     font-size: 14px;
     background-color: #fff;
     color: #000;
-    padding: 1px 10px;
+    /* padding: 1px 10px; */
     border-radius: 6px;
 }
 .product-card-section{
@@ -109,25 +111,26 @@
     margin: 5px;
     min-width: 120px; /* Ensure buttons have a minimum width */
 }
-.search-item-container{
+.productlist-search-item-container{
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     text-align: center;
     margin-bottom: 5px;
+    gap: 10vw;
 
     .search-input-label{
         font-size: 26px;
         font-weight: bold;
     }
-    .search-icon-input-container{
+    .productlist-search-icon-input-container{
         display: flex;
         justify-content: space-between;
         align-items: center;
         gap: 20px;
         border: 2px solid #000;
         width: 30vw;
-        padding: 6px 10px;
+        padding: 2px 10px;
         border-radius: 10px;
         /* background-color: #8080801e; */
 
@@ -142,7 +145,7 @@
             text-align: center;
         }
         .search-icon-symbol{
-            width: 25px;
+            width: 20px;
             height: 25px;
             font-weight: 500;
             cursor: pointer;

@@ -3,7 +3,7 @@ export const productsData = [
   'Salt',
   'Fries',
   'Medicines',
-  'Odata',
+  'Materials',
   'Equipment',
   "More can be added.."
   // 'Haneya',
@@ -93,7 +93,7 @@ export const posetraProducts = [
   },
   {
     productId: 'FRD001',
-    productName: 'Fries',
+    productName: 'Salty Fries',
     category: 'fries',
     brand: 'Morton',
     weight: '2 lb',
@@ -331,7 +331,7 @@ export const posetraProducts = [
   },
     {
       productId: 'CHC001',
-      productName: 'Ferrero Rocher',
+      productName: 'Ferrero Rocher with salty',
       category: 'chocolate',
       brand: 'Ferrero',
       weight: '5.3 oz',
@@ -346,7 +346,7 @@ export const posetraProducts = [
     },
     {
       productId: 'CHC002',
-      productName: 'Lindor',
+      productName: 'Lindor with milk',
       category: 'chocolate',
       brand: 'Lindt & Sprüngli',
       weight: '3.5 oz',

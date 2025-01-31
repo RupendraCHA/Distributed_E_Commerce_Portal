@@ -168,21 +168,11 @@ const ProductList = ({ productList, title }) => {
   return (
     <div className="container product-container">
       {/* Breadcrumbs */}
-      <div className='search-item-container'>
-        <div>
-          {/* <label htmlFor='searchItem' className='search-input-label'>Search items related to <span style={{color: "#506bf2"}}>{categoryName}</span> here</label> */}
-          <div className='search-icon-input-container'>
-            <input value={searchItem} className='search-item-input' id='searchItem' type='text'  onChange={(e) => setSearchItem(e.target.value)} placeholder='Enter item name ...'/>
-            <FaSearch className='search-icon-symbol' onClick={getSelectedItemsOnly}/>
-          </div>
-          {searchItem && <div style={{textAlign: "right", marginLeft: "5px"}} onClick={getAllProducts}><button className='removing-input-text'>Clear</button></div>}
-
-        </div>
-      </div>
+      <div className='productlist-search-item-container'>
       <Breadcrumbs
         aria-label="breadcrumb"
         className="breadcrumbs"
-        // sx={{ marginBottom: 2 }}
+        // style={{marginTop: "10"}}
       >
         {breadcrumbs.map((item, index) => (
           <Link
@@ -190,10 +180,21 @@ const ProductList = ({ productList, title }) => {
             to={item.path}
             style={{ textDecoration: 'none', color: 'inherit' }}
           >
-            <Typography className="routes" style={{backgroundColor: "#000", color: "#fff"}}>{item.label}</Typography>
+            <Typography className="routes" style={{backgroundColor: "#000", color: "#fff", padding: "4px 10px"}}>{item.label}</Typography>
           </Link>
         ))}
       </Breadcrumbs>
+        <div>
+          {/* <label htmlFor='searchItem' className='search-input-label'>Search items related to <span style={{color: "#506bf2"}}>{categoryName}</span> here</label> */}
+          <div className='productlist-search-icon-input-container'>
+            <input value={searchItem} className='search-item-input' id='searchItem' type='text'  onChange={(e) => setSearchItem(e.target.value)} placeholder='Enter item name ...'/>
+            <FaSearch className='search-icon-symbol' onClick={getSelectedItemsOnly}/>
+          </div>
+          {searchItem && <div style={{textAlign: "right", marginLeft: "5px"}} onClick={getAllProducts}><button className='removing-input-text'>Clear</button></div>}
+
+        </div>
+      </div>
+      
 
       {/* <Typography
         variant="h5"

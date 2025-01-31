@@ -238,12 +238,12 @@ const Cart = () => {
                   className="cart-item-image"
                 />
                 <div className="cart-item-details">
-                  <h2>{item.productName}</h2>
+                  <h2 style={{fontWeight: "bold"}}>{item.productName}</h2>
                   <p>
-                    <strong>Description:</strong> {item.description}
+                    {item.description}
                   </p>
-                  <p>
-                    <strong>Price:</strong> {item.price}
+                  <p style={{fontWeight: "bold"}}>
+                    {item.price} X {item.quantity}
                   </p>
                   <div className="quantity-controls">
                     {/* <button
@@ -281,7 +281,7 @@ const Cart = () => {
                     <input
                       id={`quantity-${item.productId}`}
                       type="number"
-                      min="1"
+                      // min="1"
                       value={item.quantity}
                       onChange={(e) =>
                         handleQuantityChange(item.productId, e.target.value)

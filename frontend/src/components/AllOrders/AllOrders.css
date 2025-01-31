@@ -236,6 +236,14 @@
     font-size: 0.875rem;
     font-weight: 500;
 }
+.status-badge1 {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    background-color: #dbeafe;
+    color: #1e40af;
+}
 
 .status-badge.confirmed {
     background-color: #d1fae5;
@@ -255,4 +263,12 @@
 .status-badge.delivered {
     background-color: #dcfce7;
     color: #166534;
+}
+.fullfill-order-btn{
+    background-color: #0759d3;
+    padding: 4px 4px;
+    color: #fff;
+    font-weight: 600;
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px #000;
 }

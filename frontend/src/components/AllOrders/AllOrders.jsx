@@ -9,10 +9,14 @@ const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [shippedStatus, setShippedStatus] = useState("")
+  const [userOwnOrders, setOwnOrders] = useState([])
   const userRole = useSelector((state) => state.auth.user?.role);
+
 
   useEffect(() => {
     fetchOrders();
+    getOtherUsersOrdersOnly()
   }, []);
 
   const fetchOrders = async () => {
@@ -31,14 +35,23 @@ const Orders = () => {
         if (order.status === 'confirmed') {
           setTimeout(() => {
             updateOrderStatus(order._id, 'processing');
-          }, 10000); // 10 seconds
-        } else if (order.status === 'processing') {
-          setTimeout(() => {
-            updateOrderStatus(order._id, 'delivered');
-          }, 3600000); // 1 hour (3600000 milliseconds)
+          }, 800); // 10 seconds
+        // } else if (order.status === 'processing') {
+        //   setTimeout(() => {
+        //     updateOrderStatus(order._id, 'delivered');
+        //   }, 3600000); // 1 hour (3600000 milliseconds)
         }
+      
         return order;
       });
+      const ownOrders = await axios.get(
+        `http://localhost:3002/orders/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setOwnOrders(ownOrders.data)
+      console.log("OWN ORDERS", ownOrders.data)
 
       setOrders(updatedOrders);
       setError(null);
@@ -49,6 +62,65 @@ const Orders = () => {
       setLoading(false);
     }
   };
+
+  const getOtherUsersOrdersOnly = async () => {
+    // console.log("ORDERS",orders)
+    const token = localStorage.getItem('token');
+    const response = await axios.get('http://localhost:3002/allorders');
+
+    console.log("ORDERS", response.data)
+    const ownOrders = await axios.get(
+        `http://localhost:3002/orders/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setOwnOrders(ownOrders.data)
+      console.log("USEROWNORDERS", ownOrders.data)
+    let ids = []
+
+    ownOrders.data.map((order) => {
+        ids.push(order.userId)
+    } );
+    // console.log("ids",ids)
+
+    let otherIds = []
+
+// Get orders with userIDs not present in orders21
+    response.data
+        .map((order, index) => {
+            otherIds.push(order.userId)
+        }) // Keep orders with different userID; // Limit to 7 orders
+
+    // console.log("otherIds",otherIds);
+    const otherOrders = otherIds.filter((id) => !ids.includes(id))
+    // console.log(otherOrders);
+
+    let otherOrderArray = []
+
+    response.data.map((order) => {
+        // console.log(order)
+        if (otherOrders.includes(order.userId)){
+            otherOrderArray.push(order)
+        }
+    })
+    // console.log("Array",otherOrderArray)
+
+    let otherOrdersItems = []
+
+    otherOrderArray.map((order) => {
+        otherOrdersItems.push(order.items)
+    })
+
+    console.log("Other Items", otherOrdersItems)
+
+    const inventoryResponse = await axios.get('http://localhost:3002/distributor/inventory', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    console.log(inventoryResponse.data)
+
+
+  }
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
@@ -78,6 +150,28 @@ const Orders = () => {
     return date.toDateString(); // Formats as "Day Mon DD YYYY"
   };
 
+  const handleOrderFullfillment = async (id) => {
+    console.log("ORDER FULLFILLMENT", id)
+    try {
+        const response = await axios.put(`http://localhost:3002/order/${id}/status`)
+        setShippedStatus(response.data.status)
+        // console.log("STATUS", response.data.status)
+    } catch (error) {
+        console.log("Error Occured", error)
+    }
+  }
+
+//   const getOrderStatus = async (id) => {
+//     try {
+//         const response = await axios.put(`http://localhost:3002/order/${id}/status`)
+//         let status = response.data.status
+//         return status
+//         // console.log("STATUS", response.data.status)
+//     } catch (error) {
+//         console.log("Error Occured", error)
+//     }
+//   }
+
   const OrderDetails = ({ order }) => (
     <div className="order-card">
       <div className="order-header">
@@ -89,9 +183,13 @@ const Orders = () => {
             Placed on {format(new Date(order.createdAt), 'MMM dd, yyyy')}
           </p>
         </div>
-        <span className={`status-badge ${order.status.toLowerCase()}`}>
-          {order.status}
-        </span>
+        {/* {order.status === "shipped" && <span className={`status-badge ${order.status.toLowerCase()}`}>
+          shipped
+        </span>} */}
+        {order.status === "processing" && userRole === "distributor" && shippedStatus === "" ? <button className='fullfill-order-btn' onClick={() => handleOrderFullfillment(order._id)}>Fullfill Order</button> : <span className={`status-badge1 ${order.status.toLowerCase()}`}>
+          shipped
+        </span>}
+        {/* {shippedStatus === "" ? "" : } */}
       </div>
 
       <div className="order-content">
@@ -102,7 +200,7 @@ const Orders = () => {
             {order.items.map((item, index) => (
               <div key={index} className="order-item">
                 <div className="item-details">
-                  {console.log(item)}
+                  {/* {console.log(item)} */}
                   <p className="item-name">{item.name}</p>
                   <p className="item-quantity">Quantity: {item.quantity}</p>
                 </div>
@@ -208,7 +306,7 @@ const Orders = () => {
 
   return (
     <div className="orders-container">
-      <h1 className="page-title">My Orders</h1>
+      <h1 className="page-title">All Orders</h1>
       <div className="orders-list">
         {orders.map((order) => (
           <OrderDetails key={order._id} order={order} />

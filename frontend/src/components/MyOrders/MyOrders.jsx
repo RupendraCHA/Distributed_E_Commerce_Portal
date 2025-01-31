@@ -33,12 +33,13 @@ const Orders = () => {
         if (order.status === 'confirmed') {
           setTimeout(() => {
             updateOrderStatus(order._id, 'processing');
-          }, 10000); // 10 seconds
-        } else if (order.status === 'processing') {
-          setTimeout(() => {
-            updateOrderStatus(order._id, 'delivered');
-          }, 3600000); // 1 hour (3600000 milliseconds)
-        }
+          }, 2000); // 10 seconds
+        } 
+        // else if (order.status === 'processing') {
+        //   setTimeout(() => {
+        //     updateOrderStatus(order._id, 'delivered');
+        //   }, 3600000); // 1 hour (3600000 milliseconds)
+        // }
         return order;
       });
 
@@ -81,7 +82,7 @@ const Orders = () => {
   };
 
   const OrderDetails = ({ order }) => (
-    <div className="order-card">
+    <div className="container order-card">
       <div className="order-header">
         <div>
           <h3 className="order-id">
@@ -131,7 +132,6 @@ const Orders = () => {
             <p>{`${order.address.city}, ${order.address.state} ${order.address.zipCode}`}</p>
           </div>
         </div>
-
         {/* Delivery Type */}
         <div className="order-section">
           <h4 className="section-title">Estimated Delivery</h4>
@@ -209,7 +209,7 @@ const Orders = () => {
   }
 
   return (
-    <div className="orders-container">
+    <div className="container orders-container">
       <h1 className="page-title">My Orders</h1>
       <div className="orders-list">
         {orders.map((order) => (

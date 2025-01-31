@@ -40,7 +40,7 @@ const Products = ({ iterationData, currentSection }) => {
       navigate('/products/posetra');
     } else if (product === 'Chocolates') {
       navigate('/products/chocolates');
-    } else if (product === 'Odata') {
+    } else if (product === 'Materials') {
       navigate('/products/Odata');
     }
   };
@@ -80,7 +80,7 @@ const Products = ({ iterationData, currentSection }) => {
     } else if (categoryName === 'Fries') {
       navigate('/products/fries');
       setCategoryName('');
-    } else if (categoryName === 'Odata') {
+    } else if (categoryName === 'Materials') {
       navigate('/products/Odata');
       setCategoryName('');
     }
@@ -92,7 +92,7 @@ const Products = ({ iterationData, currentSection }) => {
     'Fries',
     'Medicines',
     'Equipment',
-    'Odata',
+    'Pumps',
   ];
 
   const getImage = (eachName) => {
@@ -132,11 +132,11 @@ const Products = ({ iterationData, currentSection }) => {
           src="https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738160251/medical-equipment-facilities-therapeutic-illustration_1284-27253_vfgp0n.avif"
         />
       );
-    } else if (eachName === 'Odata') {
+    } else if (eachName === 'Materials') {
       return (
         <img
           style={{ width: '200px', height: '170px' }}
-          src="https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738164991/odata-logo-1_d8dnwf.webp"
+          src="https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738276588/blog-images-12_maucj3.jpg"
         />
       );
     }
@@ -169,7 +169,7 @@ const Products = ({ iterationData, currentSection }) => {
 
 
   return (
-    <section id="products" className=" container content-section">
+    <section id="products" className="container content-section">
       <div className="products-section-categories-container">
         <div className="categories-section">
           <h2 className="product-title category">
