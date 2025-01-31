@@ -303,7 +303,7 @@ const Orders = () => {
   if (orders.length === 0) {
     return (
       <div className="orders-container">
-        <h1 className="page-title">My Orders</h1>
+        <h1 className="page-title">Consumers Orders</h1>
         <div className="empty-state">
           <h2 className="empty-state-title">No orders found</h2>
           <p className="empty-state-message">
@@ -316,7 +316,7 @@ const Orders = () => {
 
   return (
     <div className="orders-container">
-      <h1 className="page-title"> Consumers Orders</h1>
+      <h1 className="page-title"> Consumer Orders</h1>
       <div className="orders-list">
         {orders.map((order) => (
           <OrderDetails key={order._id} order={order} />
