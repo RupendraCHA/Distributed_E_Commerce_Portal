@@ -137,10 +137,10 @@ const Orders = () => {
     console.log("ORDER FULLFILLMENT", id)
     try {
     dispatch(setUserOrders(order.items))
-
         const response = await axios.put(`http://localhost:3002/order/${id}/status`)
         setShippedStatus(response.data.status)
         console.log(response.data.id)
+        console.log(response.data.createdAt, "ShippedDate")
         setShippedId(response.data.id)
         // console.log("STATUS", response.data.status)
     } catch (error) {
@@ -180,7 +180,6 @@ const Orders = () => {
 
 
   const OrderDetails = ({ order }) => {
-
     return (<div className="order-card">
       <div className="order-header">
         <div>
@@ -194,9 +193,13 @@ const Orders = () => {
         {/* {order.status === "shipped" && <span className={`status-badge ${order.status.toLowerCase()}`}>
           shipped
         </span>} */}
-        {order.status === "processing" && userRole === "distributor" && shippedStatus === "" ? <button className='fullfill-order-btn' onClick={() => handleOrderFullfillment(order._id, order)}>Fullfill Order</button> : <span className={`status-badge1 ${order.status.toLowerCase()}`}>
-          shipped
-        </span>
+        {order.status === "processing" && userRole === "distributor" && shippedStatus === "" ? <button className='fullfill-order-btn' onClick={() => handleOrderFullfillment(order._id, order)}>Fullfill Order</button> : 
+        <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",}}>
+          <span className={`status-badge1 ${order.status.toLowerCase()}`}>
+            shipped
+          </span>
+          <p style={{fontSize: "13px", fontWeight: "600"}}>{new Date(order.createdAt).toLocaleDateString()}</p>
+        </div>
         }
         {/* {shippedStatus === "" ? "" : } */}
       </div>

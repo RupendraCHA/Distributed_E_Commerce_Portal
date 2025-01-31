@@ -92,9 +92,15 @@ const Orders = () => {
             Placed on {format(new Date(order.createdAt), 'MMM dd, yyyy')}
           </p>
         </div>
-        <span className={`status-badge ${order.status.toLowerCase()}`}>
+        {/* <span className={`status-badge ${order.status.toLowerCase()}`}>
           {order.status}
-        </span>
+        </span> */}
+        <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",}}>
+          <span className={`status-badge ${order.status.toLowerCase()}`}>
+          {order.status}
+          </span>
+          <p style={{fontSize: "13px", fontWeight: "600"}}>{new Date(order.createdAt).toLocaleDateString()}</p>
+        </div>
       </div>
 
       <div className="order-content">

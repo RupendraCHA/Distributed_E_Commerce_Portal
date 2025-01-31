@@ -624,11 +624,12 @@ app.patch("/orders/:orderId/status", async (req, res) => {
 app.put("/order/:id/status", async (req, res) => {
   const {id} = req.params
   const updateOrderData = await OrderModel.findById(id)
-  // console.log(updateOrderData.status)
+  console.log(updateOrderData)
 
   updateOrderData.status = "shipped"
-  updateOrderData.save(updateOrderData.status)
-  res.status(200).json({status: updateOrderData.status, id : updateOrderData._id})
+  updateOrderData.createdAt = new Date()
+  updateOrderData.save()
+  res.status(200).json({status: updateOrderData.status, id : updateOrderData._id, createdAt: updateOrderData.createdAt})
 })
 
 app.post("/register", async (req, res) => {
