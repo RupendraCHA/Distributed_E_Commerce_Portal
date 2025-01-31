@@ -29,6 +29,7 @@ const ProductList = ({ productList, title }) => {
     console.log(product)
     const token = localStorage.getItem('token');
     const productWithQuantity = { ...product, quantity: 1 };
+    console.log(productWithQuantity)
     dispatch(addToCart(productWithQuantity));
     try {
       const response = await axios.post(

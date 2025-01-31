@@ -3,7 +3,8 @@ import axios from 'axios';
 import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 import './AllOrders.css';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserOrders } from '../../store/userOrdersSlice';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -12,7 +13,9 @@ const Orders = () => {
   const [shippedStatus, setShippedStatus] = useState("")
   const [userOwnOrders, setOwnOrders] = useState([])
   const userRole = useSelector((state) => state.auth.user?.role);
+  const [shippedId, setShippedId] = useState("")
 
+  const dispatch = useDispatch()
 
   useEffect(() => {
     fetchOrders();
@@ -23,7 +26,10 @@ const Orders = () => {
     try {
       const token = localStorage.getItem('token');
       // const orderUrl = userRole === "Consumer" ? 'http://localhost:3002/orders' : 'http://localhost:3002/admin/orders'
-      const response = await axios.get('http://localhost:3002/allorders');
+      const response = await axios.get('http://localhost:3002/allorders', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    //   console.log("userOrdersOnly", response.data)
 
       const sortedOrders = response.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -65,61 +71,81 @@ const Orders = () => {
 
   const getOtherUsersOrdersOnly = async () => {
     // console.log("ORDERS",orders)
-    const token = localStorage.getItem('token');
-    const response = await axios.get('http://localhost:3002/allorders');
+    // const response = await axios.get('http://localhost:3002/allorders');
 
-    console.log("ORDERS", response.data)
-    const ownOrders = await axios.get(
-        `http://localhost:3002/orders/`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      setOwnOrders(ownOrders.data)
-      console.log("USEROWNORDERS", ownOrders.data)
-    let ids = []
+    // console.log("ORDERS", response.data)
+    // const ownOrders = await axios.get(
+    //     `http://localhost:3002/orders/`,
+    //     {
+    //       headers: { Authorization: `Bearer ${token}` },
+    //     }
+    //   );
+    //   setOwnOrders(ownOrders.data)
+    //   console.log("USEROWNORDERS", ownOrders.data)
+    // let ids = []
 
-    ownOrders.data.map((order) => {
-        ids.push(order.userId)
-    } );
+    // ownOrders.data.map((order) => {
+    //     ids.push(order.userId)
+    // } );
     // console.log("ids",ids)
 
-    let otherIds = []
+    // let otherIds = []
 
 // Get orders with userIDs not present in orders21
-    response.data
-        .map((order, index) => {
-            otherIds.push(order.userId)
-        }) // Keep orders with different userID; // Limit to 7 orders
+    // response.data
+    //     .map((order, index) => {
+    //         otherIds.push(order.userId)
+    //     }) 
+        // Keep orders with different userID; // Limit to 7 orders
 
     // console.log("otherIds",otherIds);
-    const otherOrders = otherIds.filter((id) => !ids.includes(id))
+    // const otherOrders = otherIds.filter((id) => !ids.includes(id))
     // console.log(otherOrders);
 
-    let otherOrderArray = []
+    // let otherOrderArray = []
 
-    response.data.map((order) => {
-        // console.log(order)
-        if (otherOrders.includes(order.userId)){
-            otherOrderArray.push(order)
-        }
-    })
+    // response.data.map((order) => {
+    //     // console.log(order)
+    //     if (otherOrders.includes(order.userId)){
+    //         otherOrderArray.push(order)
+    //     }
+    // })
     // console.log("Array",otherOrderArray)
 
-    let otherOrdersItems = []
+    // let otherOrdersItems = []
 
-    otherOrderArray.map((order) => {
-        otherOrdersItems.push(order.items)
-    })
+    // otherOrderArray.map((order) => {
+    //     otherOrdersItems.push(order.items)
+    // })
 
-    console.log("Other Items", otherOrdersItems)
+    // console.log("Other Items", otherOrdersItems)
+    const token = localStorage.getItem('token');
+    const response = await axios.get('http://localhost:3002/allorders', {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("userOrdersOnly", response.data)
 
     const inventoryResponse = await axios.get('http://localhost:3002/distributor/inventory', {
         headers: { Authorization: `Bearer ${token}` },
       });
-    console.log(inventoryResponse.data)
+    console.log("InventoryData",inventoryResponse.data)
 
 
+  }
+
+  const handleOrderFullfillment = async (id, order) => {
+    console.log("ORDER FULLFILLMENT", id)
+    try {
+    dispatch(setUserOrders(order.items))
+
+        const response = await axios.put(`http://localhost:3002/order/${id}/status`)
+        setShippedStatus(response.data.status)
+        console.log(response.data.id)
+        setShippedId(response.data.id)
+        // console.log("STATUS", response.data.status)
+    } catch (error) {
+        console.log("Error Occured", error)
+    }
   }
 
   const updateOrderStatus = async (orderId, newStatus) => {
@@ -150,30 +176,12 @@ const Orders = () => {
     return date.toDateString(); // Formats as "Day Mon DD YYYY"
   };
 
-  const handleOrderFullfillment = async (id) => {
-    console.log("ORDER FULLFILLMENT", id)
-    try {
-        const response = await axios.put(`http://localhost:3002/order/${id}/status`)
-        setShippedStatus(response.data.status)
-        // console.log("STATUS", response.data.status)
-    } catch (error) {
-        console.log("Error Occured", error)
-    }
-  }
+  
 
-//   const getOrderStatus = async (id) => {
-//     try {
-//         const response = await axios.put(`http://localhost:3002/order/${id}/status`)
-//         let status = response.data.status
-//         return status
-//         // console.log("STATUS", response.data.status)
-//     } catch (error) {
-//         console.log("Error Occured", error)
-//     }
-//   }
 
-  const OrderDetails = ({ order }) => (
-    <div className="order-card">
+  const OrderDetails = ({ order }) => {
+
+    return (<div className="order-card">
       <div className="order-header">
         <div>
           <h3 className="order-id">
@@ -186,9 +194,10 @@ const Orders = () => {
         {/* {order.status === "shipped" && <span className={`status-badge ${order.status.toLowerCase()}`}>
           shipped
         </span>} */}
-        {order.status === "processing" && userRole === "distributor" && shippedStatus === "" ? <button className='fullfill-order-btn' onClick={() => handleOrderFullfillment(order._id)}>Fullfill Order</button> : <span className={`status-badge1 ${order.status.toLowerCase()}`}>
+        {order.status === "processing" && userRole === "distributor" && shippedStatus === "" ? <button className='fullfill-order-btn' onClick={() => handleOrderFullfillment(order._id, order)}>Fullfill Order</button> : <span className={`status-badge1 ${order.status.toLowerCase()}`}>
           shipped
-        </span>}
+        </span>
+        }
         {/* {shippedStatus === "" ? "" : } */}
       </div>
 
@@ -202,6 +211,7 @@ const Orders = () => {
                 <div className="item-details">
                   {/* {console.log(item)} */}
                   <p className="item-name">{item.name}</p>
+                  <p className="item-name">{item.product}</p>
                   <p className="item-quantity">Quantity: {item.quantity}</p>
                 </div>
                 <p className="item-price">
@@ -265,8 +275,8 @@ const Orders = () => {
           <p className="payment-method">Paid via {order.paymentMethod}</p>
         </div>
       </div>
-    </div>
-  );
+    </div>)
+};
 
   if (loading) {
     return (
@@ -306,7 +316,7 @@ const Orders = () => {
 
   return (
     <div className="orders-container">
-      <h1 className="page-title">All Orders</h1>
+      <h1 className="page-title"> Users Orders</h1>
       <div className="orders-list">
         {orders.map((order) => (
           <OrderDetails key={order._id} order={order} />

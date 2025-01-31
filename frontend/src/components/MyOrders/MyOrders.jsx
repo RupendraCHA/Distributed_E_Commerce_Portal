@@ -33,7 +33,7 @@ const Orders = () => {
         if (order.status === 'confirmed') {
           setTimeout(() => {
             updateOrderStatus(order._id, 'processing');
-          }, 2000); // 10 seconds
+          }, 3000); // 10 seconds
         } 
         // else if (order.status === 'processing') {
         //   setTimeout(() => {
@@ -107,6 +107,7 @@ const Orders = () => {
                 <div className="item-details">
                   {console.log(item)}
                   <p className="item-name">{item.name}</p>
+                  <p className="item-name">{item.product}</p>
                   <p className="item-quantity">Quantity: {item.quantity}</p>
                 </div>
                 <p className="item-price">

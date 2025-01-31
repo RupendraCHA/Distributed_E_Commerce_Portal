@@ -311,13 +311,14 @@ app.get("/admin/orders", authenticateToken, isAdmin, async (req, res) => {
   try {
     const userId = req.user.id; // Corrected to use req.user.id
     const orders = await OrderModel.find({}); // Fetch orders by user ID
+    
     res.json(orders);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error fetching orders" });
   }
 });
-app.get("/allorders",async (req, res) => {
+app.get("/allorders",authenticateToken, async (req, res) => {
   // try {
   //   const orders = await OrderModel.find()
   //     .sort({ createdAt: -1 })
@@ -327,9 +328,15 @@ app.get("/allorders",async (req, res) => {
   //   res.status(500).json({ message: "Error fetching orders" });
   // }
   try {
+    const userId = req.user.id; // Corrected to use req.user.id
      // Corrected to use req.user.id
     const orders = await OrderModel.find({}); // Fetch orders by user ID
-    res.json(orders);
+    // let usersOrders = []
+    const usersOrders = orders.filter((order) => userId !== order.userId.toString())
+    // console.log(usersOrders)
+    // console.log("USERID", userId)
+    res.json(usersOrders);
+    // res.json(orders);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error fetching orders" });
@@ -621,7 +628,7 @@ app.put("/order/:id/status", async (req, res) => {
 
   updateOrderData.status = "shipped"
   updateOrderData.save(updateOrderData.status)
-  res.status(200).json({status: updateOrderData.status})
+  res.status(200).json({status: updateOrderData.status, id : updateOrderData._id})
 })
 
 app.post("/register", async (req, res) => {
