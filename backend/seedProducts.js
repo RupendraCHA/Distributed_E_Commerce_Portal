@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const Product = require("./Models/ProductModel"); // adjust the path as needed
 
 // MongoDB connection URI - replace with your actual URI
-const MONGODB_URI = "mongodb://127.0.0.1:27017/Visionsoft";
+const MONGODB_URI = "mongodb+srv://githubdevelopment:Rvsoft1234@cluster0.nqiv3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 // Sample product data
 const salts = require("./data/salts");

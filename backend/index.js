@@ -8,11 +8,13 @@ const {
   CartModel,
   SavedItemModel,
   DistributorModel,
+  ProductModel
 } = require("./Models");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { isAdmin } = require("./authentication");
 const { authenticateToken } = require("./authentication");
+const posetraProducts = require("./data/posetraProducts")
 const app = express();
 app.use(express.json());
 app.use(
@@ -25,7 +27,10 @@ app.use(
 
 const JWT_SECRET = "Account_Test"; // You can use environment variables to store this securely
 
-mongoose.connect("mongodb://127.0.0.1:27017/Visionsoft");
+mongoose.connect('mongodb+srv://githubdevelopment:Rvsoft1234@cluster0.nqiv3.mongodb.net/Visionsoft?retryWrites=true&w=majority&appName=Cluster0', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(()=>{console.log("MongoDb connected successfully")}).catch(()=>{console.log("Error while connecting mongodb")});
 
 // const connectDB = async () => {
 //   await mongoose.connect(
@@ -429,6 +434,7 @@ app.post("/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await EmployeeModel.findOne({ email: email });
+    console.log({user})
     if (!user) {
       return res
         .status(404)
@@ -1244,6 +1250,25 @@ app.get("/distributor/details", authenticateToken, async (req, res) => {
       message: "Failed to fetch distributor details",
       error: error.message,
     });
+  }
+});
+
+app.get('/products', async (req, res) => {
+  try {
+      const productCategory = req.query.productCategory;
+      console.log({ productCategory });
+
+      let products = await ProductModel.find({});
+
+      if (productCategory !== 'undefined') {
+          products = products.filter(product => 
+              product.category.toLowerCase() === productCategory.toLowerCase()
+          );
+      }
+      return res.status(200).json(products);
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Internal Server Error' });
   }
 });
 

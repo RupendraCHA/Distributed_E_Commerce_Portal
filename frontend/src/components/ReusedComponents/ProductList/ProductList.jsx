@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '../../../store/cartSlice';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link, useParams } from 'react-router-dom';
 import { useSnackbar } from 'notistack';
 import { FaSearch } from "react-icons/fa";
 import {
@@ -15,15 +15,17 @@ import {
 } from '@mui/material';
 import './ProductList.css'; // Keep this for any additional styles
 import axios from 'axios';
-
-const ProductList = ({ productList, title }) => {
+import { categories } from '../../../data/PosetraDataPage';
+const ProductList = ({ productList, title, hideHeader }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation(); // Get the current location
   const { enqueueSnackbar } = useSnackbar();
   const [sapData, setSapData] = useState({});
   const [searchItem, setSearchItem] = useState("")
-  const [productDataList, setDataList] = useState(productList)
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const { productcategory } = useParams();
+  const [productDataList, setDataList] = useState([])
 
   const handleAddToCart = async (product) => {
     console.log(product)
@@ -81,71 +83,71 @@ const ProductList = ({ productList, title }) => {
   // Define the URL and credentials
 
   // Create a function to fetch data
-  async function fetchData() {
-    const url =
-      'http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/MaterialSet?$format=json';
-    const username = 'NikhilA';
-    const password = 'Nikhil@12345';
-    // Encode the credentials in base64 for Basic Authentication
-    const headers = new Headers();
-    headers.set('Authorization', 'Basic ' + btoa(username + ':' + password));
+  // async function fetchData() {
+  //   const url =
+  //     'http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/MaterialSet?$format=json';
+  //   const username = 'NikhilA';
+  //   const password = 'Nikhil@12345';
+  //   // Encode the credentials in base64 for Basic Authentication
+  //   const headers = new Headers();
+  //   headers.set('Authorization', 'Basic ' + btoa(username + ':' + password));
 
-    try {
-      // Make the request to the OData service
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: headers,
-      });
+  //   try {
+  //     // Make the request to the OData service
+  //     const response = await fetch(url, {
+  //       method: 'GET',
+  //       headers: headers,
+  //     });
 
-      // Check if the response is okay
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data.d.results[0]); // Handle the data, perhaps display it on the frontend
-        setSapData(data.d.results[0]);
-      } else {
-        console.error('Failed to fetch data', response.status);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
+  //     // Check if the response is okay
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       console.log(data.d.results[0]); // Handle the data, perhaps display it on the frontend
+  //       setSapData(data.d.results[0]);
+  //     } else {
+  //       console.error('Failed to fetch data', response.status);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //   }
+  // }
 
-  // Call the function to fetch data
-  fetchData();
+  // // Call the function to fetch data
+  // fetchData();
 
-  async function fetchSapData() {
-    const url =
-      'http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/MaterialSet?$format=json';
-    const username = 'NikhilA';
-    const password = 'Nikhil@12345';
-    // Encode the credentials in base64 for Basic Authentication
-    const headers = new Headers();
-    headers.set('Authorization', 'Basic ' + btoa(username + ':' + password));
+  // async function fetchSapData() {
+  //   const url =
+  //     'http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/MaterialSet?$format=json';
+  //   const username = 'NikhilA';
+  //   const password = 'Nikhil@12345';
+  //   // Encode the credentials in base64 for Basic Authentication
+  //   const headers = new Headers();
+  //   headers.set('Authorization', 'Basic ' + btoa(username + ':' + password));
 
-    try {
-      // Make the request to the OData service
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: headers,
-      });
+  //   try {
+  //     // Make the request to the OData service
+  //     const response = await fetch(url, {
+  //       method: 'GET',
+  //       headers: headers,
+  //     });
 
-      // Check if the response is okay
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data.d.results[0]); // Handle the data, perhaps display it on the frontend
-        setSapData(data.d.results[0]);
-      } else {
-        console.error('Failed to fetch data', response.status);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
+  //     // Check if the response is okay
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       console.log(data.d.results[0]); // Handle the data, perhaps display it on the frontend
+  //       setSapData(data.d.results[0]);
+  //     } else {
+  //       console.error('Failed to fetch data', response.status);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //   }
+  // }
 
 
 
-  // Call the function to fetch data
-  fetchSapData();
+  // // Call the function to fetch data
+  // fetchSapData();
 
 
   const getSelectedItemsOnly = () => {
@@ -177,27 +179,36 @@ const ProductList = ({ productList, title }) => {
       setDataList(productList)
     } 
   }
-
+  
+  useEffect(() => {
+    if(productcategory === "Odata"){
+      setDataList(categories["Odata"])
+    }
+    else{
+      setDataList(productList)
+    }
+  }, [productList])
+  
 
   return (
     <div className="container product-container">
       {/* Breadcrumbs */}
-      <div className='productlist-search-item-container'>
-      <Breadcrumbs
-        aria-label="breadcrumb"
-        className="breadcrumbs"
-        // style={{marginTop: "10"}}
-      >
-        {breadcrumbs.map((item, index) => (
-          <Link
-            key={index}
-            to={item.path}
-            style={{ textDecoration: 'none', color: 'inherit' }}
-          >
-            <Typography className="routes" style={{backgroundColor: "#000", color: "#fff", padding: "4px 10px"}}>{item.label}</Typography>
-          </Link>
-        ))}
-      </Breadcrumbs>
+        <div className='productlist-search-item-container'>
+        <Breadcrumbs
+          aria-label="breadcrumb"
+          className="breadcrumbs"
+          // style={{marginTop: "10"}}
+        >
+          {breadcrumbs.map((item, index) => (
+            <Link
+              key={index}
+              to={item.path}
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              <Typography className="routes" style={{backgroundColor: "#000", color: "#fff", padding: "4px 10px"}}>{item.label}</Typography>
+            </Link>
+          ))}
+        </Breadcrumbs>
         <div>
           {/* <label htmlFor='searchItem' className='search-input-label'>Search items related to <span style={{color: "#506bf2"}}>{categoryName}</span> here</label> */}
           <div className='productlist-search-icon-input-container'>
@@ -208,6 +219,8 @@ const ProductList = ({ productList, title }) => {
 
         </div>
       </div>
+      
+      
       
 
       {/* <Typography

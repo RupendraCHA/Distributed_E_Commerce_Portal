@@ -1,99 +1,60 @@
 import PropTypes from 'prop-types';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { FaSearch } from 'react-icons/fa';
+import axios from 'axios';
+
 import './Products.css';
 import ProductList from '../ProductList/ProductList';
 import CustomProductList from '../CustomProductList/CustomProductList';
-import { FaSearch } from 'react-icons/fa';
-import { useState } from 'react';
-
 import { setItemName } from '../../../store/viewProductsSlice';
-import { useDispatch } from 'react-redux';
 
 const Products = ({ iterationData, currentSection }) => {
   const { productcategory } = useParams(); // Get the dynamic category from URL
-
-  const [categoriesData, setCategoriesData] = useState(iterationData);
-  const [categoryName, setCategoryName] = useState('');
-  const [showInputError, setInputError] = useState(false)
-  console.log(currentSection);
-  console.log(iterationData);
-
-  const dispatch = useDispatch()
-
+  console.log({productcategory})
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const [productsData, setProductsData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [categoryName, setCategoryName] = useState('');
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
+
   const handleProductSelection = (product) => {
-    if (product === 'Salt') {
-      navigate('/products/salts');
-    } else if (product === 'Medicines') {
-      navigate('/products/medicines');
-    } else if (product === 'Fries') {
-      navigate('/products/fries');
-    } else if (product === 'Curatum') {
-      navigate('/products/curatum');
-    } else if (product === 'Hanelytics') {
-      navigate('/products/hanelytics');
-    } else if (product === 'DMAG') {
-      navigate('/products/dmag');
-    } else if (product === 'Haneya') {
-      navigate('/products/haneya');
-    } else if (product === 'Posetra') {
-      navigate('/products/posetra');
-    } else if (product === 'Chocolates') {
-      navigate('/products/chocolates');
-    } else if (product === 'Materials') {
-      navigate('/products/Odata');
+    if(product.toLowerCase() === "materials"){
+      navigate(`/products/Odata`);
+    }
+    else{
+      navigate(`/products/${product.toLowerCase()}`);
     }
   };
 
-  // console.log(iterationData)
-
-  if (productcategory) {
-    const currentCategoryData = iterationData[productcategory];
-    console.log(currentCategoryData);
-    if (currentCategoryData.customProduct) {
-      return <CustomProductList productData={currentCategoryData} />;
-    }
-    return (
-      <ProductList
-        productList={currentCategoryData}
-        title={`${
-          productcategory.charAt(0).toUpperCase() + productcategory.slice(1)
-        } List`}
-      />
-    );
-  }
-
-  const getProductsData = () => {
-    return <h1>Hello</h1>;
-  };
-
-  const getOnlySelectedCategory = () => {
-    if (categoryName === 'Salt') {
-      navigate('/products/salts');
-      setCategoryName('');
-    } else if (categoryName === 'Medicines') {
-      navigate('/products/medicines');
-      setCategoryName('');
-    } else if (categoryName === 'Chocolates') {
-      navigate('/products/chocolates');
-      setCategoryName('');
-    } else if (categoryName === 'Fries') {
-      navigate('/products/fries');
-      setCategoryName('');
-    } else if (categoryName === 'Materials') {
-      navigate('/products/Odata');
-      setCategoryName('');
+  const goToAllProducts = () => {
+    if (categoryName !== "") {
+      dispatch(setItemName(categoryName));
+      navigate('/viewProducts');
     }
   };
 
-  const options = [
-    'Chocolates',
-    'Salt',
-    'Fries',
-    'Medicines',
-    'Equipment',
-    'Pumps',
-  ];
+  const removeInputText = () => {
+    setCategoryName("");
+  };
+
+  const handleInputChange = (e) => {
+    // setCategoryName(e.target.value)
+    if (e.key === "Enter"){
+      goToAllProducts()
+    }
+
+  };
+
+  const getCategoryName = (currentSection) => {
+    return currentSection === "Products" ? "Product Categories" : currentSection;
+  };
+
 
   const getImage = (eachName) => {
     if (eachName === 'Chocolates') {
@@ -142,42 +103,50 @@ const Products = ({ iterationData, currentSection }) => {
     }
   };
 
-  const goToAllProducts = () => {
 
-    if (categoryName !== ""){
-      dispatch(setItemName(categoryName))
-      navigate('/viewProducts');
+  useEffect(() => {
+    // Fetch data from backend API
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get(`http://localhost:3002/products?productCategory=${encodeURIComponent(productcategory)}`);
+        console.log({response:response.data})
+        setProductsData(response.data);
+        setFilteredProducts(response.data);
+      } catch (error) {
+        console.log(error.message)
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [productcategory]);
+
+
+
+  if (loading) return <p>Loading products...</p>;
+  if (error) return <p>Error: {error}</p>;
+
+  if (productcategory) {
+    const currentCategoryData = productsData[productcategory];
+    if (currentCategoryData?.customProduct) {
+      return <CustomProductList productData={currentCategoryData} />;
     }
+    return (
+      <ProductList
+        productList={productsData}
+        title={`${productcategory.charAt(0).toUpperCase() + productcategory.slice(1)} List`}
+      />
+    );
   }
-
-  const removeInputText = () => {
-    setCategoryName("")
-  }
-
-  const handleInputChange = (e) => {
-    // setCategoryName(e.target.value)
-    if (e.key === "Enter"){
-      goToAllProducts()
-    }
-
-  }
-
-  const getCategoryName = (currentSection) => {
-
-    if (currentSection === "Products"){
-      return "Product Categories"
-    }else {
-      return currentSection
-    }
-  }
-
 
   return (
     <section id="products" className="container content-section">
       <div className="products-section-categories-container">
         <div className="categories-section">
           <h2 className="product-title category">
-          {getCategoryName(currentSection)}
+            {getCategoryName(currentSection)}
           </h2>
           <div className="search-category-with-input">
             <div className="search-category-section">
@@ -188,51 +157,51 @@ const Products = ({ iterationData, currentSection }) => {
                 onChange={(e) => setCategoryName(e.target.value)}
                 onKeyDown={handleInputChange}
                 style={{ cursor: 'pointer' }}
-
               />
               <FaSearch
                 className="categories-icon"
                 style={{ cursor: 'pointer' }}
-                // onClick={getOnlySelectedCategory}
                 onClick={goToAllProducts}
               />
             </div>
-          {categoryName && <div style={{textAlign: "right"}} onClick={removeInputText}><button className='removing-input-text1'>X</button></div>}
-            
+            {categoryName && <div style={{ textAlign: "right" }} onClick={removeInputText}>
+              <button className='removing-input-text1'>X</button>
+            </div>}
           </div>
-
         </div>
       </div>
 
       <ul className="cards-section">
-        {iterationData.map((eachName, index) => {
-          if (currentSection === 'Products') {
+        {
+          iterationData.map((eachName, index) => {
+            if (currentSection === 'Products') {
+              return (
+                <li
+                  key={index}
+                  className="card"
+                  onClick={() => handleProductSelection(eachName)}
+                >
+                  {getImage(eachName)}
+                  <h2>{eachName}</h2>
+                  <p className="card-text">Greetings, Explore our Items</p>
+                  <button>View</button>
+                </li>
+              );
+            }
             return (
               <li
                 key={index}
                 className="card"
                 onClick={() => handleProductSelection(eachName)}
               >
-                {getImage(eachName)}
+                {/* {eachName} */}
                 <h2>{eachName}</h2>
-                <p className="card-text">Greetings, Explore our Items</p>
+                <p className="card-text"></p>
                 <button>View</button>
               </li>
             );
-          }
-          return (
-            <li
-              key={index}
-              className="card"
-              onClick={() => handleProductSelection(eachName)}
-            >
-              {/* {eachName} */}
-              <h2>{eachName}</h2>
-              <p className="card-text"></p>
-              <button>View</button>
-            </li>
-          );
-        })}
+          })}
+        
       </ul>
     </section>
   );
@@ -241,6 +210,5 @@ const Products = ({ iterationData, currentSection }) => {
 export default Products;
 
 Products.propTypes = {
-  iterationData: PropTypes.object.isRequired,
   currentSection: PropTypes.string.isRequired,
 };

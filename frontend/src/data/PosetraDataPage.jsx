@@ -332,7 +332,7 @@ export const posetraProducts = [
     {
       productId: 'CHC001',
       productName: 'Ferrero Rocher with salty',
-      category: 'chocolate',
+      category: 'chocolates',
       brand: 'Ferrero',
       weight: '5.3 oz',
       price: '$10',
@@ -347,7 +347,7 @@ export const posetraProducts = [
     {
       productId: 'CHC002',
       productName: 'Lindor with milk',
-      category: 'chocolate',
+      category: 'chocolates',
       brand: 'Lindt & Sprüngli',
       weight: '3.5 oz',
       price: '$7',
@@ -363,7 +363,7 @@ export const posetraProducts = [
       {
         productId: 'CHC003',
         productName: 'Hershey\'s Milk Chocolate Bar',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Hershey\'s',
         weight: '1.55 oz',
         price: '$1.50',
@@ -376,7 +376,7 @@ export const posetraProducts = [
       {
         productId: 'CHC004',
         productName: 'Ghirardelli Dark Chocolate Squares',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Ghirardelli',
         weight: '5.32 oz',
         price: '$8',
@@ -390,7 +390,7 @@ export const posetraProducts = [
       {
         productId: 'CHC005',
         productName: 'Reese\'s Peanut Butter Cups',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Hershey\'s',
         weight: '1.6 oz',
         price: '$1.25',
@@ -403,7 +403,7 @@ export const posetraProducts = [
       {
         productId: 'CHC006',
         productName: 'Kit Kat',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Nestlé',
         weight: '1.5 oz',
         price: '$1.20',
@@ -416,7 +416,7 @@ export const posetraProducts = [
       {
         productId: 'CHC007',
         productName: 'Snickers',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Mars',
         weight: '1.86 oz',
         price: '$1.50',
@@ -429,7 +429,7 @@ export const posetraProducts = [
       {
         productId: 'CHC008',
         productName: 'Twix',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Mars',
         weight: '1.79 oz',
         price: '$1.30',
@@ -442,7 +442,7 @@ export const posetraProducts = [
       {
         productId: 'CHC009',
         productName: 'M&M\'s Milk Chocolate',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Mars',
         weight: '1.69 oz',
         price: '$1.00',
@@ -455,7 +455,7 @@ export const posetraProducts = [
       {
         productId: 'CHC010',
         productName: 'Dove Dark Chocolate Promises',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Dove',
         weight: '9.5 oz',
         price: '$6',
@@ -468,7 +468,7 @@ export const posetraProducts = [
       {
         productId: 'CHC011',
         productName: 'Cadbury Dairy Milk',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Cadbury',
         weight: '4.4 oz',
         price: '$4',
@@ -482,7 +482,7 @@ export const posetraProducts = [
       {
         productId: 'CHC012',
         productName: 'Milky Way',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Mars',
         weight: '1.84 oz',
         price: '$1.20',
@@ -495,7 +495,7 @@ export const posetraProducts = [
       {
         productId: 'CHC013',
         productName: '3 Musketeers',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Mars',
         weight: '1.92 oz',
         price: '$1.10',
@@ -508,7 +508,7 @@ export const posetraProducts = [
       {
         productId: 'CHC014',
         productName: 'Toblerone',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Mondelez International',
         weight: '3.52 oz',
         price: '$5',
@@ -521,7 +521,7 @@ export const posetraProducts = [
       {
         productId: 'CHC015',
         productName: 'Godiva Dark Chocolate Truffles',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Godiva',
         weight: '4.5 oz',
         price: '$12',
@@ -534,7 +534,7 @@ export const posetraProducts = [
       {
         productId: 'CHC016',
         productName: 'Russell Stover Assorted Chocolates',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Russell Stover',
         weight: '12 oz',
         price: '$10',
@@ -933,7 +933,7 @@ const fries = [
     {
       productId: 'CHC001',
       productName: 'Ferrero Rocher',
-      category: 'chocolate',
+      category: 'chocolates',
       brand: 'Ferrero',
       weight: '5.3 oz',
       price: '$10',
@@ -948,7 +948,7 @@ const fries = [
     {
       productId: 'CHC002',
       productName: 'Lindor',
-      category: 'chocolate',
+      category: 'chocolates',
       brand: 'Lindt & Sprüngli',
       weight: '3.5 oz',
       price: '$7',
@@ -964,7 +964,7 @@ const fries = [
       {
         productId: 'CHC003',
         productName: 'Hershey\'s Milk Chocolate Bar',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Hershey\'s',
         weight: '1.55 oz',
         price: '$1.50',
@@ -977,7 +977,7 @@ const fries = [
       {
         productId: 'CHC004',
         productName: 'Ghirardelli Dark Chocolate Squares',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Ghirardelli',
         weight: '5.32 oz',
         price: '$8',
@@ -991,7 +991,7 @@ const fries = [
       {
         productId: 'CHC005',
         productName: 'Reese\'s Peanut Butter Cups',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Hershey\'s',
         weight: '1.6 oz',
         price: '$1.25',
@@ -1004,7 +1004,7 @@ const fries = [
       {
         productId: 'CHC006',
         productName: 'Kit Kat',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Nestlé',
         weight: '1.5 oz',
         price: '$1.20',
@@ -1017,7 +1017,7 @@ const fries = [
       {
         productId: 'CHC007',
         productName: 'Snickers',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Mars',
         weight: '1.86 oz',
         price: '$1.50',
@@ -1030,7 +1030,7 @@ const fries = [
       {
         productId: 'CHC008',
         productName: 'Twix',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Mars',
         weight: '1.79 oz',
         price: '$1.30',
@@ -1043,7 +1043,7 @@ const fries = [
       {
         productId: 'CHC009',
         productName: 'M&M\'s Milk Chocolate',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Mars',
         weight: '1.69 oz',
         price: '$1.00',
@@ -1056,7 +1056,7 @@ const fries = [
       {
         productId: 'CHC010',
         productName: 'Dove Dark Chocolate Promises',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Dove',
         weight: '9.5 oz',
         price: '$6',
@@ -1069,7 +1069,7 @@ const fries = [
       {
         productId: 'CHC011',
         productName: 'Cadbury Dairy Milk',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Cadbury',
         weight: '4.4 oz',
         price: '$4',
@@ -1083,7 +1083,7 @@ const fries = [
       {
         productId: 'CHC012',
         productName: 'Milky Way',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Mars',
         weight: '1.84 oz',
         price: '$1.20',
@@ -1096,7 +1096,7 @@ const fries = [
       {
         productId: 'CHC013',
         productName: '3 Musketeers',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Mars',
         weight: '1.92 oz',
         price: '$1.10',
@@ -1109,7 +1109,7 @@ const fries = [
       {
         productId: 'CHC014',
         productName: 'Toblerone',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Mondelez International',
         weight: '3.52 oz',
         price: '$5',
@@ -1122,7 +1122,7 @@ const fries = [
       {
         productId: 'CHC015',
         productName: 'Godiva Dark Chocolate Truffles',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Godiva',
         weight: '4.5 oz',
         price: '$12',
@@ -1135,7 +1135,7 @@ const fries = [
       {
         productId: 'CHC016',
         productName: 'Russell Stover Assorted Chocolates',
-        category: 'chocolate',
+        category: 'chocolates',
         brand: 'Russell Stover',
         weight: '12 oz',
         price: '$10',
