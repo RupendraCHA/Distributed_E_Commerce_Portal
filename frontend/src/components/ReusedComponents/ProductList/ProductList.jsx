@@ -160,10 +160,23 @@ const ProductList = ({ productList, title }) => {
   const getAllProducts = () => {
     setDataList(productList)
     setSearchItem("")
-
   }
 
   // let categoryName = (productList[0].category).toUpperCase()
+
+  const handleSearchByKey = (e) => {
+    if (e.key === "Enter"){
+      getSelectedItemsOnly()
+    }
+  }
+
+  const handleInputChange = (e) => {
+    setSearchItem(e.target.value)
+
+    if (e.target.value === "") {
+      setDataList(productList)
+    } 
+  }
 
 
   return (
@@ -188,7 +201,7 @@ const ProductList = ({ productList, title }) => {
         <div>
           {/* <label htmlFor='searchItem' className='search-input-label'>Search items related to <span style={{color: "#506bf2"}}>{categoryName}</span> here</label> */}
           <div className='productlist-search-icon-input-container'>
-            <input value={searchItem} className='search-item-input' id='searchItem' type='text'  onChange={(e) => setSearchItem(e.target.value)} placeholder='Enter item name ...'/>
+            <input value={searchItem} className='search-item-input' id='searchItem' type='text'  onChange={handleInputChange} onKeyDown={handleSearchByKey} placeholder='Enter item name ...'/>
             <FaSearch className='search-icon-symbol' onClick={getSelectedItemsOnly}/>
           </div>
           {searchItem && <div style={{textAlign: "right", marginLeft: "5px"}} onClick={getAllProducts}><button className='removing-input-text'>Clear</button></div>}

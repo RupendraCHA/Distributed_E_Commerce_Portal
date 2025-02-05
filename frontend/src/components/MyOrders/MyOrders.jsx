@@ -85,10 +85,10 @@ const Orders = () => {
     <div className="container order-card">
       <div className="order-header">
         <div>
-          <h3 className="order-id">
+          <h3 className="order-id text-blue-600 font-[SansSerif]">
             Order #{order._id.slice(-8).toUpperCase()}
           </h3>
-          <p className="order-date">
+          <p className="order-date font-medium">
             Placed on {format(new Date(order.createdAt), 'MMM dd, yyyy')}
           </p>
         </div>
@@ -99,14 +99,14 @@ const Orders = () => {
           <span className={`status-badge ${order.status.toLowerCase()}`}>
           {order.status}
           </span>
-          <p style={{fontSize: "13px", fontWeight: "600"}}>{new Date(order.createdAt).toLocaleDateString()}</p>
+          <p style={{fontSize: "13px", fontWeight: "600"}}>{new Date(order.createdAt).toLocaleString()}</p>
         </div>
       </div>
 
       <div className="order-content">
         {/* Order Items */}
         <div className="order-section">
-          <h4 className="section-title">Items</h4>
+          <h4 className="section-title mx-2">Items</h4>
           <div className="item-list">
             {order.items.map((item, index) => (
               <div key={index} className="order-item">
@@ -114,7 +114,7 @@ const Orders = () => {
                   {console.log(item)}
                   <p className="item-name">{item.name}</p>
                   <p className="item-name">{item.product}</p>
-                  <p className="item-quantity">Quantity: {item.quantity}</p>
+                  <p className="item-quantity font-medium">Quantity: {item.quantity}</p>
                 </div>
                 <p className="item-price">
                   $
@@ -133,7 +133,7 @@ const Orders = () => {
         {/* Delivery Address */}
         <div className="order-section">
           <h4 className="section-title">Delivery Address</h4>
-          <div className="address-details">
+          <div className="address-details font-medium">
             <p>{order.address.addressLine1}</p>
             {order.address.addressLine2 && <p>{order.address.addressLine2}</p>}
             <p>{`${order.address.city}, ${order.address.state} ${order.address.zipCode}`}</p>
@@ -141,8 +141,8 @@ const Orders = () => {
         </div>
         {/* Delivery Type */}
         <div className="order-section">
-          <h4 className="section-title">Estimated Delivery</h4>
-          <p className="delivery-type">
+          <h4 className="section-title text-blue-600">Estimated Delivery</h4>
+          <p className="delivery-type font-medium">
             {order.deliveryType === 'standard'
               ? `Order will be delivered on ${getDeliveryDate(
                   order.createdAt,
@@ -173,7 +173,7 @@ const Orders = () => {
             <span>Total</span>
             <span>${order.total.toFixed(2)}</span>
           </div>
-          <p className="payment-method">Paid via {order.paymentMethod}</p>
+          <p className="payment-method font-medium">Paid via {order.paymentMethod}</p>
         </div>
       </div>
     </div>
@@ -203,7 +203,7 @@ const Orders = () => {
 
   if (orders.length === 0) {
     return (
-      <div className="orders-container">
+      <div className="container orders-container">
         <h1 className="page-title">My Orders</h1>
         <div className="empty-state">
           <h2 className="empty-state-title">No orders found</h2>

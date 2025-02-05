@@ -22,11 +22,13 @@ const Checkout = () => {
 
   // Calculate total price including delivery fee
   const calculateTotal = () => {
-    const itemsTotal = cartItems.reduce(
+    let itemsTotal = cartItems.reduce(
       (total, item) =>
         total + parseFloat(item.price.replace('$', '')) * item.quantity,
       0
     );
+
+    // itemsTotal = itemsTotal.toFixed(2)
 
     let deliveryFee = 0;
     if (deliveryType === 'premium') {
@@ -362,12 +364,12 @@ const Checkout = () => {
                   <span>Subtotal</span>
                   <span>
                     $
-                    {calculateTotal() -
+                    {(calculateTotal() -
                       (deliveryType === 'premium'
                         ? 10
                         : deliveryType === 'airMail'
                         ? 100
-                        : 0)}
+                        : 0)).toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mt-2">

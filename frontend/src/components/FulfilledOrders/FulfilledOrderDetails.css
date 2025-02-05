@@ -1,0 +1,16 @@
+.fullfilled-order-details-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+
+    div{
+        text-align: center;
+        
+        h1{
+            margin-bottom: 10px;
+            font-size: 28px;
+            font-weight: bold;
+        }
+    }
+}

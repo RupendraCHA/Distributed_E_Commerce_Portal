@@ -27,6 +27,15 @@ const JWT_SECRET = "Account_Test"; // You can use environment variables to store
 
 mongoose.connect("mongodb://127.0.0.1:27017/Visionsoft");
 
+// const connectDB = async () => {
+//   await mongoose.connect(
+//     "mongodb+srv://githubdevelopment:Rvsoft1234@cluster0.nqiv3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+//   );
+//   console.log(`Connected to Database Successfully!`);
+// };
+
+// connectDB();
+
 const Stripe = require("stripe");
 const stripe = Stripe(
   "sk_test_51Q9ZJ7HC7NaQVzOS1SMqmgTvtTKQOgMSp0BlgI7gUCJTsSTRQw4vOvgFWC8WsDAuDwALyyu59DxfsIOGb3z3isJR005xoAmBGN"
@@ -85,6 +94,87 @@ app.post("/create-checkout-session", async (req, res) => {
     });
   }
 });
+
+app.get("/getDataFromSap", async (req, res) => {
+  const url = "http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/Material_data1Set?$format=json";
+  const username = "NikhilA";
+  const password = "Nikhil@12345";
+  // Encode the credentials in base64 for Basic Authentication
+  const headers = new Headers();
+  headers.set('Authorization', 'Basic ' + btoa(username + ":" + password));
+
+  try {
+      // Make the request to the OData service
+      const response = await fetch(url, {
+          method: 'GET',
+          headers: headers
+      });
+
+      // Check if the response is okay
+      let dataFieldsForSAP = []
+      if (response.ok) {
+          const data = await response.json();
+          
+          // # 3) Destructuring the fields, adding them into an Array and consoling them
+
+          data.d.results.map((eachRecord) => {
+              let newObject = {
+               // product_ID:eachRecord.Product_ID,
+                productName:eachRecord.Product,
+                category :eachRecord.Material_Category,
+                brand :"",
+                description:eachRecord.Material_Description,
+                price:eachRecord.Price_Of_Product, 
+                weight:eachRecord.Allowed_Packaging_Weight,
+                stock:eachRecord.Storage_percentage,
+                expirationDate:eachRecord.Expiration_Date,
+                image : "",
+              }
+              dataFieldsForSAP.push(newObject)
+            })
+          const updatedData = dataFieldsForSAP.map((product) => {
+            if (product.productName === "AGRPUMP"){
+              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206530/41jM54U8FgL._AC_UF1000_1000_QL80__pyongi.jpg" }
+            }
+            else if (product.productName === "BENALIUM"){
+              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206617/images_hqeypc.jpg" }
+            }
+            else if (product.productName === "BRASS"){
+              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206705/brass-metal-components_bxwkyf.jpg" }
+            }
+            else if (product.productName === "LED"){
+              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206775/led-bulb-raw-material-500x500_otjrgh.webp" }
+            }
+            else if (product.productName === "MNIPICKAXES"){
+              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206885/ImageForArticle_1446_17219052982689037_kgkxpu.webp" }
+            }
+            else if (product.productName === "SITTAPER"){
+              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738207536/images_1_a6hh4a.jpg" }
+            }
+            else if (product.productName === "SULPHUR"){
+              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208651/360_F_85756492_i638LcwoFrymrBj96ZMHP4nL4BOolKfK_ai3zwv.jpg" }
+            }
+            else if (product.productName === "THORIUM"){
+              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208805/b90b79a0-fcb7-40ea-955d-729b1a85e92b_484973f3_wrdyaa.webp" }
+            }
+            else if (product.productName === "TIE"){
+              return {...product, productName: "URANIUM", category: 'fashion accessories', description: "This is Radioactive element & generates Nuclear Energy", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208888/uranium-chemical-element_gojtdh.webp" }
+            }
+            else if (product.productName === "TILE"){
+              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208950/1711451520993_ylgnow.jpg" }
+            }
+          })
+          console.log("updatedData",updatedData)
+          res.status(200).json({success: true, data:updatedData})
+          // res.status(200).json({success: true, data:dataFieldsForSAP})
+
+        } else {
+          console.error('Failed to fetch data', response.status);
+      }
+  } catch (error) {
+      console.error('Error:', error);
+  }
+})
 
 
 app.post("/confirm-payment", authenticateToken, async (req, res) => {
@@ -319,22 +409,13 @@ app.get("/admin/orders", authenticateToken, isAdmin, async (req, res) => {
   }
 });
 app.get("/allorders",authenticateToken, async (req, res) => {
-  // try {
-  //   const orders = await OrderModel.find()
-  //     .sort({ createdAt: -1 })
-  //     .populate("userId", "name email");
-  //   res.json(orders);
-  // } catch (error) {
-  //   res.status(500).json({ message: "Error fetching orders" });
-  // }
+  
   try {
     const userId = req.user.id; // Corrected to use req.user.id
-     // Corrected to use req.user.id
     const orders = await OrderModel.find({}); // Fetch orders by user ID
     // let usersOrders = []
     const usersOrders = orders.filter((order) => userId !== order.userId.toString())
-    // console.log(usersOrders)
-    // console.log("USERID", userId)
+    
     res.json(usersOrders);
     // res.json(orders);
   } catch (error) {
@@ -363,7 +444,7 @@ app.post("/login", async (req, res) => {
       { id: user._id, email: user.email, role: user.role },
       JWT_SECRET,
       {
-        expiresIn: "4h",
+        expiresIn: "24h",
       }
     );
     return res.json({
@@ -624,16 +705,16 @@ app.patch("/orders/:orderId/status", async (req, res) => {
 app.put("/order/:id/status", async (req, res) => {
   const {id} = req.params
   const updateOrderData = await OrderModel.findById(id)
-  console.log(updateOrderData)
+  // console.log("updatedORDERDATA",updateOrderData)
 
   updateOrderData.status = "Shipped on"
   updateOrderData.createdAt = new Date()
   updateOrderData.save()
-  res.status(200).json({status: updateOrderData.status, id : updateOrderData._id, createdAt: updateOrderData.createdAt})
+  res.status(200).json({status: updateOrderData.status, orderedItems: updateOrderData.items, id : updateOrderData._id, createdAt: updateOrderData.createdAt})
 })
 
 app.post("/register", async (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const { name, email, password, role } = req.body;
   const existingUser = await EmployeeModel.findOne({ email });
   if (existingUser) {
@@ -1218,6 +1299,249 @@ app.get("/distributor/inventory", authenticateToken, async (req, res) => {
       .json({ message: "Failed to fetch inventory", error: error.message });
   }
 });
+
+app.get("/inventories", authenticateToken, async (req, res) => {
+  try {
+    const distributor = await DistributorModel.findOne({ userId: req.user.id });
+    res.status(200).json(distributor)
+  } catch (error) {
+    console.error("Error fetching inventory:", error);
+    res
+      .status(500)
+      .json({ message: "Failed to fetch inventory", error: error.message });
+  }
+})
+
+app.post("/inventories", authenticateToken, async (req, res) => {
+  const {inventoryOrders, orderedItems, disWarehouses} = req.body
+  // console.log("INVENTORIES", inventoryOrders)
+  console.log("CONSUMERS", orderedItems)
+  // console.log("D.Warehouses", disWarehouses)
+  // try {
+
+  //   if (!orderedItems || orderedItems.length === 0 || disWarehouses.length===0 || !disWarehouses){
+  //     return res.status(400).json({message: "Consumer Order and Warehouse details are required!"})
+  //   }
+
+
+  //   let {warehouses} = disWarehouses
+  //   // console.log("1",warehouses)
+
+
+  //   warehouses.sort((a, b) => b.isPrimary - a.isPrimary)
+
+  //   for (let orderItem of orderedItems) {
+  //     const {product, quantity} = orderItem
+  //     let remainingQuantity = quantity
+
+  //     for (let warehouse of warehouses){
+  //       if (remainingQuantity === 0 ) break;
+
+  //       let productIndex = warehouse.inventory.findIndex(p => p.productId === product)
+
+  //       if (productIndex !== -1 && warehouse.inventory[productIndex].quantity > 0){
+
+  //         let availableQuantity = warehouse.inventory[productIndex].quantity
+
+  //         if (availableQuantity >= remainingQuantity){
+  //           warehouse.inventory[productIndex].quantity -= remainingQuantity
+  //           remainingQuantity = 0
+  //         }else {
+  //           warehouse.inventory[productIndex].quantity = 0
+  //           remainingQuantity -= availableQuantity
+  //         }
+  //       }
+  //     }
+  //   }
+  //   await DistributorModel.findByIdAndUpdate(disWarehouses._id, {warehouses})
+  //   // const distributor = await DistributorModel.findOne({ userId: req.user.id });
+  //   // console.log(distributor.warehouses)
+  //   // console.log("2",warehouses)
+
+  //   res.json({message: "Order Fullfilled Successfully", updatedWarehouses: warehouses})
+  //   // res.status(200).json(distributor)
+  // } catch (error) {
+  //   console.error("Error fetching inventory:", error);
+  //   res
+  //     .status(500)
+  //     .json({ message: "Failed to fetch inventory", error: error.message });
+  // }
+//   try {
+//     if (!orderedItems || orderedItems.length === 0 || disWarehouses.length === 0 || !disWarehouses) {
+//         return res.status(400).json({ message: "Consumer Order and Warehouse details are required!" });
+//     }
+
+//     let { warehouses } = disWarehouses;
+//     warehouses.sort((a, b) => b.isPrimary - a.isPrimary);
+
+//     let deductedProducts = []; // Array to store deducted products and their warehouse info
+//     let insufficientStockProducts = [];
+
+//     for (let orderItem of orderedItems) {
+//         const { product, quantity } = orderItem;
+//         let remainingQuantity = quantity;
+//         let deductedFromWarehouses = [];
+
+//         for (let warehouse of warehouses) {
+//             if (remainingQuantity === 0) break;
+
+//             let productIndex = warehouse.inventory.findIndex(p => p.productId === product);
+
+//             if (productIndex !== -1 && warehouse.inventory[productIndex].quantity > 0) {
+//                 let availableQuantity = warehouse.inventory[productIndex].quantity;
+//                 let deductedQuantity = Math.min(availableQuantity, remainingQuantity);
+
+//                 warehouse.inventory[productIndex].quantity -= deductedQuantity;
+//                 remainingQuantity -= deductedQuantity;
+
+//                 // Track which warehouse the stock was deducted from
+//                 deductedFromWarehouses.push({
+//                     warehouseId: warehouse._id,
+//                     warehouseLocation: warehouse.addressLine1 + ", " + warehouse.city,
+//                     deductedQuantity
+//                 });
+//             }
+//         }
+
+//         // If stock was deducted, add to the deductedProducts array
+//         if (deductedFromWarehouses.length > 0) {
+//             deductedProducts.push({
+//                 productId: product,
+//                 orderedQuantity: quantity,
+//                 deductedFrom: deductedFromWarehouses,
+//                 productName: orderItem.name
+//             });
+//         }
+
+//         if (remainingQuantity > 0) {
+//           insufficientStockProducts.push({
+//               productId: product,
+//               orderedQuantity: quantity,
+//               availableQuantity: quantity - remainingQuantity,
+//               productName: orderItem.name
+//               // Amount that could be fulfilled
+//           });
+//       }
+//     }
+
+//     await DistributorModel.findByIdAndUpdate(disWarehouses._id, { warehouses });
+//     console.log("Deducted Products:", deductedProducts);
+//     console.log("Insufficient Stock Products:", insufficientStockProducts);
+
+//     res.json({
+//         message: insufficientStockProducts.length > 0 
+//             ? "Order partially fulfilled, some products have insufficient stock" 
+//             : "Order fulfilled successfully",
+//         deductedProducts,
+//         insufficientStockProducts,
+//         updatedWarehouses: warehouses,
+//         success: true
+//     });
+
+// } catch (error) {
+//     console.error("Error fetching inventory:", error);
+//     res.status(500).json({ message: "Failed to fetch inventory", error: error.message });
+// }
+try {
+  if (!orderedItems || orderedItems.length === 0 || disWarehouses.length === 0 || !disWarehouses) {
+      return res.status(400).json({ message: "Consumer Order and Warehouse details are required!" });
+  }
+
+  let { warehouses } = disWarehouses;
+  warehouses.sort((a, b) => b.isPrimary - a.isPrimary);
+
+  let deductedProducts = []; // Stores deducted products and their warehouse info
+  let insufficientStockProducts = []; // Stores products with insufficient stock
+
+  for (let orderItem of orderedItems) {
+      const { product, name, quantity } = orderItem;  // Extract productName
+      let remainingQuantity = quantity;
+      let deductedFromWarehouses = [];
+      let insufficientWarehouses = []; // Track which warehouses had insufficient stock
+
+      for (let warehouse of warehouses) {
+          if (remainingQuantity === 0) break;
+
+          let productIndex = warehouse.inventory.findIndex(p => p.productId === product);
+
+          if (productIndex !== -1) {
+              let availableQuantity = warehouse.inventory[productIndex].quantity;
+              let deductedQuantity = Math.min(availableQuantity, remainingQuantity);
+
+              if (deductedQuantity > 0) {
+                  warehouse.inventory[productIndex].quantity -= deductedQuantity;
+                  remainingQuantity -= deductedQuantity;
+
+                  // Track the warehouse from which stock was deducted
+                  deductedFromWarehouses.push({
+                      warehouseId: warehouse._id,
+                      warehouseLocation: `${warehouse.addressLine1}, ${warehouse.city}`,
+                      deductedQuantity
+                  });
+              }
+
+              // If the product is still needed but the warehouse has 0 stock, mark it as insufficient
+              if (remainingQuantity > 0 && availableQuantity === 0) {
+                  insufficientWarehouses.push({
+                      warehouseId: warehouse._id,
+                      warehouseLocation: `${warehouse.addressLine1}, ${warehouse.city}`
+                  });
+              }
+          }
+      }
+
+      // If stock was deducted, add to deductedProducts array
+      if (deductedFromWarehouses.length > 0) {
+          deductedProducts.push({
+              productId: product,
+              productName: name,  // Include product name
+              orderedQuantity: quantity,
+              deductedFrom: deductedFromWarehouses
+          });
+      }
+
+      // If order couldn't be fully fulfilled, add to insufficientStockProducts array
+      if (remainingQuantity > 0) {
+          insufficientStockProducts.push({
+              productId: product,
+              productName: name,  // Include product name
+              orderedQuantity: quantity,
+              availableQuantity: quantity - remainingQuantity, // Amount that could be fulfilled
+              insufficientFrom: insufficientWarehouses // Track where stock was insufficient
+          });
+      }
+  }
+
+  // Add insufficient products to disWarehouses
+  disWarehouses.insufficientStockProducts = insufficientStockProducts;
+
+  // Update the warehouse data in MongoDB
+  await DistributorModel.findByIdAndUpdate(disWarehouses._id, { warehouses, insufficientStockProducts });
+
+  console.log("Deducted Products:", deductedProducts);
+  console.log("Insufficient Stock Products:", insufficientStockProducts);
+
+  res.json({
+      message: insufficientStockProducts.length > 0 
+          ? "Order partially fulfilled, some products have insufficient stock" 
+          : "Order fulfilled successfully",
+      deductedProducts,
+      insufficientStockProducts,
+      updatedWarehouses: warehouses,
+      success:true
+  });
+
+} catch (error) {
+  console.error("Error updating inventory:", error);
+  res.status(500).json({ message: "Failed to update inventory", error: error.message });
+}
+
+
+})
+
+app.put("/updateInventory", async (req, res) => {
+
+})
 
 app.post(
   "/warehouses/:warehouseId/products",

@@ -456,6 +456,7 @@ const InventoryManagement = () => {
       }
     });
     setFilteredInventory(sorted);
+    console.log(sorted)
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 

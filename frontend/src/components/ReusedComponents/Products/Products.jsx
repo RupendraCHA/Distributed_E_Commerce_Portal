@@ -155,7 +155,11 @@ const Products = ({ iterationData, currentSection }) => {
   }
 
   const handleInputChange = (e) => {
-    setCategoryName(e.target.value)
+    // setCategoryName(e.target.value)
+    if (e.key === "Enter"){
+      goToAllProducts()
+    }
+
   }
 
   const getCategoryName = (currentSection) => {
@@ -181,7 +185,8 @@ const Products = ({ iterationData, currentSection }) => {
                 type="text"
                 placeholder="*Search Product..."
                 value={categoryName}
-                onChange={handleInputChange}
+                onChange={(e) => setCategoryName(e.target.value)}
+                onKeyDown={handleInputChange}
                 style={{ cursor: 'pointer' }}
 
               />

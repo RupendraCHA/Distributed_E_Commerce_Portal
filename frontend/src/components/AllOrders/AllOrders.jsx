@@ -4,7 +4,13 @@ import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 import './AllOrders.css';
 import { useDispatch, useSelector } from 'react-redux';
-import { setUserOrders } from '../../store/userOrdersSlice';
+import { setUserOrders, setUpdated, setDeductedOrderDetails, setInsufficientOrderDetails } from '../../store/userOrdersSlice';
+import { getInventoryOrdersAndConsumerOrdersOnly } from '../UpdateInventoryDetails/UpdateInventoryDetails';
+import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+// import { FcInTransit } from "react-icons/fc";
+import { CiDeliveryTruck } from "react-icons/ci";
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -14,34 +20,45 @@ const Orders = () => {
   const [userOwnOrders, setOwnOrders] = useState([])
   const userRole = useSelector((state) => state.auth.user?.role);
   const [shippedId, setShippedId] = useState("")
+  const [consumerOrders, setConsumerOrders] = useState([])
+  const [inventoryOrders, setInventoryOrders] = useState([])
+  const [disWarehouses, setDisWarehouses] = useState({})
+  // const [isUpdated, setIsUpdated] = useState(false)
+
+  const [deductedProducts, setDeductedProducts] = useState([])
+  const [insufficientProducts, setInsufficientProducts] = useState([])
 
   const dispatch = useDispatch()
+  const isUpdated = useSelector((state) => state.userOrders.isUpdated)
+
 
   useEffect(() => {
     fetchOrders();
     getOtherUsersOrdersOnly()
   }, []);
 
+  const orderFulfilmentConsumerItems = useSelector((state) => state.userOrders.userOrdersData)
+
+  // console.log("orderFulfilmentConsumerItems",orderFulfilmentConsumerItems)
+  const navigate = useNavigate()
+
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem('token');
-      // const orderUrl = userRole === "Consumer" ? 'http://localhost:3002/orders' : 'http://localhost:3002/admin/orders'
       const response = await axios.get('http://localhost:3002/allorders', {
         headers: { Authorization: `Bearer ${token}` },
       });
-    //   console.log("userOrdersOnly", response.data)
 
       const sortedOrders = response.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
 
-      // Automatically update status from "confirmed" to "processing" after 10 seconds
-      // and from "processing" to "delivered" after 1 hour
       const updatedOrders = sortedOrders.map((order) => {
         if (order.status === 'confirmed') {
           setTimeout(() => {
             updateOrderStatus(order._id, 'processing');
-          }, 800); // 10 seconds
+          }, 800); 
+        // 10 seconds
         // } else if (order.status === 'processing') {
         //   setTimeout(() => {
         //     updateOrderStatus(order._id, 'delivered');
@@ -57,7 +74,7 @@ const Orders = () => {
         }
       );
       setOwnOrders(ownOrders.data)
-      console.log("OWN ORDERS", ownOrders.data)
+      // console.log("OWN ORDERS", ownOrders.data)
 
       setOrders(updatedOrders);
       setError(null);
@@ -69,80 +86,66 @@ const Orders = () => {
     }
   };
 
-  const getOtherUsersOrdersOnly = async () => {
-    // console.log("ORDERS",orders)
-    // const response = await axios.get('http://localhost:3002/allorders');
+const getOtherUsersOrdersOnly = async () => {
+  const {consumerOrders, InventoryOrders, distributorWarehouses} = await getInventoryOrdersAndConsumerOrdersOnly()
+  setConsumerOrders(consumerOrders)
+  setInventoryOrders(InventoryOrders)
+  setDisWarehouses(distributorWarehouses)
+  const token = localStorage.getItem('token');
 
-    // console.log("ORDERS", response.data)
-    // const ownOrders = await axios.get(
-    //     `http://localhost:3002/orders/`,
-    //     {
-    //       headers: { Authorization: `Bearer ${token}` },
-    //     }
-    //   );
-    //   setOwnOrders(ownOrders.data)
-    //   console.log("USEROWNORDERS", ownOrders.data)
-    // let ids = []
+  const response = await axios.get("http://localhost:3002/inventories", {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  // console.log("INVENTORIES WITH WAREHOUSES", response.data)
+  // console.log("Consumer Orders", consumerOrders)
+  // console.log("Inventory Orders", InventoryOrders)
+    // const response = await axios.get('http://localhost:3002/allorders', {
+    //     headers: { Authorization: `Bearer ${token}` },
+    //   });
+  //     console.log("userOrdersOnly", response.data)
 
-    // ownOrders.data.map((order) => {
-    //     ids.push(order.userId)
-    // } );
-    // console.log("ids",ids)
-
-    // let otherIds = []
-
-// Get orders with userIDs not present in orders21
-    // response.data
-    //     .map((order, index) => {
-    //         otherIds.push(order.userId)
-    //     }) 
-        // Keep orders with different userID; // Limit to 7 orders
-
-    // console.log("otherIds",otherIds);
-    // const otherOrders = otherIds.filter((id) => !ids.includes(id))
-    // console.log(otherOrders);
-
-    // let otherOrderArray = []
-
-    // response.data.map((order) => {
-    //     // console.log(order)
-    //     if (otherOrders.includes(order.userId)){
-    //         otherOrderArray.push(order)
-    //     }
-    // })
-    // console.log("Array",otherOrderArray)
-
-    // let otherOrdersItems = []
-
-    // otherOrderArray.map((order) => {
-    //     otherOrdersItems.push(order.items)
-    // })
-
-    // console.log("Other Items", otherOrdersItems)
-    const token = localStorage.getItem('token');
-    const response = await axios.get('http://localhost:3002/allorders', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      console.log("userOrdersOnly", response.data)
-
-    const inventoryResponse = await axios.get('http://localhost:3002/distributor/inventory', {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-    console.log("InventoryData",inventoryResponse.data)
-
-
-  }
+  //   const inventoryResponse = await axios.get('http://localhost:3002/distributor/inventory', {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+  //   console.log("InventoryData",inventoryResponse.data)
+}
 
   const handleOrderFullfillment = async (id, order) => {
-    console.log("ORDER FULLFILLMENT", id)
+    // console.log("ORDER FULLFILLMENT", id)
     try {
     dispatch(setUserOrders(order.items))
         const response = await axios.put(`http://localhost:3002/order/${id}/status`)
         setShippedStatus(response.data.status)
-        console.log(response.data.id)
-        console.log(response.data.createdAt, "ShippedDate")
-        setShippedId(response.data.id)
+        const orderedItems = response.data.orderedItems
+        // console.log(response.data.id)
+        // console.log(response.data.createdAt, "ShippedDate")
+        // setShippedId(response.data.id)
         // console.log("STATUS", response.data.status)
+      const token = localStorage.getItem('token');
+
+        const inventoryResponse = await axios.post("http://localhost:3002/inventories",{inventoryOrders, orderedItems, disWarehouses}, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+
+        console.log(inventoryResponse.data)
+
+        if (inventoryResponse.data.success === true) {
+          dispatch(setUpdated(true))
+          dispatch(setDeductedOrderDetails(inventoryResponse.data.deductedProducts))
+          dispatch(setInsufficientOrderDetails(inventoryResponse.data.insufficientStockProducts))
+          toast.success('Order Fullfilled successfully!');
+          setTimeout(() => {
+          window.location.reload()
+
+          }, 1000)
+
+          // navigate("/consumerOrderFullfilled")
+        }
+        const result = inventoryResponse.data
+        // console.log(result)
+        // console.log("INVENTORYS", inventoryOrders)
+        // console.log("ORDERFULLFILLMENT", orderFulfilmentConsumerItems)
+
     } catch (error) {
         console.log("Error Occured", error)
     }
@@ -176,18 +179,30 @@ const Orders = () => {
     return date.toDateString(); // Formats as "Day Mon DD YYYY"
   };
 
+  const handleIsUpdated = () => {
+    dispatch(setUpdated(false))
+  }
+
+  const handleOrderDetails = () => {
+      navigate("/inventoryOrders")
+      dispatch(setUpdated(false))
+    }
   
 
 
   const OrderDetails = ({ order }) => {
+      const navigate = useNavigate();
+    
+    
     return (<div className="order-card">
       <div className="order-header">
         <div>
-          <h3 className="order-id">
-            Order #{order._id.slice(-8).toUpperCase()}
+          <h3 className="consumer-order-id text-blue-600 font-[SansSerif]">
+            OrderId #{order._id.slice(-8).toUpperCase()}
           </h3>
-          <p className="order-date">
+          <p className="order-date font-medium">
             Placed on {format(new Date(order.createdAt), 'MMM dd, yyyy')}
+            {/* Placed on {new Date(order.createdAt).toLocaleString()} */}
           </p>
         </div>
         {/* {order.status === "shipped" && <span className={`status-badge ${order.status.toLowerCase()}`}>
@@ -198,7 +213,7 @@ const Orders = () => {
           <span className={`status-badge1 ${order.status.toLowerCase()}`}>
             Shipped on
           </span>
-          <p style={{fontSize: "13px", fontWeight: "600"}}>{new Date(order.createdAt).toLocaleDateString()}</p>
+          <p style={{fontSize: "13px", fontWeight: "600"}}>{new Date(order.createdAt).toLocaleString()}</p>
         </div>
         }
         {/* {shippedStatus === "" ? "" : } */}
@@ -207,7 +222,7 @@ const Orders = () => {
       <div className="order-content">
         {/* Order Items */}
         <div className="order-section">
-          <h4 className="section-title">Items</h4>
+          <h4 className="section-title mx-2 text-3xl">Items</h4>
           <div className="item-list">
             {order.items.map((item, index) => (
               <div key={index} className="order-item">
@@ -215,7 +230,7 @@ const Orders = () => {
                   {/* {console.log(item)} */}
                   <p className="item-name">{item.name}</p>
                   <p className="item-name">{item.product}</p>
-                  <p className="item-quantity">Quantity: {item.quantity}</p>
+                  <p className="item-quantity font-medium">Quantity: {item.quantity}</p>
                 </div>
                 <p className="item-price">
                   $
@@ -234,7 +249,7 @@ const Orders = () => {
         {/* Delivery Address */}
         <div className="order-section">
           <h4 className="section-title">Delivery Address</h4>
-          <div className="address-details">
+          <div className="address-details font-medium">
             <p>{order.address.addressLine1}</p>
             {order.address.addressLine2 && <p>{order.address.addressLine2}</p>}
             <p>{`${order.address.city}, ${order.address.state} ${order.address.zipCode}`}</p>
@@ -243,8 +258,8 @@ const Orders = () => {
 
         {/* Delivery Type */}
         <div className="order-section">
-          <h4 className="section-title">Estimated Delivery on</h4>
-          <p className="delivery-type">
+          <h4 className="orders-section-title text-blue-600">Estimated Delivery on</h4>
+          <p className="delivery-type font-medium text-0.2xl">
             {order.deliveryType === 'standard'
               ? `Order will be delivered on ${getDeliveryDate(
                   order.createdAt,
@@ -275,7 +290,7 @@ const Orders = () => {
             <span>Total</span>
             <span>${order.total.toFixed(2)}</span>
           </div>
-          <p className="payment-method">Paid via {order.paymentMethod}</p>
+          <p className="payment-method font-medium">Paid via {order.paymentMethod}</p>
         </div>
       </div>
     </div>)
@@ -317,15 +332,32 @@ const Orders = () => {
     );
   }
 
-  return (
-    <div className="orders-container">
+  return (<>
+    {/* {isUpdated ? <div>
+        <h1>FilfilledOrderDetails</h1>
+        <button className='btn btn-primary' onClick={handleOrderDetails}>Back</button>
+    </div> : <div className="orders-container">
       <h1 className="page-title"> Consumer Orders</h1>
       <div className="orders-list">
         {orders.map((order) => (
           <OrderDetails key={order._id} order={order} />
         ))}
       </div>
+    </div>} */}
+    <div className="orders-container">
+      {/* <h1 className="page-title"> Consumer Orders</h1> */}
+      <h1 className="text-3xl font-bold flex items-center">
+        {/* <CiDeliveryTruck className='consumer-order-icon' style={{fontWeight: "bold"}}/> */}
+        Consumer Orders
+      </h1>
+      <div className="orders-list">
+        {orders.map((order) => (
+          <OrderDetails key={order._id} order={order} />
+        ))}
+      </div>
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
+    </>
   );
 };
 

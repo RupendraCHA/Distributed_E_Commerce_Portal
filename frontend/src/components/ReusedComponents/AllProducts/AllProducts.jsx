@@ -206,6 +206,12 @@ const AllProducts = () => {
 
   }
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter"){
+      getSelectedItemsFromSearch()
+    }
+  }
+
 
 //   let categoryName = (productList[0].category).toUpperCase()
 
@@ -216,7 +222,7 @@ const AllProducts = () => {
       <div className='search-item-container'>
         <div>
           <div className='search-icon-input-container'>
-            <input value={searchItem} className='search-item-input' id='searchItem' type='text'  onChange={handleInputChange} placeholder='*Search Product...'/>
+            <input value={searchItem} className='search-item-input' id='searchItem' type='text'  onChange={handleInputChange} onKeyDown={handleKeyDown} placeholder='*Search Product...'/>
             <FaSearch className='search-icon-symbol' onClick={getSelectedItemsFromSearch}/>
           </div>
         </div>

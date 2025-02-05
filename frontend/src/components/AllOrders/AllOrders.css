@@ -35,10 +35,10 @@
     border-bottom: 1px solid #e2e8f0;
 }
 
-.order-id {
-    font-size: 1.25rem;
+.consumer-order-id {
+    font-size: 1.4rem;
     font-weight: 600;
-    color: #2d3748;
+    /* color: #2d3748; */
 }
 
 .order-date {
@@ -67,11 +67,11 @@
     margin-bottom: 1.5rem;
 }
 
-.section-title {
-    font-size: 1rem;
+.orders-section-title {
+    font-size: 1.4rem;
     font-weight: 600;
     margin-bottom: 0.75rem;
-    color: #4a5568;
+    /* color: #4a5568; */
 }
 
 .item-list {
@@ -271,4 +271,11 @@
     font-weight: 600;
     border-radius: 5px;
     box-shadow: 2px 2px 5px #000;
+}
+.consumer-order-icon{
+    width:32px;
+    height: 32px;
+    margin-right: 5px;
+    /* color: blue; */
+    /* font-weight: 900; */
 }

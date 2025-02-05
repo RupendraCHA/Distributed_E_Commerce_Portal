@@ -62,6 +62,9 @@ import('../components/InventoryAndOrders/InventoryOrders.jsx')
 const TrackShipping = React.lazy(() => 
 import('../components/TrackShipping/TrackShipping.jsx')
 )
+const FullFilledOrderDetails = React.lazy(() => 
+  import('../components/FulfilledOrders/FilfilledOrderDetails.jsx')
+)
 
 
 import {
@@ -167,6 +170,10 @@ export const privateRoutes = [
   {
     path: '/trackShipping',
     element: TrackShipping
+  },
+  {
+    path: "/consumerOrderFullfilled",
+    element: FullFilledOrderDetails
   }
 ];
 

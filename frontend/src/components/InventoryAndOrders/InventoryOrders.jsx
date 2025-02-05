@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import "./InventoryOrders.css"
 
 // import Inventory from '../Inventory/Inventory'
@@ -17,6 +17,11 @@ const InventoryOrders = () => {
   const [refreshText, setRefreshText] = useState(false)
 
   const navigate = useNavigate()
+  const userOrder = useSelector((state) => state.userOrders.userOrdersData)
+  const isUpdated = useSelector((state) => state.userOrders.isUpdated)
+
+
+  useEffect(() => {},[refreshText,isUpdated ])
 
   const handleRefresh = () => {
     navigate("/inventoryOrders")
@@ -27,15 +32,17 @@ const InventoryOrders = () => {
     }
   }
 
-  const userOrder = useSelector((state) => state.userOrders.userOrdersData)
   console.log(userOrder, "UD")
 
   return (
     <div className='container'>
-    <div className='refresh-container'>
-      <IoMdRefresh className='refresh-icon' onClick={handleRefresh}/>
+    <span className='refresh-container' onClick={handleRefresh}>
+      <button className='refresh-btn'> 
+      <IoMdRefresh className='refresh-icon' />
+      Refresh
+      </button>
       {/* <h1 className='refresh-button-for-inventory'>Refresh</h1> */}
-    </div>
+    </span>
     {refreshText && <div className='container inventory-orders-container'>
         {userRole === "distributor" && <div className='inventory-sub-section'><InventoryOrdersManagement/></div>}
         {/* {userRole === "distributor" && <div className='orders-sub-section'><Orders/></div>} */}

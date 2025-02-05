@@ -17,6 +17,7 @@ const InventoryOrdersManagement = () => {
   const [warehouses, setWarehouses] = useState([]);
 
   const userOrder = useSelector((state) => state.userOrders.userOrdersData)
+  const isUpdated = useSelector((state) => state.userOrders.isUpdated)
 //   console.log("userOrderData1",userOrder)
 
 
@@ -27,7 +28,7 @@ const InventoryOrdersManagement = () => {
   useEffect(() => {
     // Apply filters whenever inventory, warehouse selection, or search query changes
     filterInventory();
-  }, [inventory, selectedWarehouse, searchQuery]);
+  }, [inventory, selectedWarehouse, searchQuery,isUpdated]);
 
   const fetchInventoryData = async () => {
     try {
@@ -94,17 +95,18 @@ const InventoryOrdersManagement = () => {
     );
   }
 
-  return (
-    <div className="container">
+  return (<>
+  <div className="container">
       <div className="flex flex-col space-y-4 mb-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold flex items-center">
-            <FaWarehouse className="mr-2" />
+          <h1 className="text-3xl font-bold flex items-center">
+            <FaWarehouse className="mr-2"/>
             Inventory Management
+            {/* Warehouses Dashboard */}
           </h1>
           <button
             onClick={handleSort}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 flex items-center"
+            className="bg-blue-400 text-white px-2 py-1 font-medium rounded hover:bg-blue-600 flex items-center"
           >
             <FaSortAmountDown className="mr-2" />
             Sort by Quantity (
@@ -128,7 +130,7 @@ const InventoryOrdersManagement = () => {
           <select
             value={selectedWarehouse}
             onChange={(e) => setSelectedWarehouse(e.target.value)}
-            className="p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="p-2 border rounded font-medium focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
             <option value="all">All Warehouses</option>
             {warehouses.map((warehouse) => (
@@ -143,18 +145,18 @@ const InventoryOrdersManagement = () => {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead className="bg-blue-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-sm font-bold text-blue-700 uppercase tracking-wider">
                   Product
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-sm font-bold text-blue-700 uppercase tracking-wider">
                   Warehouse
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-sm font-bold text-blue-700 uppercase tracking-wider">
                   Quantity
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-sm font-bold text-blue-700 uppercase tracking-wider">
                   Status
                 </th>
               </tr>
@@ -187,15 +189,15 @@ const InventoryOrdersManagement = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-gray-900 font-bold">
                         {item.warehouseName}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 font-bold">
                         {item.warehouseLocation}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
+                      <div className="text-sm text-gray-900 font-bold">
                         {item.quantity}
                       </div>
                       
@@ -207,7 +209,7 @@ const InventoryOrdersManagement = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
-                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${itemCountColor}`}
+                        className={`px-2 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${itemCountColor}`}
                       >
                         {item.quantity > item.reorderPoint
                           ? 'In Stock'
@@ -223,6 +225,9 @@ const InventoryOrdersManagement = () => {
       </div>
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
+    
+  </>
+    
   );
 };
 
