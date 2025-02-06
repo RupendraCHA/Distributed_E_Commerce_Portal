@@ -27,10 +27,7 @@ app.use(
 
 const JWT_SECRET = "Account_Test"; // You can use environment variables to store this securely
 
-mongoose.connect('mongodb+srv://githubdevelopment:Rvsoft1234@cluster0.nqiv3.mongodb.net/Visionsoft?retryWrites=true&w=majority&appName=Cluster0', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(()=>{console.log("MongoDb connected successfully")}).catch(()=>{console.log("Error while connecting mongodb")});
+mongoose.connect('mongodb+srv://githubdevelopment:Rvsoft1234@cluster0.nqiv3.mongodb.net/Visionsoft?retryWrites=true&w=majority&appName=Cluster0').then(()=>{console.log("MongoDb connected successfully")}).catch(()=>{console.log("Error while connecting mongodb")});
 
 // const connectDB = async () => {
 //   await mongoose.connect(

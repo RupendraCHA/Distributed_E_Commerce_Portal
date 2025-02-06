@@ -122,7 +122,7 @@ const InventoryOrdersManagement = () => {
                 placeholder="Search by Product ID..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-full p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="pl-10 w-full font-semibold p-2 border rounded focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
           </div>
@@ -176,9 +176,9 @@ const InventoryOrdersManagement = () => {
                   <tr key={item._id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <FaBox className="text-gray-400 mr-2" />
+                        <FaBox className="text-gray-500 mr-2" />
                         <div>
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-bold text-gray-900">
                             {item.productName}
                           </div>
                           
@@ -192,7 +192,7 @@ const InventoryOrdersManagement = () => {
                       <div className="text-sm text-gray-900 font-bold">
                         {item.warehouseName}
                       </div>
-                      <div className="text-sm text-gray-500 font-bold">
+                      <div className="text-sm text-gray-500 font-semibold">
                         {item.warehouseLocation}
                       </div>
                     </td>
@@ -202,7 +202,7 @@ const InventoryOrdersManagement = () => {
                       </div>
                       
                       {item.quantity <= item.minimumStock && (
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                        <span className="px-2 inline-flex text-sm leading-5 font-semibold rounded-full bg-red-100 text-red-800">
                           Low Stock
                         </span>
                       )}

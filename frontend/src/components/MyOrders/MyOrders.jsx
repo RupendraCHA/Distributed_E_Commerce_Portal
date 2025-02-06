@@ -81,6 +81,15 @@ const Orders = () => {
     return date.toDateString(); // Formats as "Day Mon DD YYYY"
   };
 
+  const getDeliveryPrice = (type) => {
+    if (type === "standard"){
+      return "$0.00"
+    }else if (type === "premium"){
+      return "$10.00"
+    }
+    return "$100.00"
+  }
+
   const OrderDetails = ({ order }) => (
     <div className="container order-card">
       <div className="order-header">
@@ -113,7 +122,7 @@ const Orders = () => {
                 <div className="item-details">
                   {console.log(item)}
                   <p className="item-name">{item.name}</p>
-                  <p className="item-name">{item.product}</p>
+                  <p className="text-gray-400 font-normal">{item.product}</p>
                   <p className="item-quantity font-medium">Quantity: {item.quantity}</p>
                 </div>
                 <p className="item-price">
@@ -128,11 +137,20 @@ const Orders = () => {
               </div>
             ))}
           </div>
+          <div className="order-item my-2">
+                <div className="item-details">
+                  <p className="item-name">{order.deliveryType === "airMail" ? "Air" :order.deliveryType.slice(0,1).toUpperCase() + order.deliveryType.slice(1,order.deliveryType.length)} Delivery</p>
+                </div>
+                <p className="item-price">
+                {getDeliveryPrice(order.deliveryType)}
+                </p>
+          </div>
         </div>
+        
 
         {/* Delivery Address */}
         <div className="order-section">
-          <h4 className="section-title">Delivery Address</h4>
+          <h4 className="font-bold mb-2 text-blue-500 text-xl">Delivery Address</h4>
           <div className="address-details font-medium">
             <p>{order.address.addressLine1}</p>
             {order.address.addressLine2 && <p>{order.address.addressLine2}</p>}
@@ -141,7 +159,7 @@ const Orders = () => {
         </div>
         {/* Delivery Type */}
         <div className="order-section">
-          <h4 className="section-title text-blue-600">Estimated Delivery</h4>
+          <h4 className="font-bold mb-2 text-blue-500 text-xl">Estimated Delivery</h4>
           <p className="delivery-type font-medium">
             {order.deliveryType === 'standard'
               ? `Order will be delivered on ${getDeliveryDate(

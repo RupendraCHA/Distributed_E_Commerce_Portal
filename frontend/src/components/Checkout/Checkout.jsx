@@ -257,7 +257,7 @@ const Checkout = () => {
                     ? 'border-blue-500 bg-blue-50'
                     : 'border-gray-200 hover:border-blue-300'
                 }`}
-                onClick={() => handleDeliveryTypeChange('standard')}
+                onClick={() => handleDeliveryTypeChange('Standard')}
               >
                 <div className="flex items-start">
                   <input

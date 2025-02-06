@@ -67,12 +67,12 @@
     margin-bottom: 1.5rem;
 }
 
-.orders-section-title {
+/* .orders-section-title {
     font-size: 1.4rem;
     font-weight: 600;
     margin-bottom: 0.75rem;
-    /* color: #4a5568; */
-}
+    color: #4a5568;
+} */
 
 .item-list {
     display: flex;
