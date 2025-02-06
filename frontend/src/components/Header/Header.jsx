@@ -16,6 +16,7 @@ import { setCartItems } from '../../store/cartSlice'; // Import the setCartItems
 import axios from 'axios';
 
 const Header = () => {
+  const user = useSelector((state)=>state.auth.user)
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const userRole = useSelector((state) => state.auth.user?.role);
   const cartItems = useSelector((state) => state.cart.cartItems);
@@ -24,7 +25,6 @@ const Header = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [distributorAnchorEl, setDistributorAnchorEl] = useState(null);
   const [text, setText] = useState('')
-
   // Distribution routes
   const distributorRoutes = [
     {
@@ -105,6 +105,14 @@ const Header = () => {
           <nav>
             <ul className="flex gap-4 font-semibold">
               {/* Your existing navigation items */}
+              <li className=''>
+                <Link
+                  // to="/products"
+                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                >
+                  Accounting
+                </Link>
+              </li>
               <li className=''>
                 <Link
                   // to="/products"
@@ -254,7 +262,7 @@ const Header = () => {
               </li>
 
               {/* Profile Icon */}
-              <li className="relative">
+              <li className="relative flex items-center justify-center cursor-pointer" onClick={handleProfileClick}>
                 <AccountCircleIcon
                   style={{
                     marginTop: '5px',
@@ -263,8 +271,11 @@ const Header = () => {
                     cursor: 'pointer',
                     color: 'white',
                   }}
-                  onClick={handleProfileClick}
+                  
                 />
+                <div className='text-whiteColor' style={{
+                  marginLeft:"10px"
+                }}>{user.name}</div>
                 <Popper
                   open={Boolean(anchorEl)}
                   anchorEl={anchorEl}
@@ -311,6 +322,7 @@ const Header = () => {
                   </ClickAwayListener>
                 </Popper>
               </li>
+              
             </ul>
           </nav>
         )}

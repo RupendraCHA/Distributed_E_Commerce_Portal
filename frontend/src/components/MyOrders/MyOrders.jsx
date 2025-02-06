@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 import './MyOrders.css';
 import { useSelector } from 'react-redux';
-
+import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,6 +50,28 @@ const Orders = () => {
       console.error('Error fetching orders:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const downloadInvoice = async (orderId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`http://localhost:3002/orders/${orderId}/invoice`, {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: "blob", // Important for handling files
+      });
+  
+      // Create a URL for the file and trigger download
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `invoice-${orderId}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.log({error})
+      console.error("Error downloading invoice:", error);
     }
   };
 
@@ -105,6 +127,7 @@ const Orders = () => {
           {order.status}
         </span> */}
         <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",}}>
+            <DownloadForOfflineIcon onClick={() => downloadInvoice(order._id)} className='cursor-pointer' />
           <span className={`status-badge ${order.status.toLowerCase()}`}>
           {order.status}
           </span>

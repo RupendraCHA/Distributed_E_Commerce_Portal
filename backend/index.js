@@ -1,6 +1,11 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
+const path = require('path');
+const mustache = require('mustache');
+const puppeteer = require('puppeteer');
 const {
   EmployeeModel,
   AddressModel,
@@ -14,6 +19,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { isAdmin } = require("./authentication");
 const { authenticateToken } = require("./authentication");
+
 const posetraProducts = require("./data/posetraProducts")
 const app = express();
 app.use(express.json());
@@ -667,6 +673,65 @@ app.get("/orders", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Error fetching orders" });
   }
 });
+
+
+app.get("/orders/:orderId/invoice", authenticateToken, async (req, res) => {
+  try {
+      const orderId = req.params.orderId;
+      const order = await OrderModel.findById(orderId); // Your Order Model
+
+      if (!order) {
+          return res.status(404).json({ message: "Order not found" });
+      }
+
+      const invoicesDir = path.join(__dirname, 'invoices');
+      if (!fs.existsSync(invoicesDir)) {
+          fs.mkdirSync(invoicesDir, { recursive: true });
+      }
+
+      const template = fs.readFileSync(path.join(__dirname, 'templates/invoice.mustache'), 'utf8');
+
+      const data = {
+          orderId: order._id,
+          date: new Date(order.createdAt).toDateString(), // Format the date
+          items: order.items.map(item => ({
+              name: item.name,
+              quantity: item.quantity,
+              price: item.price,
+          })),
+          total: order.total,
+          paymentMethod: order.paymentMethod,
+          address: order.address, // Include address information
+      };
+
+      // Generate HTML content using Mustache
+      const htmlContent = mustache.render(template, data);
+      const htmlFilePath = path.join(invoicesDir, `order-${orderId}.html`);
+
+      // Save the HTML file
+      fs.writeFileSync(htmlFilePath, htmlContent);
+
+      // Convert the HTML file to PDF using Puppeteer
+      const browser = await puppeteer.launch();
+      const page = await browser.newPage();
+      await page.setContent(htmlContent);
+      const pdfFilePath = path.join(invoicesDir, `order-${orderId}.pdf`);
+      await page.pdf({ path: pdfFilePath, format: 'A4' });
+
+      await browser.close();
+
+      res.download(pdfFilePath, `invoice-${orderId}.pdf`, () => {
+          // Optional: Delete files after sending
+          fs.unlinkSync(htmlFilePath);
+          fs.unlinkSync(pdfFilePath); 
+      });
+
+  } catch (error) {
+      console.error("Error generating invoice:", error);
+      res.status(500).json({ message: "Error generating invoice" });
+  }
+});
+
 
 app.put("/user", authenticateToken, (req, res) => {
   const userId = req.user.id; // Extract user ID from token
