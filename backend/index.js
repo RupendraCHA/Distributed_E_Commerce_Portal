@@ -52,7 +52,7 @@ const stripe = Stripe(
 );
 
 app.get("/", (req, res) => {
-  res.send("MongoDB Running Successfully!")
+  res.send("Posetra Server Started Successfully!")
 })
 
 app.post("/create-checkout-session", async (req, res) => {
