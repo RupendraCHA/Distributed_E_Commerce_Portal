@@ -44,10 +44,16 @@ mongoose.connect('mongodb+srv://githubdevelopment:Rvsoft1234@cluster0.nqiv3.mong
 
 // connectDB();
 
+
+
 const Stripe = require("stripe");
 const stripe = Stripe(
   "sk_test_51Q9ZJ7HC7NaQVzOS1SMqmgTvtTKQOgMSp0BlgI7gUCJTsSTRQw4vOvgFWC8WsDAuDwALyyu59DxfsIOGb3z3isJR005xoAmBGN"
 );
+
+app.get("/", (req, res) => {
+  res.send("MongoDB Running Successfully!")
+})
 
 app.post("/create-checkout-session", async (req, res) => {
   try {
@@ -1141,38 +1147,7 @@ app.post("/distributor/warehouses", authenticateToken, async (req, res) => {
   }
 });
 
-// Delete warehouse
-// app.delete(
-//   "/distributor/warehouses/:warehouseId",
-//   authenticateToken,
-//   async (req, res) => {
-//     try {
-//       const { warehouseId } = req.params;
-//       const distributor = await DistributorModel.findOne({
-//         userId: req.user.id,
-//       });
 
-//       if (!distributor) {
-//         return res.status(404).json({ message: "Distributor not found" });
-//       }
-
-//       const warehouse = distributor.warehouses.findByIdAndDelete(
-//         { _id: warehouseId },
-//         { new: true }
-//       );
-
-//       if (!warehouse) {
-//         return res.status(404).json({ message: "Warehouse not found" });
-//       }
-
-//       return res.json(warehouse);
-//     } catch (error) {
-//       return res
-//         .status(500)
-//         .json({ message: "Failed to delete warehouse", error });
-//     }
-//   }
-// );
 app.delete(
   "/distributor/warehouses/:warehouseId",
   authenticateToken,
@@ -1402,133 +1377,8 @@ app.get("/inventories", authenticateToken, async (req, res) => {
 app.post("/inventories", authenticateToken, async (req, res) => {
   const {inventoryOrders, orderedItems, disWarehouses} = req.body
   // console.log("INVENTORIES", inventoryOrders)
-  console.log("CONSUMERS", orderedItems)
-  // console.log("D.Warehouses", disWarehouses)
-  // try {
+  // console.log("CONSUMERS", orderedItems)
 
-  //   if (!orderedItems || orderedItems.length === 0 || disWarehouses.length===0 || !disWarehouses){
-  //     return res.status(400).json({message: "Consumer Order and Warehouse details are required!"})
-  //   }
-
-
-  //   let {warehouses} = disWarehouses
-  //   // console.log("1",warehouses)
-
-
-  //   warehouses.sort((a, b) => b.isPrimary - a.isPrimary)
-
-  //   for (let orderItem of orderedItems) {
-  //     const {product, quantity} = orderItem
-  //     let remainingQuantity = quantity
-
-  //     for (let warehouse of warehouses){
-  //       if (remainingQuantity === 0 ) break;
-
-  //       let productIndex = warehouse.inventory.findIndex(p => p.productId === product)
-
-  //       if (productIndex !== -1 && warehouse.inventory[productIndex].quantity > 0){
-
-  //         let availableQuantity = warehouse.inventory[productIndex].quantity
-
-  //         if (availableQuantity >= remainingQuantity){
-  //           warehouse.inventory[productIndex].quantity -= remainingQuantity
-  //           remainingQuantity = 0
-  //         }else {
-  //           warehouse.inventory[productIndex].quantity = 0
-  //           remainingQuantity -= availableQuantity
-  //         }
-  //       }
-  //     }
-  //   }
-  //   await DistributorModel.findByIdAndUpdate(disWarehouses._id, {warehouses})
-  //   // const distributor = await DistributorModel.findOne({ userId: req.user.id });
-  //   // console.log(distributor.warehouses)
-  //   // console.log("2",warehouses)
-
-  //   res.json({message: "Order Fullfilled Successfully", updatedWarehouses: warehouses})
-  //   // res.status(200).json(distributor)
-  // } catch (error) {
-  //   console.error("Error fetching inventory:", error);
-  //   res
-  //     .status(500)
-  //     .json({ message: "Failed to fetch inventory", error: error.message });
-  // }
-//   try {
-//     if (!orderedItems || orderedItems.length === 0 || disWarehouses.length === 0 || !disWarehouses) {
-//         return res.status(400).json({ message: "Consumer Order and Warehouse details are required!" });
-//     }
-
-//     let { warehouses } = disWarehouses;
-//     warehouses.sort((a, b) => b.isPrimary - a.isPrimary);
-
-//     let deductedProducts = []; // Array to store deducted products and their warehouse info
-//     let insufficientStockProducts = [];
-
-//     for (let orderItem of orderedItems) {
-//         const { product, quantity } = orderItem;
-//         let remainingQuantity = quantity;
-//         let deductedFromWarehouses = [];
-
-//         for (let warehouse of warehouses) {
-//             if (remainingQuantity === 0) break;
-
-//             let productIndex = warehouse.inventory.findIndex(p => p.productId === product);
-
-//             if (productIndex !== -1 && warehouse.inventory[productIndex].quantity > 0) {
-//                 let availableQuantity = warehouse.inventory[productIndex].quantity;
-//                 let deductedQuantity = Math.min(availableQuantity, remainingQuantity);
-
-//                 warehouse.inventory[productIndex].quantity -= deductedQuantity;
-//                 remainingQuantity -= deductedQuantity;
-
-//                 // Track which warehouse the stock was deducted from
-//                 deductedFromWarehouses.push({
-//                     warehouseId: warehouse._id,
-//                     warehouseLocation: warehouse.addressLine1 + ", " + warehouse.city,
-//                     deductedQuantity
-//                 });
-//             }
-//         }
-
-//         // If stock was deducted, add to the deductedProducts array
-//         if (deductedFromWarehouses.length > 0) {
-//             deductedProducts.push({
-//                 productId: product,
-//                 orderedQuantity: quantity,
-//                 deductedFrom: deductedFromWarehouses,
-//                 productName: orderItem.name
-//             });
-//         }
-
-//         if (remainingQuantity > 0) {
-//           insufficientStockProducts.push({
-//               productId: product,
-//               orderedQuantity: quantity,
-//               availableQuantity: quantity - remainingQuantity,
-//               productName: orderItem.name
-//               // Amount that could be fulfilled
-//           });
-//       }
-//     }
-
-//     await DistributorModel.findByIdAndUpdate(disWarehouses._id, { warehouses });
-//     console.log("Deducted Products:", deductedProducts);
-//     console.log("Insufficient Stock Products:", insufficientStockProducts);
-
-//     res.json({
-//         message: insufficientStockProducts.length > 0 
-//             ? "Order partially fulfilled, some products have insufficient stock" 
-//             : "Order fulfilled successfully",
-//         deductedProducts,
-//         insufficientStockProducts,
-//         updatedWarehouses: warehouses,
-//         success: true
-//     });
-
-// } catch (error) {
-//     console.error("Error fetching inventory:", error);
-//     res.status(500).json({ message: "Failed to fetch inventory", error: error.message });
-// }
 try {
   if (!orderedItems || orderedItems.length === 0 || disWarehouses.length === 0 || !disWarehouses) {
       return res.status(400).json({ message: "Consumer Order and Warehouse details are required!" });
@@ -1626,9 +1476,7 @@ try {
 
 })
 
-app.put("/updateInventory", async (req, res) => {
 
-})
 
 app.post(
   "/warehouses/:warehouseId/products",
