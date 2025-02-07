@@ -34,10 +34,10 @@ const AllProducts = () => {
 
 
   const productNameInput = useSelector((state) => state.allProducts.searchName)
-  console.log("Product Name Input", productNameInput)
+  // console.log("Product Name Input", productNameInput)
 
   const handleAddToCart = async (product) => {
-    console.log(product)
+    // console.log(product)
     const token = localStorage.getItem('token');
     const productWithQuantity = { ...product, quantity: 1 };
     dispatch(addToCart(productWithQuantity));
@@ -87,77 +87,6 @@ const AllProducts = () => {
         path: routePath,
       }; // Capitalize the label
     });
-
-  // Define the URL and credentials
-
-  // Create a function to fetch data
-  // async function fetchData() {
-  //   const url =
-  //     'http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/MaterialSet?$format=json';
-  //   const username = 'NikhilA';
-  //   const password = 'Nikhil@12345';
-  //   // Encode the credentials in base64 for Basic Authentication
-  //   const headers = new Headers();
-  //   headers.set('Authorization', 'Basic ' + btoa(username + ':' + password));
-
-  //   try {
-  //     // Make the request to the OData service
-  //     const response = await fetch(url, {
-  //       method: 'GET',
-  //       headers: headers,
-  //     });
-
-  //     // Check if the response is okay
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       console.log(data.d.results[0]); // Handle the data, perhaps display it on the frontend
-  //       setSapData(data.d.results[0]);
-  //     } else {
-  //       console.error('Failed to fetch data', response.status);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //   }
-  // }
-
-  // Call the function to fetch data
-  // fetchData();
-
-  // async function fetchSapData() {
-  //   const url =
-  //     'http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/MaterialSet?$format=json';
-  //   const username = 'NikhilA';
-  //   const password = 'Nikhil@12345';
-  //   // Encode the credentials in base64 for Basic Authentication
-  //   const headers = new Headers();
-  //   headers.set('Authorization', 'Basic ' + btoa(username + ':' + password));
-
-  //   try {
-  //     // Make the request to the OData service
-  //     const response = await fetch(url, {
-  //       method: 'GET',
-  //       headers: headers,
-  //     });
-
-  //     // Check if the response is okay
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       console.log(data.d.results[0]); // Handle the data, perhaps display it on the frontend
-  //       setSapData(data.d.results[0]);
-  //     } else {
-  //       console.error('Failed to fetch data', response.status);
-  //     }
-  //   } catch (error) {
-  //     console.error('Error:', error);
-  //   }
-  // }
-
-
-
-  // Call the function to fetch data
-  // fetchSapData();
-
-  
 
   const getSelectedItemsOnly = (value) => {
     console.log("Search Items Here")
