@@ -77,8 +77,7 @@ app.get("/start", (req, res) => {
         </head>
         <body>
             <div>
-                <h1>POSETRA Distributed E-Commerce Portal</h1>
-                <h1>You are Successfully started the Server</h1>
+                <h1>POSETRA Distributed E-Commerce Portal - Successfully started the Server</h1>
             </div>
         </body>
         </html>
