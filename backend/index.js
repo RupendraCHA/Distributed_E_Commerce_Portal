@@ -51,9 +51,39 @@ const stripe = Stripe(
   "sk_test_51Q9ZJ7HC7NaQVzOS1SMqmgTvtTKQOgMSp0BlgI7gUCJTsSTRQw4vOvgFWC8WsDAuDwALyyu59DxfsIOGb3z3isJR005xoAmBGN"
 );
 
-app.get("/", (req, res) => {
-  res.send("Posetra Server Started Successfully!")
-})
+app.get("/start", (req, res) => {
+  res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <link
+      rel="icon"
+      type="image/svg+xml"
+      href=".Posetra"
+    />
+          <title>HANElytics server</title>
+          <style>
+            div{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                background-color: black;
+            }
+            h1{
+                color: white;
+            }
+          </style>
+        </head>
+        <body>
+            <div>
+                <h1>POSETRA Distributed E-Commerce Portal</h1>
+                <h1>You are Successfully started the Server</h1>
+            </div>
+        </body>
+        </html>
+      `);
+});
 
 app.post("/create-checkout-session", async (req, res) => {
   try {
