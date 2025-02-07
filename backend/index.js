@@ -59,7 +59,7 @@ app.get("/start", (req, res) => {
         <link
       rel="icon"
       type="image/svg+xml"
-      href="./Posetra_Logo1.jpg"
+      href="https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738926639/Posetra_Logo1_bcwdlt.jpg"
     />
           <title>HANElytics server</title>
           <style>
