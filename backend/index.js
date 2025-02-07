@@ -51,7 +51,7 @@ const stripe = Stripe(
   "sk_test_51Q9ZJ7HC7NaQVzOS1SMqmgTvtTKQOgMSp0BlgI7gUCJTsSTRQw4vOvgFWC8WsDAuDwALyyu59DxfsIOGb3z3isJR005xoAmBGN"
 );
 
-app.get("/start", (req, res) => {
+app.get("/", (req, res) => {
   res.send(`
         <!DOCTYPE html>
         <html>
@@ -61,7 +61,7 @@ app.get("/start", (req, res) => {
       type="image/svg+xml"
       href="https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738926639/Posetra_Logo1_bcwdlt.jpg"
     />
-          <title>HANElytics server</title>
+          <title>POSETRA E-Commerce Server</title>
           <style>
             div{
                 display: flex;
