@@ -1,11 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 
+const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
 // Create async thunk for updating cart item quantity
 export const updateCartItemQuantityAsync = createAsyncThunk(
   'cart/updateCartItemQuantityAsync',
   async ({ productId, quantity }, { rejectWithValue }) => {
     try {
-      const response = await fetch('http://localhost:3002/addToCartInCart', {
+      const response = await fetch(server_Url + '/addToCartInCart', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

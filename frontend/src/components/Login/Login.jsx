@@ -13,6 +13,9 @@ function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -42,7 +45,8 @@ function Login() {
     } else {
       setErrors({});
       axios
-        .post('http://localhost:3002/login', { email, password })
+        .post(server_Url+'/login', { email, password })
+        // .post('http://localhost:3002/login', { email, password })
         .then((response) => {
           // if (result.data.message === 'Success') {
           //     dispatch(login());

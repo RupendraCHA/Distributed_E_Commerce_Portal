@@ -11,6 +11,9 @@ const Orders = () => {
   const [error, setError] = useState(null);
   const userRole = useSelector((state) => state.auth.user?.role);
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
   useEffect(() => {
     fetchOrders();
   }, []);
@@ -19,7 +22,7 @@ const Orders = () => {
     try {
       const token = localStorage.getItem('token');
       // const orderUrl = userRole === "Consumer" ? 'http://localhost:3002/orders' : 'http://localhost:3002/admin/orders'
-      const response = await axios.get('http://localhost:3002/orders', {
+      const response = await axios.get(server_Url + '/orders', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -56,7 +59,7 @@ const Orders = () => {
   const downloadInvoice = async (orderId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:3002/orders/${orderId}/invoice`, {
+      const response = await axios.get(server_Url + `/orders/${orderId}/invoice`, {
         headers: { Authorization: `Bearer ${token}` },
         responseType: "blob", // Important for handling files
       });
@@ -79,7 +82,7 @@ const Orders = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.patch(
-        `http://localhost:3002/orders/${orderId}/status`,
+        server_Url + `/orders/${orderId}/status`,
         { status: newStatus },
         {
           headers: { Authorization: `Bearer ${token}` },

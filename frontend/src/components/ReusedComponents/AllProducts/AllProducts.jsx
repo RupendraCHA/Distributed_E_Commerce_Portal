@@ -27,6 +27,9 @@ const AllProducts = () => {
   const [searchItem, setSearchItem] = useState("")
   const [productDataList, setDataList] = useState(posetraProducts)
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
 
   useEffect(() => {
     getSelectedItemsOnly(productNameInput)
@@ -43,7 +46,7 @@ const AllProducts = () => {
     dispatch(addToCart(productWithQuantity));
     try {
       const response = await axios.post(
-        'http://localhost:3002/addToCart',
+        server_Url + '/addToCart',
         productWithQuantity,
         {
           headers: { Authorization: `Bearer ${token}` }, // Add token to headers
@@ -90,8 +93,6 @@ const AllProducts = () => {
 
   const getSelectedItemsOnly = (value) => {
     console.log("Search Items Here")
-
-    
     if (value !== ""){
     setSearchItem(productNameInput)
 
@@ -140,9 +141,6 @@ const AllProducts = () => {
       getSelectedItemsFromSearch()
     }
   }
-
-
-//   let categoryName = (productList[0].category).toUpperCase()
 
 
   return (

@@ -11,11 +11,14 @@ const StripeCheckout = () => {
   const stripe = useStripe();
   const elements = useElements();
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
   const handleCheckout = async () => {
     try {
       // Replace this with your backend URL if it’s hosted elsewhere
       const response = await fetch(
-        'http://localhost:3002/create-checkout-session',
+        server_Url + '/create-checkout-session',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

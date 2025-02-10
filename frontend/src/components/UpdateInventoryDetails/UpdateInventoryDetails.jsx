@@ -3,27 +3,30 @@ import axios from "axios";
 
 
 const getInventoryOrdersAndConsumerOrdersOnly = async () => {
+
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
     let consumerOrders = null;
         let InventoryOrders = null;
         let distributorWarehouses = null
     try {
         
         const token = localStorage.getItem('token');
-    const consumerResponse = await axios.get('http://localhost:3002/allorders', {
+    const consumerResponse = await axios.get(server_Url + '/allorders', {
         headers: { Authorization: `Bearer ${token}` },
       });
       consumerOrders = consumerResponse.data
       console.log("consumerOrdersOnly", consumerOrders)
       
 
-    const inventoryResponse = await axios.get('http://localhost:3002/distributor/inventory', {
+    const inventoryResponse = await axios.get(server_Url + '/distributor/inventory', {
         headers: { Authorization: `Bearer ${token}` },
       });
       InventoryOrders = inventoryResponse.data
 
     // console.log("InventoryOrders",InventoryOrders)
 
-    const warehousesResponse = await axios.get("http://localhost:3002/inventories", {
+    const warehousesResponse = await axios.get(server_Url + "/inventories", {
         headers: { Authorization: `Bearer ${token}` },
       })
 

@@ -31,7 +31,7 @@ const PlaceOrder = () => {
 
     const placeOrder = (event) => {
         event.preventDefault()
-        console.log("Your order is placed")
+        // console.log("Your order is placed")
         navigate("/stripePayment")
     }
 

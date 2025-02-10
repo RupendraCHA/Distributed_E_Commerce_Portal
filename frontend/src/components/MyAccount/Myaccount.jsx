@@ -8,14 +8,20 @@ const MyAccount = () => {
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
   // Fetch user data from the backend when the component mounts
   useEffect(() => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('token'); // Retrieve the token from local storage
-        const response = await axios.get('http://localhost:3002/user', {
+        const response = await axios.get(server_Url + '/user', {
           headers: { Authorization: `Bearer ${token}` }, // Include token in headers
         });
+        // const response = await axios.get('http://localhost:3002/user', {
+        //   headers: { Authorization: `Bearer ${token}` }, // Include token in headers
+        // });
         setUserData(response.data);
       } catch (err) {
         console.error(err);
@@ -24,7 +30,6 @@ const MyAccount = () => {
         setLoading(false);
       }
     };
-
     fetchUserData();
   }, []);
 
@@ -37,7 +42,7 @@ const MyAccount = () => {
     setIsSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.put('http://localhost:3002/user', userData, {
+      await axios.put(server_Url + '/user', userData, {
         headers: { Authorization: `Bearer ${token}` },
       });
       alert('User data updated successfully.');

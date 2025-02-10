@@ -15,10 +15,13 @@ const TrackShipping = () => {
       const [myOrders, setMyOrders] = useState([])
       const [OrdersDetails, setOrderDetails] = useState([])
 
+    const server_Url = import.meta.env.VITE_API_SERVER_URL
+      
+
       const fetchOrdersData = async () => {
         try {
             const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3002/orders', {
+        const response = await axios.get(server_Url + '/orders', {
             headers: { Authorization: `Bearer ${token}` },
         });
         console.log(response, "RESPONSE")

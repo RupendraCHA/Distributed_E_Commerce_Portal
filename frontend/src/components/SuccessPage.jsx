@@ -12,6 +12,9 @@ const SuccessPage = () => {
   const dispatch = useDispatch();
   const isProcessed = useRef(false); // Track if the payment has been processed
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
   useEffect(() => {
     const confirmPayment = async () => {
       if (isProcessed.current) return; // Prevent multiple calls
@@ -22,7 +25,7 @@ const SuccessPage = () => {
 
         // Call the backend to confirm payment and create order
         await axios.post(
-          'http://localhost:3002/confirm-payment',
+          server_Url + '/confirm-payment',
           { sessionId },
           { headers: { Authorization: `Bearer ${token}` } }
         );
