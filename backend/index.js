@@ -6,6 +6,9 @@ const fs = require('fs');
 const path = require('path');
 const mustache = require('mustache');
 const puppeteer = require('puppeteer');
+require("dotenv/config.js")
+const Stripe = require("stripe");
+
 const {
   EmployeeModel,
   AddressModel,
@@ -31,24 +34,31 @@ app.use(
   })
 );
 
-const JWT_SECRET = "Account_Test"; // You can use environment variables to store this securely
+// const JWT_SECRET = "Account_Test";
 
-mongoose.connect('mongodb+srv://githubdevelopment:Rvsoft1234@cluster0.nqiv3.mongodb.net/Visionsoft?retryWrites=true&w=majority&appName=Cluster0').then(()=>{console.log("MongoDb connected successfully")}).catch(()=>{console.log("Error while connecting mongodb")});
-
-// const connectDB = async () => {
-//   await mongoose.connect(
-//     "mongodb+srv://githubdevelopment:Rvsoft1234@cluster0.nqiv3.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
-//   );
-//   console.log(`Connected to Database Successfully!`);
-// };
-
-// connectDB();
+const MONGO_URI = process.env.MONGO_URI
+const Stripe_Key = process.env.Stripe_Key
+const JWT_SECRET = process.env.JWT_SECRET;
+const PORT = process.env.PORT
 
 
+const connectDB = async () => {
+  
+try {
+  await mongoose.connect(
+    MONGO_URI
+  );
+  console.log(`Connected to Database Successfully!`);
+} catch (error) {
+  console.log("Error While connecting to MongoDB", error.message)
+}
+}
+connectDB();
 
-const Stripe = require("stripe");
+
+
 const stripe = Stripe(
-  "sk_test_51Q9ZJ7HC7NaQVzOS1SMqmgTvtTKQOgMSp0BlgI7gUCJTsSTRQw4vOvgFWC8WsDAuDwALyyu59DxfsIOGb3z3isJR005xoAmBGN"
+  Stripe_Key
 );
 
 app.get("/", (req, res) => {
@@ -1578,6 +1588,6 @@ app.post(
   }
 );
 
-app.listen(3002, () => {
-  console.log("Server is running, http://localhost:3002");
+app.listen(PORT, () => {
+  console.log(`Server is running Successfully`);
 });
