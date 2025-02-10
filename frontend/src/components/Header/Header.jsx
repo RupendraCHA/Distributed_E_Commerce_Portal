@@ -45,6 +45,9 @@ const Header = () => {
     },
   ];
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
   // Fetch cart items when the component is mounted
   useEffect(() => {
     console.log('Called', isLoggedIn);
@@ -52,9 +55,12 @@ const Header = () => {
       const fetchCartItems = async () => {
         try {
           const token = localStorage.getItem('token');
-          const response = await axios.get('http://localhost:3002/cart', {
+          const response = await axios.get(server_Url+'/cart', {
             headers: { Authorization: `Bearer ${token}` },
           });
+          // const response = await axios.get('http://localhost:3002/cart', {
+          //   headers: { Authorization: `Bearer ${token}` },
+          // });
           dispatch(setCartItems(response.data.cartItems)); // Store cart items in Redux store
         } catch (error) {
           console.error('Error fetching cart items:', error);
@@ -91,7 +97,7 @@ const Header = () => {
 
   return (
     <>
-      <header className="container flex justify-between items-center h-30 px-20 py-2 bg-gradient-to-r from-[#86d3e3] to-[#506bf2]">
+      <header className="flex justify-between items-center h-30 px-20 py-2 bg-gradient-to-r from-[#86d3e3] to-[#506bf2]">
         <div>
           <Link to="/" className="no-underline">
             <img

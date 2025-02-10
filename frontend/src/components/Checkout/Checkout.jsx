@@ -20,6 +20,9 @@ const Checkout = () => {
   const cartItems = useSelector((state) => state.cart.cartItems);
   const navigate = useNavigate();
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
   // Calculate total price including delivery fee
   const calculateTotal = () => {
     let itemsTotal = cartItems.reduce(
@@ -55,17 +58,26 @@ const Checkout = () => {
 
       if (role === 'distributor') {
         response = await axios.get(
-          'http://localhost:3002/distributor/warehouses',
+          server_Url + '/distributor/warehouses',
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
+        // response = await axios.get(
+        //   'http://localhost:3002/distributor/warehouses',
+        //   {
+        //     headers: { Authorization: `Bearer ${token}` },
+        //   }
+        // );
         setWarehouses(response.data);
         setSelectedWarehouse(response.data[0]); // Select first warehouse by default
       } else {
-        response = await axios.get('http://localhost:3002/addresses', {
+        response = await axios.get(server_Url+ '/addresses', {
           headers: { Authorization: `Bearer ${token}` },
         });
+        // response = await axios.get('http://localhost:3002/addresses', {
+        //   headers: { Authorization: `Bearer ${token}` },
+        // });
         setWarehouses(response.data);
         const primaryAddress = response.data.find((addr) => addr.isPrimary);
         setSelectedWarehouse(primaryAddress || response.data[0]);
@@ -141,7 +153,8 @@ const Checkout = () => {
       }
 
       const response = await axios.post(
-        'http://localhost:3002/create-checkout-session',
+        server_Url+'/create-checkout-session',
+        // 'http://localhost:3002/create-checkout-session',
         {
           lineItems,
           selectedAddress: selectedWarehouse,

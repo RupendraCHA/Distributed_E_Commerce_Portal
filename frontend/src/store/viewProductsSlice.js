@@ -1,8 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
+// import "dotenv/config.js"
 
 const initialState = {
     searchName: ""
 }
+
+// const backendURL = process.env.Server_URL
+// console.log(backendURL)
 
 const allProductsSlice = createSlice({
     name: "allProducts",

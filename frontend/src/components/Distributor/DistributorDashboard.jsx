@@ -15,6 +15,9 @@ const DistributorDashboard = () => {
   const [distributor, setDistributor] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
   useEffect(() => {
     fetchDistributorDetails();
   }, []);
@@ -23,7 +26,8 @@ const DistributorDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        'http://localhost:3002/distributor/details',
+        server_Url+'/distributor/details',
+        // 'http://localhost:3002/distributor/details',
         {
           headers: { Authorization: `Bearer ${token}` },
         }

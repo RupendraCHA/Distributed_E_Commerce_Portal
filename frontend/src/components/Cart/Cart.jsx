@@ -19,6 +19,9 @@ const Cart = () => {
   const [error, setError] = useState(null);
   const [saveLoading, setSaveLoading] = useState(false);
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
   // Calculate total price
   const totalPrice = cartItems.reduce(
     (total, item) =>
@@ -30,9 +33,12 @@ const Cart = () => {
     const fetchSavedItems = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:3002/savedItems', {
+        const response = await axios.get(server_Url + '/savedItems', {
           headers: { Authorization: `Bearer ${token}` },
         });
+        // const response = await axios.get('http://localhost:3002/savedItems', {
+        //   headers: { Authorization: `Bearer ${token}` },
+        // });
         setSavedItems(response.data.savedItems);
       } catch (error) {
         console.error('Error fetching saved items:', error);
@@ -48,20 +54,30 @@ const Cart = () => {
       const token = localStorage.getItem('token');
 
       await axios.post(
-        `http://localhost:3002/saveForLater/${productId}`,
+        server_Url + `/saveForLater/${productId}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      // await axios.post(
+      //   `http://localhost:3002/saveForLater/${productId}`,
+      //   {},
+      //   {
+      //     headers: { Authorization: `Bearer ${token}` },
+      //   }
+      // );
 
       // Update Redux cart state
       dispatch(removeFromCart(productId));
 
       // Refresh saved items
-      const response = await axios.get('http://localhost:3002/savedItems', {
+      const response = await axios.get(server_Url+'/savedItems', {
         headers: { Authorization: `Bearer ${token}` },
       });
+      // const response = await axios.get('http://localhost:3002/savedItems', {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // });
       setSavedItems(response.data.savedItems);
 
       setError(null);
@@ -114,23 +130,36 @@ const Cart = () => {
       const token = localStorage.getItem('token');
 
       const response = await axios.post(
-        `http://localhost:3002/moveToCart/${productId}`,
+        server_Url+`/moveToCart/${productId}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      // const response = await axios.post(
+      //   `http://localhost:3002/moveToCart/${productId}`,
+      //   {},
+      //   {
+      //     headers: { Authorization: `Bearer ${token}` },
+      //   }
+      // );
 
       // Update Redux cart state with the new item
       dispatch(addToCart(response.data.cartItem));
 
       // Refresh saved items
       const savedResponse = await axios.get(
-        'http://localhost:3002/savedItems',
+        server_Url+'/savedItems',
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      // const savedResponse = await axios.get(
+      //   'http://localhost:3002/savedItems',
+      //   {
+      //     headers: { Authorization: `Bearer ${token}` },
+      //   }
+      // );
       setSavedItems(savedResponse.data.savedItems);
 
       setError(null);
@@ -148,9 +177,12 @@ const Cart = () => {
       const token = localStorage.getItem('token');
 
       // Call the backend API to remove the item
-      await axios.delete(`http://localhost:3002/cart/${productId}`, {
+      await axios.delete(server_Url+`/cart/${productId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      // await axios.delete(`http://localhost:3002/cart/${productId}`, {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // });
 
       // If API call succeeds, update Redux state
       dispatch(removeFromCart(productId));
@@ -166,9 +198,12 @@ const Cart = () => {
     // Check if the user has an address before proceeding to payment
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get('http://localhost:3002/addresses', {
+      const response = await axios.get(server_Url+'/addresses', {
         headers: { Authorization: `Bearer ${token}` },
       });
+      // const response = await axios.get('http://localhost:3002/addresses', {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // });
       if (response.data.length === 0) {
         navigate('/my-address'); // Redirect to add address page if no address exists
       } else {

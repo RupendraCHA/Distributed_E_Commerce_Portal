@@ -31,6 +31,8 @@ const Orders = () => {
   const dispatch = useDispatch()
   const isUpdated = useSelector((state) => state.userOrders.isUpdated)
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
 
   useEffect(() => {
     fetchOrders();
@@ -45,9 +47,10 @@ const Orders = () => {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:3002/allorders', {
+      const response = await axios.get(server_Url + "/allorders", {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
 
       const sortedOrders = response.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -68,13 +71,18 @@ const Orders = () => {
         return order;
       });
       const ownOrders = await axios.get(
-        `http://localhost:3002/orders/`,
+        server_Url + `/orders/`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      // const ownOrders = await axios.get(
+      //   `http://localhost:3002/orders/`,
+      //   {
+      //     headers: { Authorization: `Bearer ${token}` },
+      //   }
+      // );
       setOwnOrders(ownOrders.data)
-      // console.log("OWN ORDERS", ownOrders.data)
 
       setOrders(updatedOrders);
       setError(null);
@@ -93,39 +101,29 @@ const getOtherUsersOrdersOnly = async () => {
   setDisWarehouses(distributorWarehouses)
   const token = localStorage.getItem('token');
 
-  const response = await axios.get("http://localhost:3002/inventories", {
+  const response = await axios.get(server_Url + "/inventories", {
     headers: { Authorization: `Bearer ${token}` },
   })
-  // console.log("INVENTORIES WITH WAREHOUSES", response.data)
-  // console.log("Consumer Orders", consumerOrders)
-  // console.log("Inventory Orders", InventoryOrders)
-    // const response = await axios.get('http://localhost:3002/allorders', {
-    //     headers: { Authorization: `Bearer ${token}` },
-    //   });
-  //     console.log("userOrdersOnly", response.data)
-
-  //   const inventoryResponse = await axios.get('http://localhost:3002/distributor/inventory', {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-  //   console.log("InventoryData",inventoryResponse.data)
+  // const response = await axios.get("http://localhost:3002/inventories", {
+  //   headers: { Authorization: `Bearer ${token}` },
+  // })
 }
 
   const handleOrderFullfillment = async (id, order) => {
-    // console.log("ORDER FULLFILLMENT", id)
     try {
     dispatch(setUserOrders(order.items))
-        const response = await axios.put(`http://localhost:3002/order/${id}/status`)
+        const response = await axios.put(server_Url + `/order/${id}/status`)
+        // const response = await axios.put(`http://localhost:3002/order/${id}/status`)
         setShippedStatus(response.data.status)
         const orderedItems = response.data.orderedItems
-        // console.log(response.data.id)
-        // console.log(response.data.createdAt, "ShippedDate")
-        // setShippedId(response.data.id)
-        // console.log("STATUS", response.data.status)
       const token = localStorage.getItem('token');
 
-        const inventoryResponse = await axios.post("http://localhost:3002/inventories",{inventoryOrders, orderedItems, disWarehouses}, {
+        const inventoryResponse = await axios.post(server_Url + "/inventories",{inventoryOrders, orderedItems, disWarehouses}, {
           headers: { Authorization: `Bearer ${token}` },
         })
+        // const inventoryResponse = await axios.post("http://localhost:3002/inventories",{inventoryOrders, orderedItems, disWarehouses}, {
+        //   headers: { Authorization: `Bearer ${token}` },
+        // })
 
         console.log(inventoryResponse.data)
 
@@ -139,12 +137,8 @@ const getOtherUsersOrdersOnly = async () => {
 
           }, 1000)
 
-          // navigate("/consumerOrderFullfilled")
         }
         const result = inventoryResponse.data
-        // console.log(result)
-        // console.log("INVENTORYS", inventoryOrders)
-        // console.log("ORDERFULLFILLMENT", orderFulfilmentConsumerItems)
 
     } catch (error) {
         console.log("Error Occured", error)

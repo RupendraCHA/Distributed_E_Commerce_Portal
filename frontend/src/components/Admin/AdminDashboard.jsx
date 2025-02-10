@@ -11,6 +11,9 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const navigate = useNavigate();
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
   useEffect(() => {
     fetchDashboardData();
   }, []);
@@ -19,11 +22,17 @@ const AdminDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        'http://localhost:3002/admin/dashboard',
+        server_Url + '/admin/dashboard',
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
+      // const response = await axios.get(
+      //   'http://localhost:3002/admin/dashboard',
+      //   {
+      //     headers: { Authorization: `Bearer ${token}` },
+      //   }
+      // );
       setDashboardData(response.data);
       setError(null);
     } catch (err) {

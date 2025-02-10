@@ -13,6 +13,9 @@ const InventoryManagement = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [warehouses, setWarehouses] = useState([]);
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
   useEffect(() => {
     fetchInventoryData();
   }, []);
@@ -26,7 +29,8 @@ const InventoryManagement = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        'http://localhost:3002/distributor/inventory',
+        server_Url+'/distributor/inventory',
+        // 'http://localhost:3002/distributor/inventory',
         {
           headers: { Authorization: `Bearer ${token}` },
         }

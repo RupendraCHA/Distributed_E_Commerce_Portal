@@ -32,6 +32,9 @@ const DistributorRegistration = () => {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
   const validateForm = () => {
     const newErrors = {};
     // Company validation
@@ -112,7 +115,8 @@ const DistributorRegistration = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        'http://localhost:3002/distributor/register',
+        server_Url+'/distributor/register',
+        // 'http://localhost:3002/distributor/register',
         formData,
         {
           headers: { Authorization: `Bearer ${token}` },
