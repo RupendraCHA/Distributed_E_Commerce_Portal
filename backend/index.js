@@ -41,6 +41,7 @@ const Stripe_Key = process.env.Stripe_Key
 const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = process.env.PORT
 
+const checkoutURLs = 
 
 const connectDB = async () => {
   
