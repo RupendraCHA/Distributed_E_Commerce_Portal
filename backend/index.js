@@ -41,8 +41,8 @@ const Stripe_Key = process.env.Stripe_Key
 const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = process.env.PORT
 
-const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com"
-// const checkoutURLs = "http://localhost:5173"
+// const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com"
+const checkoutURLs = "http://localhost:5173"
 
 const connectDB = async () => {
   
@@ -749,6 +749,33 @@ app.get("/api/v1/orders", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Error fetching orders" });
   }
 });
+
+app.get("/api/v1/ordersForInvoice/:orderId", authenticateToken, async (req, res) => {
+  const {orderId} = req.params
+  // console.log(orderId)
+  try {
+    const userId = req.user.id; // Corrected to use req.user.id
+
+    // Convert the orderId string to ObjectId
+    const objectId = new mongoose.Types.ObjectId(orderId);
+
+    // Find the order in the database
+    const order = await OrderModel.findOne({ _id: objectId });
+    // order.push(order.deliveryType)
+    // console.log("ORDER", order.items)
+    
+    const orders = await OrderModel.find({ userId }); // Fetch orders by user ID
+
+    
+    // console.log("orderData",orderData)
+    res.json({orders: orders, orderDetails: order});
+    // res.json(orders);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching orders" });
+  }
+});
+
 
 
 app.get("/api/v1/orders/:orderId/invoice", async (req, res) => {
