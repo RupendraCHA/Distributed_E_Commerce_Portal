@@ -22,6 +22,9 @@ const Products = ({ iterationData, currentSection }) => {
   const [categoryName, setCategoryName] = useState('');
   const [filteredProducts, setFilteredProducts] = useState([]);
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
 
   const handleProductSelection = (product) => {
     if(product.toLowerCase() === "materials"){
@@ -116,7 +119,7 @@ const Products = ({ iterationData, currentSection }) => {
     // Fetch data from backend API
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`http://localhost:3002/products?productCategory=${encodeURIComponent(productcategory)}`);
+        const response = await axios.get(server_Url + `/products?productCategory=${encodeURIComponent(productcategory)}`);
         console.log({response:response.data})
         setProductsData(response.data);
         setFilteredProducts(response.data);

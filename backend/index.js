@@ -41,6 +41,7 @@ const Stripe_Key = process.env.Stripe_Key
 const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = process.env.PORT
 
+const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com"
 
 const connectDB = async () => {
   
@@ -113,8 +114,12 @@ app.post("/create-checkout-session", async (req, res) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}`, // Pass session ID to success URL
-      cancel_url: `http://localhost:5173/cancel`,
+      success_url: checkoutURLs + `/success?session_id={CHECKOUT_SESSION_ID}`, 
+      // // Pass session ID to success URL
+      cancel_url: checkoutURLs + `/cancel`,
+      // success_url: `http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}`, 
+      // // // Pass session ID to success URL
+      // cancel_url: `http://localhost:5173/cancel`,
       metadata: {
         userId,
         addressId: selectedAddress._id,
