@@ -58,14 +58,15 @@ const Orders = () => {
 
   const downloadInvoice = async (orderId) => {
     try {
-      const token = localStorage.getItem("token");
+      // const token = localStorage.getItem("token");
       const response = await axios.get(server_Url + `/api/v1/orders/${orderId}/invoice`, {
-        headers: { Authorization: `Bearer ${token}` },
+        // headers: { Authorization: `Bearer ${token}` },
         responseType: "blob", // Important for handling files
       });
   
       // Create a URL for the file and trigger download
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      // const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(response.data);
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", `invoice-${orderId}.pdf`);
