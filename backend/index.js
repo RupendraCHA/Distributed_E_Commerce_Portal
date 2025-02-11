@@ -81,7 +81,7 @@ app.get("/", (req, res) => {
                 justify-content: center;
                 align-items: center;
                 height: 100vh;
-                background-color: black;
+                background-color: #86d3e3;
             }
             h1{
                 color: white;
