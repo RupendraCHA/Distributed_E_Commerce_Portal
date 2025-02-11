@@ -751,7 +751,7 @@ app.get("/api/v1/orders", authenticateToken, async (req, res) => {
 });
 
 
-app.get("/api/v1/orders/:orderId/invoice", authenticateToken, async (req, res) => {
+app.get("/api/v1/orders/:orderId/invoice", async (req, res) => {
   try {
       const orderId = req.params.orderId;
       const order = await OrderModel.findById(orderId); // Your Order Model
