@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import './MyOrders.css';
 import { useSelector } from 'react-redux';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import { VscFilePdf } from "react-icons/vsc";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -381,7 +382,8 @@ const handleDownloadInvoice = async (orderId) => {
             <div style={{ marginLeft: "5px"}}>
               {/* <PictureAsPdfIcon onClick={() => downloadInvoice(order._id)} className='cursor-pointer' />
               <p>PDF</p> */}
-              <PictureAsPdfIcon onClick={() => handleDownloadInvoice(order._id)} className='cursor-pointer' />
+              <PictureAsPdfIcon style={{color: "red", boxShadow: "2px 2px 1px black", borderRadius: "2px"}} onClick={() => handleDownloadInvoice(order._id)} className='cursor-pointer' />
+              {/* <VscFilePdf style={{color: "red",width: "20px", boxShadow: "2px 2px 2px black"}} onClick={() => handleDownloadInvoice(order._id)} className='cursor-pointer' /> */}
             </div>
           </div>
           
