@@ -1,7 +1,9 @@
 export const productsData = [
   'Chocolates',
   'Salt',
-  'Fries',
+  // 'Fries',
+  //"Smartphones",
+  "Sneakers",
   'Medicines',
   'Materials',
   'Equipment',
