@@ -97,7 +97,7 @@ const WarehouseManagement = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        server_Url+'/distributor/warehouses',
+        server_Url+'/api/v1/distributor/warehouses',
         // 'http://localhost:3002/distributor/warehouses',
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -143,7 +143,7 @@ const WarehouseManagement = () => {
       const token = localStorage.getItem('token');
       if (editingWarehouse) {
         await axios.put(
-          server_Url+`/distributor/warehouses/${editingWarehouse._id}`,
+          server_Url+`/api/v1/distributor/warehouses/${editingWarehouse._id}`,
           // `http://localhost:3002/distributor/warehouses/${editingWarehouse._id}`,
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
@@ -151,7 +151,7 @@ const WarehouseManagement = () => {
         toast.success('Warehouse updated successfully');
       } else {
         await axios.post(
-          server_Url+'/distributor/warehouses',
+          server_Url+'/api/v1/distributor/warehouses',
           // 'http://localhost:3002/distributor/warehouses',
           formData,
           { headers: { Authorization: `Bearer ${token}` } }
@@ -216,7 +216,7 @@ const WarehouseManagement = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.delete(
-        server_Url+`/distributor/warehouses/${warehouseId}`,
+        server_Url+`/api/v1/distributor/warehouses/${warehouseId}`,
         // `http://localhost:3002/distributor/warehouses/${warehouseId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -234,7 +234,7 @@ const WarehouseManagement = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        server_Url+`/distributor/warehouses/${warehouseId}/primary`,
+        server_Url+`/api/v1/distributor/warehouses/${warehouseId}/primary`,
         // `http://localhost:3002/distributor/warehouses/${warehouseId}/primary`,
         {},
         { headers: { Authorization: `Bearer ${token}` } }

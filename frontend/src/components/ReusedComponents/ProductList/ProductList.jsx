@@ -38,7 +38,7 @@ const ProductList = ({ productList, title, hideHeader }) => {
     dispatch(addToCart(productWithQuantity));
     try {
       const response = await axios.post(
-        server_Url + '/addToCart',
+        server_Url + '/api/v1/addToCart',
         productWithQuantity,
         {
           headers: { Authorization: `Bearer ${token}` }, // Add token to headers

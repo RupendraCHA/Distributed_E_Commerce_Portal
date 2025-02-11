@@ -22,7 +22,7 @@ const Orders = () => {
     try {
       const token = localStorage.getItem('token');
       // const orderUrl = userRole === "Consumer" ? 'http://localhost:3002/orders' : 'http://localhost:3002/admin/orders'
-      const response = await axios.get(server_Url + '/orders', {
+      const response = await axios.get(server_Url + '/api/v1/orders', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -59,7 +59,7 @@ const Orders = () => {
   const downloadInvoice = async (orderId) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(server_Url + `/orders/${orderId}/invoice`, {
+      const response = await axios.get(server_Url + `/api/v1/orders/${orderId}/invoice`, {
         headers: { Authorization: `Bearer ${token}` },
         responseType: "blob", // Important for handling files
       });
@@ -82,7 +82,7 @@ const Orders = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.patch(
-        server_Url + `/orders/${orderId}/status`,
+        server_Url + `/api/v1/orders/${orderId}/status`,
         { status: newStatus },
         {
           headers: { Authorization: `Bearer ${token}` },

@@ -24,8 +24,6 @@ const Products = ({ iterationData, currentSection }) => {
 
   const server_Url = import.meta.env.VITE_API_SERVER_URL
 
-
-
   const handleProductSelection = (product) => {
     if(product.toLowerCase() === "materials"){
       navigate(`/products/Odata`);
@@ -82,7 +80,15 @@ const Products = ({ iterationData, currentSection }) => {
           src="https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738158989/l-intro-1689870440_ksj4xk.jpg"
         />
       );
-    } else if (eachName === 'Medicines') {
+    } else if (eachName === 'Sneakers') {
+      return (
+        <img
+          style={{ width: '200px', height: '170px' }}
+          src="https://res.cloudinary.com/de5vxdg21/image/upload/v1739198141/Sneakers_iwx7em.avif"
+        />
+      );
+    }
+    else if (eachName === 'Medicines') {
       return (
         <img
           style={{ width: '200px', height: '170px' }}

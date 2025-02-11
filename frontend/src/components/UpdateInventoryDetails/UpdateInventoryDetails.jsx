@@ -12,21 +12,21 @@ const getInventoryOrdersAndConsumerOrdersOnly = async () => {
     try {
         
         const token = localStorage.getItem('token');
-    const consumerResponse = await axios.get(server_Url + '/allorders', {
+    const consumerResponse = await axios.get(server_Url + '/api/v1/allorders', {
         headers: { Authorization: `Bearer ${token}` },
       });
       consumerOrders = consumerResponse.data
       console.log("consumerOrdersOnly", consumerOrders)
       
 
-    const inventoryResponse = await axios.get(server_Url + '/distributor/inventory', {
+    const inventoryResponse = await axios.get(server_Url + '/api/v1/distributor/inventory', {
         headers: { Authorization: `Bearer ${token}` },
       });
       InventoryOrders = inventoryResponse.data
 
     // console.log("InventoryOrders",InventoryOrders)
 
-    const warehousesResponse = await axios.get(server_Url + "/inventories", {
+    const warehousesResponse = await axios.get(server_Url + "/api/v1/inventories", {
         headers: { Authorization: `Bearer ${token}` },
       })
 

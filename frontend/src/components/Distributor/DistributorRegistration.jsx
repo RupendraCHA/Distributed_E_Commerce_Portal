@@ -115,7 +115,7 @@ const DistributorRegistration = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.post(
-        server_Url+'/distributor/register',
+        server_Url+'/api/v1/distributor/register',
         // 'http://localhost:3002/distributor/register',
         formData,
         {

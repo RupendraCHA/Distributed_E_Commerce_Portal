@@ -42,6 +42,7 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = process.env.PORT
 
 const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com"
+// const checkoutURLs = "http://localhost:5173"
 
 const connectDB = async () => {
   
@@ -95,7 +96,38 @@ app.get("/", (req, res) => {
       `);
 });
 
-app.post("/create-checkout-session", async (req, res) => {
+
+// Get dashboard stats
+// /api/v1/admin/dashboard API
+app.get("/api/v1/admin/dashboard", authenticateToken, isAdmin, async (req, res) => {
+  try {
+    const [totalUsers, totalOrders, recentOrders, userStats] =
+      await Promise.all([
+        EmployeeModel.countDocuments(),
+        OrderModel.countDocuments(),
+        OrderModel.find().sort({ createdAt: -1 }).limit(5),
+        EmployeeModel.aggregate([
+          {
+            $group: {
+              _id: "$role",
+              count: { $sum: 1 },
+            },
+          },
+        ]),
+      ]);
+
+    res.json({
+      totalUsers,
+      totalOrders,
+      recentOrders,
+      userStats,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching dashboard data" });
+  }
+});
+
+app.post("/api/v1/create-checkout-session", async (req, res) => {
   try {
     const { lineItems, selectedAddress, userId, cartItems, deliveryType } =
       req.body;
@@ -417,34 +449,7 @@ app.put(
   }
 );
 
-// Get dashboard stats
-app.get("/admin/dashboard", authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const [totalUsers, totalOrders, recentOrders, userStats] =
-      await Promise.all([
-        EmployeeModel.countDocuments(),
-        OrderModel.countDocuments(),
-        OrderModel.find().sort({ createdAt: -1 }).limit(5),
-        EmployeeModel.aggregate([
-          {
-            $group: {
-              _id: "$role",
-              count: { $sum: 1 },
-            },
-          },
-        ]),
-      ]);
 
-    res.json({
-      totalUsers,
-      totalOrders,
-      recentOrders,
-      userStats,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching dashboard data" });
-  }
-});
 
 // Get all orders (admin view)
 app.get("/admin/orders", authenticateToken, isAdmin, async (req, res) => {
@@ -466,7 +471,7 @@ app.get("/admin/orders", authenticateToken, isAdmin, async (req, res) => {
     res.status(500).json({ message: "Error fetching orders" });
   }
 });
-app.get("/allorders",authenticateToken, async (req, res) => {
+app.get("/api/v1/allorders",authenticateToken, async (req, res) => {
   
   try {
     const userId = req.user.id; // Corrected to use req.user.id
@@ -483,7 +488,7 @@ app.get("/allorders",authenticateToken, async (req, res) => {
 });
 
 
-app.post("/login", async (req, res) => {
+app.post("/api/v1/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await EmployeeModel.findOne({ email: email });
@@ -519,7 +524,7 @@ app.post("/login", async (req, res) => {
 });
 
 // Fetch user data
-app.get("/user", authenticateToken, (req, res) => {
+app.get("/api/v1/user", authenticateToken, (req, res) => {
   const userId = req.user.id; // Assuming you have a user id in the token
   EmployeeModel.findById(userId)
     .then((user) => {
@@ -535,7 +540,28 @@ app.get("/user", authenticateToken, (req, res) => {
     });
 });
 
-app.get("/addresses", authenticateToken, async (req, res) => {
+app.put("/api/v1/user", authenticateToken, (req, res) => {
+  const userId = req.user.id; // Extract user ID from token
+  const { name, email } = req.body; // Get updated name and email from request body
+
+  EmployeeModel.findByIdAndUpdate(userId, { name, email }, { new: true }) // Update user details
+    .then((user) => {
+      if (user) {
+        res.json({
+          message: "User data updated successfully",
+          user: { name: user.name, email: user.email },
+        });
+      } else {
+        res.status(404).json({ message: "User not found" });
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(500).json({ message: "Internal server error" });
+    });
+});
+
+app.get("/api/v1/addresses", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const addresses = await AddressModel.find({ userId });
@@ -546,7 +572,7 @@ app.get("/addresses", authenticateToken, async (req, res) => {
   }
 });
 
-app.post("/addresses", authenticateToken, async (req, res) => {
+app.post("/api/v1/addresses", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const { addressLine1, addressLine2, city, state, zipCode } = req.body;
@@ -568,7 +594,7 @@ app.post("/addresses", authenticateToken, async (req, res) => {
   }
 });
 
-app.put("/addresses/:id/primary", authenticateToken, async (req, res) => {
+app.put("/api/v1/addresses/:id/primary", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const addressId = req.params.id;
@@ -594,7 +620,7 @@ app.put("/addresses/:id/primary", authenticateToken, async (req, res) => {
   }
 });
 
-app.put("/addresses/:id", authenticateToken, async (req, res) => {
+app.put("/api/v1/addresses/:id", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const addressId = req.params.id;
@@ -630,7 +656,7 @@ app.put("/addresses/:id", authenticateToken, async (req, res) => {
   }
 });
 
-app.delete("/addresses/:id", authenticateToken, async (req, res) => {
+app.delete("/api/v1/addresses/:id", authenticateToken, async (req, res) => {
   try {
     const addressId = req.params.id;
     const deletedAddress = await AddressModel.findByIdAndDelete(addressId);
@@ -713,7 +739,7 @@ app.post("/orders", authenticateToken, async (req, res) => {
 });
 
 // GET /orders - Fetch orders for the authenticated user
-app.get("/orders", authenticateToken, async (req, res) => {
+app.get("/api/v1/orders", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id; // Corrected to use req.user.id
     const orders = await OrderModel.find({ userId }); // Fetch orders by user ID
@@ -725,7 +751,7 @@ app.get("/orders", authenticateToken, async (req, res) => {
 });
 
 
-app.get("/orders/:orderId/invoice", authenticateToken, async (req, res) => {
+app.get("/api/v1/orders/:orderId/invoice", authenticateToken, async (req, res) => {
   try {
       const orderId = req.params.orderId;
       const order = await OrderModel.findById(orderId); // Your Order Model
@@ -783,28 +809,7 @@ app.get("/orders/:orderId/invoice", authenticateToken, async (req, res) => {
 });
 
 
-app.put("/user", authenticateToken, (req, res) => {
-  const userId = req.user.id; // Extract user ID from token
-  const { name, email } = req.body; // Get updated name and email from request body
-
-  EmployeeModel.findByIdAndUpdate(userId, { name, email }, { new: true }) // Update user details
-    .then((user) => {
-      if (user) {
-        res.json({
-          message: "User updated successfully",
-          user: { name: user.name, email: user.email },
-        });
-      } else {
-        res.status(404).json({ message: "User not found" });
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      res.status(500).json({ message: "Internal server error" });
-    });
-});
-
-app.patch("/orders/:orderId/status", async (req, res) => {
+app.patch("/api/v1/orders/:orderId/status", async (req, res) => {
   const { orderId } = req.params;
   const { status } = req.body;
 
@@ -820,7 +825,7 @@ app.patch("/orders/:orderId/status", async (req, res) => {
   }
 });
 
-app.put("/order/:id/status", async (req, res) => {
+app.put("/api/v1/order/:id/status", async (req, res) => {
   const {id} = req.params
   const updateOrderData = await OrderModel.findById(id)
   // console.log("updatedORDERDATA",updateOrderData)
@@ -831,7 +836,7 @@ app.put("/order/:id/status", async (req, res) => {
   res.status(200).json({status: updateOrderData.status, orderedItems: updateOrderData.items, id : updateOrderData._id, createdAt: updateOrderData.createdAt})
 })
 
-app.post("/register", async (req, res) => {
+app.post("/api/v1/register", async (req, res) => {
   // console.log(req.body);
   const { name, email, password, role } = req.body;
   const existingUser = await EmployeeModel.findOne({ email });
@@ -854,7 +859,7 @@ app.post("/register", async (req, res) => {
     .catch((err) => console.log(err.message));
 });
 
-app.get("/savedItems", authenticateToken, async (req, res) => {
+app.get("/api/v1/savedItems", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const savedItems = await SavedItemModel.find({ userId });
@@ -867,7 +872,7 @@ app.get("/savedItems", authenticateToken, async (req, res) => {
   }
 });
 
-app.post("/moveToCart/:productId", authenticateToken, async (req, res) => {
+app.post("/api/v1/moveToCart/:productId", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const productId = req.params.productId;
@@ -925,7 +930,7 @@ app.delete("/savedItems/:productId", authenticateToken, async (req, res) => {
   }
 });
 
-app.post("/saveForLater/:productId", authenticateToken, async (req, res) => {
+app.post("/api/v1/saveForLater/:productId", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const productId = req.params.productId;
@@ -972,7 +977,7 @@ app.post("/saveForLater/:productId", authenticateToken, async (req, res) => {
   }
 });
 
-app.post("/addToCart", authenticateToken, async (req, res) => {
+app.post("/api/v1/addToCart", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const {
@@ -1088,7 +1093,7 @@ app.post("/addToCartInCart", authenticateToken, async (req, res) => {
   }
 });
 
-app.delete("/cart/:id", authenticateToken, async (req, res) => {
+app.delete("/api/v1/cart/:id", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
     const productId = req.params.id;
@@ -1110,7 +1115,7 @@ app.delete("/cart/:id", authenticateToken, async (req, res) => {
   }
 });
 
-app.get("/cart", authenticateToken, async (req, res) => {
+app.get("/api/v1/cart", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id; // Extract user ID from the token
     // Fetch all cart items for the user
@@ -1131,7 +1136,7 @@ app.get("/cart", authenticateToken, async (req, res) => {
 });
 
 // Create new distributor profile
-app.post("/distributor/register", authenticateToken, async (req, res) => {
+app.post("/api/v1/distributor/register", authenticateToken, async (req, res) => {
   try {
     const { companyName, contactPerson, warehouse } = req.body;
 
@@ -1163,7 +1168,7 @@ app.post("/distributor/register", authenticateToken, async (req, res) => {
 });
 
 //Get Warehouses
-app.get("/distributor/warehouses", authenticateToken, async (req, res) => {
+app.get("/api/v1/distributor/warehouses", authenticateToken, async (req, res) => {
   try {
     const distributor = await DistributorModel.findOne({ userId: req.user.id });
     if (!distributor) {
@@ -1176,7 +1181,7 @@ app.get("/distributor/warehouses", authenticateToken, async (req, res) => {
 });
 
 // Add warehouse
-app.post("/distributor/warehouses", authenticateToken, async (req, res) => {
+app.post("/api/v1/distributor/warehouses", authenticateToken, async (req, res) => {
   try {
     const distributor = await DistributorModel.findOne({ userId: req.user.id });
     if (!distributor) {
@@ -1191,9 +1196,8 @@ app.post("/distributor/warehouses", authenticateToken, async (req, res) => {
   }
 });
 
-
 app.delete(
-  "/distributor/warehouses/:warehouseId",
+  "/api/v1/distributor/warehouses/:warehouseId",
   authenticateToken,
   async (req, res) => {
     try {
@@ -1235,7 +1239,7 @@ app.delete(
 
 // Update warehouse
 app.put(
-  "/distributor/warehouses/:warehouseId",
+  "/api/v1/distributor/warehouses/:warehouseId",
   authenticateToken,
   async (req, res) => {
     try {
@@ -1270,7 +1274,7 @@ app.put(
 );
 
 app.put(
-  "/distributor/warehouses/:warehouseId/primary",
+  "/api/v1/distributor/warehouses/:warehouseId/primary",
   authenticateToken,
   async (req, res) => {
     try {
@@ -1314,7 +1318,7 @@ app.put(
   }
 );
 
-app.get("/distributor/details", authenticateToken, async (req, res) => {
+app.get("/api/v1/distributor/details", authenticateToken, async (req, res) => {
   try {
     // Find the distributor associated with the logged-in user
     const distributor = await DistributorModel.findOne({ userId: req.user.id });
@@ -1353,7 +1357,7 @@ app.get('/products', async (req, res) => {
   }
 });
 
-app.get("/distributor/inventory", authenticateToken, async (req, res) => {
+app.get("/api/v1/distributor/inventory", authenticateToken, async (req, res) => {
   try {
     // Find the distributor associated with the logged-in user
     const distributor = await DistributorModel.findOne({ userId: req.user.id });
@@ -1406,7 +1410,7 @@ app.get("/distributor/inventory", authenticateToken, async (req, res) => {
   }
 });
 
-app.get("/inventories", authenticateToken, async (req, res) => {
+app.get("/api/v1/inventories", authenticateToken, async (req, res) => {
   try {
     const distributor = await DistributorModel.findOne({ userId: req.user.id });
     res.status(200).json(distributor)
@@ -1418,7 +1422,7 @@ app.get("/inventories", authenticateToken, async (req, res) => {
   }
 })
 
-app.post("/inventories", authenticateToken, async (req, res) => {
+app.post("/api/v1/inventories", authenticateToken, async (req, res) => {
   const {inventoryOrders, orderedItems, disWarehouses} = req.body
   // console.log("INVENTORIES", inventoryOrders)
   // console.log("CONSUMERS", orderedItems)

@@ -48,7 +48,7 @@ const Orders = () => {
   const fetchOrders = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(server_Url + "/allorders", {
+      const response = await axios.get(server_Url + "/api/v1/allorders", {
         headers: { Authorization: `Bearer ${token}` },
       });
       
@@ -72,7 +72,7 @@ const Orders = () => {
         return order;
       });
       const ownOrders = await axios.get(
-        server_Url + `/orders/`,
+        server_Url + `/api/v1/orders`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -102,7 +102,7 @@ const getOtherUsersOrdersOnly = async () => {
   setDisWarehouses(distributorWarehouses)
   const token = localStorage.getItem('token');
 
-  const response = await axios.get(server_Url + "/inventories", {
+  const response = await axios.get(server_Url + "/api/v1/inventories", {
     headers: { Authorization: `Bearer ${token}` },
   })
   // const response = await axios.get("http://localhost:3002/inventories", {
@@ -113,13 +113,13 @@ const getOtherUsersOrdersOnly = async () => {
   const handleOrderFullfillment = async (id, order) => {
     try {
     dispatch(setUserOrders(order.items))
-        const response = await axios.put(server_Url + `/order/${id}/status`)
+        const response = await axios.put(server_Url + `/api/v1/order/${id}/status`)
         // const response = await axios.put(`http://localhost:3002/order/${id}/status`)
         setShippedStatus(response.data.status)
         const orderedItems = response.data.orderedItems
       const token = localStorage.getItem('token');
 
-        const inventoryResponse = await axios.post(server_Url + "/inventories",{inventoryOrders, orderedItems, disWarehouses}, {
+        const inventoryResponse = await axios.post(server_Url + "/api/v1/inventories",{inventoryOrders, orderedItems, disWarehouses}, {
           headers: { Authorization: `Bearer ${token}` },
         })
         // const inventoryResponse = await axios.post("http://localhost:3002/inventories",{inventoryOrders, orderedItems, disWarehouses}, {
@@ -150,7 +150,7 @@ const getOtherUsersOrdersOnly = async () => {
     try {
       const token = localStorage.getItem('token');
       await axios.patch(
-        `http://localhost:3002/orders/${orderId}/status`,
+        server_Url + `/api/v1/orders/${orderId}/status`,
         { status: newStatus },
         {
           headers: { Authorization: `Bearer ${token}` },
