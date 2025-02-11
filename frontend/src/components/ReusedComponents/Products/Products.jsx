@@ -12,7 +12,6 @@ import { setItemName } from '../../../store/viewProductsSlice';
 
 const Products = ({ iterationData, currentSection }) => {
   const { productcategory } = useParams(); // Get the dynamic category from URL
-  console.log({productcategory})
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -31,6 +30,11 @@ const Products = ({ iterationData, currentSection }) => {
     else{
       navigate(`/products/${product.toLowerCase()}`);
     }
+    setFilteredProducts([])
+    setProductsData([])
+    setLoading(
+      true
+    )
   };
 
   const goToAllProducts = () => {
@@ -128,7 +132,6 @@ const Products = ({ iterationData, currentSection }) => {
         setLoading(false);
       }
     };
-
     fetchProducts();
   }, [productcategory]);
 

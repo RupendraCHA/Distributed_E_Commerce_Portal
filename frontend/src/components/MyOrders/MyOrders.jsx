@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 import './MyOrders.css';
 import { useSelector } from 'react-redux';
-import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -130,10 +130,15 @@ const Orders = () => {
           {order.status}
         </span> */}
         <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",}}>
-            <DownloadForOfflineIcon onClick={() => downloadInvoice(order._id)} className='cursor-pointer' />
-          <span className={`status-badge ${order.status.toLowerCase()}`}>
-          {order.status}
-          </span>
+          <div style={{display: "flex", flexDirection: "row", alignItems: "space-between", justifyContent: "space-between",}}>
+              <span className={`status-badge ${order.status.toLowerCase()}`}>
+                {order.status}
+              </span>
+            <div style={{ marginLeft: "5px"}}>
+              <PictureAsPdfIcon onClick={() => downloadInvoice(order._id)} className='cursor-pointer' />
+            </div>
+          </div>
+          
           <p style={{fontSize: "13px", fontWeight: "600"}}>{new Date(order.createdAt).toLocaleString()}</p>
         </div>
       </div>
