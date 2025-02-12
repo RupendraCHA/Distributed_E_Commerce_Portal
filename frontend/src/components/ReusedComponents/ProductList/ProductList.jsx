@@ -183,7 +183,8 @@ const ProductList = ({ productList, title, hideHeader }) => {
                   color="text.secondary"
                   className="product-price"
                 >
-                  Price: {product.price} | Weight: {product.weight}
+                  <p>Price: {product.price}</p>
+                  <p>Weight: {product.weight}</p>
                 </Typography>
                 <Typography
                   variant="body2"
