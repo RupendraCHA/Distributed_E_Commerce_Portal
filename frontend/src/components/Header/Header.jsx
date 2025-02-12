@@ -111,30 +111,36 @@ const Header = () => {
           <nav>
             <ul className="flex gap-4 font-semibold">
               {/* Your existing navigation items */}
-              <li className=''>
-                <Link
-                  // to="/products"
-                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
-                >
-                  Accounting
-                </Link>
-              </li>
-              <li className=''>
-                <Link
-                  // to="/products"
-                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
-                >
-                  Manufacturing
-                </Link>
-              </li>
-              <li className="">
-                <Link
-                  // to="/products"
-                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
-                >
-                  Sourcing
-                </Link>
-              </li>
+              
+              {
+                userRole != "user" && 
+                <>
+                  <li className=''>
+                    <Link
+                      // to="/products"
+                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                    >
+                      Accounting
+                    </Link>
+                  </li><li className=''>
+                      <Link
+                        // to="/products"
+                        className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                      >
+                        Manufacturing
+                      </Link>
+                  </li>
+                  <li className="">
+                      <Link
+                        // to="/products"
+                        className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                      >
+                        Sourcing
+                      </Link>
+                  </li>
+                </>
+              }
+              
               <li className="">
                 <Link
                   to="/products"
@@ -143,7 +149,9 @@ const Header = () => {
                   Product Categories
                 </Link>
               </li>
-              <li>
+              {
+                userRole != "user" && <>
+                  <li>
                 <Link
                   to="/solutions"
                   className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
@@ -199,6 +207,8 @@ const Header = () => {
                   Invoice
                 </Link>
               </li>
+                </>
+              }
 
               {/* Add Distributor Icon and Dropdown if user is a distributor */}
               {userRole === 'distributor' && (
