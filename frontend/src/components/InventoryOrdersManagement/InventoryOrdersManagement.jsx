@@ -168,11 +168,12 @@ const InventoryOrdersManagement = () => {
             <tbody className="bg-white divide-y divide-gray-200">
               {filteredInventory.map((item) => {
                 let itemCountColor = 'bg-yellow-100 text-yellow-800';
-                if (item.quantity < 100) {
+                console.log({item})
+                if (item.quantity < 10) {
                   itemCountColor = 'bg-red-100 text-red-800';
-                } else if (item.quantity >= 100 && item.quantity <= 200) {
+                } else if (item.quantity >= 10 && item.quantity <= 20) {
                   itemCountColor = 'bg-orange-100 text-orange-800';
-                } else if (item.quantity > 200) {
+                } else if (item.quantity > 20) {
                   itemCountColor = 'bg-green-100 text-green-800';
                 }
 

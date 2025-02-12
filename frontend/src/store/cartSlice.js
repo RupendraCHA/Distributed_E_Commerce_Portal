@@ -76,7 +76,7 @@ const cartSlice = createSlice({
       if (item) {
         item.quantity += action.payload.quantity;
       } else {
-        state.cartItems.push({ ...action.payload, quantity: 1 }); // Set default quantity to 1
+        state.cartItems.push({ ...action.payload, quantity: action.payload.quantity || 1 }); // Set default quantity to 1
       }
     },
     removeFromCart: (state, action) => {

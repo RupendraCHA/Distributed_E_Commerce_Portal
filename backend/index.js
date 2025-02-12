@@ -911,22 +911,29 @@ app.post("/api/v1/moveToCart/:productId", authenticateToken, async (req, res) =>
       return res.status(404).json({ message: "Saved item not found" });
     }
 
-    // Create cart item
-    const cartItem = new CartModel({
-      userId,
-      productId,
-      quantity: 1,
-      productName: savedItem.productName,
-      category: savedItem.category,
-      brand: savedItem.brand,
-      price: savedItem.price,
-      description: savedItem.description,
-      weight: savedItem.weight,
-      expirationDate: savedItem.expirationDate,
-      image: savedItem.image,
-    });
+    let cartItem = await CartModel.findOne({ userId, productId });
 
-    await cartItem.save();
+    if (cartItem) {
+      // If item already exists in cart, update the quantity
+      cartItem.quantity += savedItem.quantity;
+      await cartItem.save();
+    } else {
+      // Create new cart item with the quantity from saved items
+      cartItem = new CartModel({
+        userId,
+        productId,
+        quantity: savedItem.quantity, // Preserve the saved quantity
+        productName: savedItem.productName,
+        category: savedItem.category,
+        brand: savedItem.brand,
+        price: savedItem.price,
+        description: savedItem.description,
+        weight: savedItem.weight,
+        expirationDate: savedItem.expirationDate,
+        image: savedItem.image,
+      });
+      await cartItem.save();
+    }
 
     // Remove from saved items
     await SavedItemModel.findOneAndDelete({ userId, productId });
@@ -962,6 +969,7 @@ app.post("/api/v1/saveForLater/:productId", authenticateToken, async (req, res) 
   try {
     const userId = req.user.id;
     const productId = req.params.productId;
+    const { quantity } = req.body;
 
     // First, get the item from cart
     const cartItem = await CartModel.findOne({ userId, productId });
@@ -990,6 +998,7 @@ app.post("/api/v1/saveForLater/:productId", authenticateToken, async (req, res) 
       weight: cartItem.weight,
       expirationDate: cartItem.expirationDate,
       image: cartItem.image,
+      quantity: quantity || cartItem.quantity,
     });
 
     // Save the item
