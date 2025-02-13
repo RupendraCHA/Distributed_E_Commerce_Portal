@@ -488,6 +488,38 @@ app.get("/api/v1/allorders",authenticateToken, async (req, res) => {
   }
 });
 
+app.get("/distributors/products", async (req, res) => {
+  try {
+    const distributors = await DistributorModel.find();
+    
+    // Consolidate product quantities from all distributors using reduce
+    const productQuantities = distributors.reduce((acc, distributor) => {
+      distributor.warehouses.forEach((warehouse) => {
+        warehouse.inventory.forEach((item) => {
+          acc[item.productId] = (acc[item.productId] || 0) + item.quantity;
+        });
+      });
+      return acc;
+    }, {});
+    
+    // Fetch all products
+    const products = await ProductModel.find();
+    
+    // Map product data and merge quantity from productQuantities
+    const finalProductList = products.map((product) => productQuantities[product.productId] > 0? {
+      ...product.toObject(),
+      quantity: productQuantities[product.productId] || 0,  // Ensure default is 0
+    }: {}).filter((product)=> product.productId);
+
+    // Log to verify the final list of products
+    console.log(finalProductList);
+
+    res.status(200).json(finalProductList);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
 
 app.post("/api/v1/login", async (req, res) => {
   const { email, password } = req.body;

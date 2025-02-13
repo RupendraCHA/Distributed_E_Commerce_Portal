@@ -6,6 +6,8 @@ import "./initialPage.css";
 function InitialPage() {
   // Accessing the logged-in state from the Redux store
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const userRole = useSelector((state) => state.auth.user?.role);
+
   console.log({isLoggedIn})
     if (isLoggedIn) {
         return ( 
@@ -17,7 +19,10 @@ function InitialPage() {
                   Browse our collection, find what you love, and enjoy a smooth shopping experience from start to finish.
                 </h4>
                 <div>
-                  <Link to="/products"><button className="hover:bg-red-700  text-xl border-2 border-solid py-3 px-5 rounded-2">Shop Now</button></Link>
+                  <Link to=
+                  {userRole === "user" ? "/distributors/products"
+                    : 
+                  "/products"}><button className="hover:bg-red-700  text-xl border-2 border-solid py-3 px-5 rounded-2">Shop Now</button></Link>
                 </div>
               </div>
               <img src="https://res.cloudinary.com/dppznstlh/image/upload/v1733338071/cart_2_pmbksp.png" className='initial-image' alt="POSETRA Home PAGE"/>

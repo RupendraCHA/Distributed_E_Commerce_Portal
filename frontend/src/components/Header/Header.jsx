@@ -138,76 +138,83 @@ const Header = () => {
                         Sourcing
                       </Link>
                   </li>
+                  <li className="">
+                    <Link
+                      to="/products"
+                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                    >
+                      Product Categories
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/solutions"
+                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                    >
+                      Solutions
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/pricing"
+                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                    >
+                      Pricing
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/inventory"
+                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                    >
+                      Inventory
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/quotation"
+                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                    >
+                      Quotation
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/order"
+                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                    >
+                      Order
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/ship"
+                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                    >
+                      Ship
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="/invoice"
+                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                    >
+                      Invoice
+                    </Link>
+                  </li>
                 </>
               }
-              
-              <li className="">
-                <Link
-                  to="/products"
-                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
-                >
-                  Product Categories
-                </Link>
-              </li>
               {
-                userRole != "user" && <>
-                  <li>
-                <Link
-                  to="/solutions"
-                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
-                >
-                  Solutions
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/pricing"
-                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
-                >
-                  Pricing
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/inventory"
-                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
-                >
-                  Inventory
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/quotation"
-                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
-                >
-                  Quotation
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/order"
-                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
-                >
-                  Order
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/ship"
-                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
-                >
-                  Ship
-                </Link>
-              </li>
-              <li>
-                <Link
-                  to="/invoice"
-                  className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
-                >
-                  Invoice
-                </Link>
-              </li>
-                </>
+                userRole === "user" && (
+                  <li className="">
+                    <Link
+                      to="/distributors/products"
+                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                    >
+                      Products
+                    </Link>
+                  </li>
+                )
               }
 
               {/* Add Distributor Icon and Dropdown if user is a distributor */}

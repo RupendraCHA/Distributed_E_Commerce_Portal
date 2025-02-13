@@ -11,6 +11,9 @@ import SuccessPage from '../components/SuccessPage.jsx';
 export const Products = React.lazy(() =>
   import('../components/ReusedComponents/Products/Products.jsx')
 );
+const UserProducts = React.lazy(() =>
+  import('../components/ReusedComponents/Products/UserProducts.jsx')
+);
 const Checkout = React.lazy(() =>
   import('../components/Checkout/Checkout.jsx')
 );
@@ -138,6 +141,10 @@ export const privateRoutes = [
   {
     path: '/logout',
     element: Logout,
+  },
+  {
+    path: '/distributors/products',
+    element: UserProducts
   },
   {
     path: '/cart',
