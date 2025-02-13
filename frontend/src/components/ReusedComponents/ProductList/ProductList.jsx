@@ -153,17 +153,6 @@ const ProductList = ({ productList, title, hideHeader }) => {
         </div>
       </div>
       
-      
-      
-
-      {/* <Typography
-        variant="h5"
-        component="h2"
-        gutterBottom
-        className="produtList-title"
-      >
-        {title}
-      </Typography> */}
       {productDataList.length > 0 ? <Grid container spacing={2}>
         {productDataList.map((product, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>

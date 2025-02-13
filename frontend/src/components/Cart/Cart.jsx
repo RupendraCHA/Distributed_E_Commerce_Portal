@@ -224,13 +224,15 @@ const Cart = () => {
 
       {cartItems.length === 0 ? (
         <div className="empty-cart">
-          <p>Your cart is empty.</p>
-          <button
-            className="btn btn-primary"
-            onClick={() => navigate('/products')}
-          >
-            Continue Shopping
-          </button>
+          <div>
+            <p>Your cart is empty.</p>
+            <button
+              className="btn btn-primary"
+              onClick={() => navigate('/products')}
+            >
+              Continue Shopping
+            </button>
+          </div>
           {savedItems.length > 0 && (
             <div className="saved-items-section">
               <h2>Saved for Later</h2>
@@ -240,6 +242,7 @@ const Cart = () => {
                     <img
                       src={item.image}
                       alt={item.productName}
+                      // className="cart-saved-item-image"
                       className="saved-item-image"
                     />
                     <div className="saved-item-details">
