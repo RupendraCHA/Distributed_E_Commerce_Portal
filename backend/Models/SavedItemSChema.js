@@ -20,6 +20,11 @@ const savedItemSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  quantity: {
+    type: Number,
+    required: true,
+    default: 1, // Default quantity to 1 if not provided
+  },
 });
 
 const SavedItemModel = mongoose.model("SavedItem", savedItemSchema);

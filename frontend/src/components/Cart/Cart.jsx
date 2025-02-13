@@ -48,14 +48,14 @@ const Cart = () => {
     fetchSavedItems();
   }, []);
 
-  const handleSaveForLater = async (productId) => {
+  const handleSaveForLater = async (productId,quantity) => {
     try {
       setSaveLoading(true);
       const token = localStorage.getItem('token');
 
       await axios.post(
         server_Url + `/api/v1/saveForLater/${productId}`,
-        {},
+        { quantity }, 
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -124,14 +124,14 @@ const Cart = () => {
   };
 
   // Add this function to move items back to cart
-  const handleMoveToCart = async (productId) => {
+  const handleMoveToCart = async (productId,quantity) => {
     try {
       setSaveLoading(true);
       const token = localStorage.getItem('token');
 
       const response = await axios.post(
         server_Url+`/api/v1/moveToCart/${productId}`,
-        {},
+        { quantity },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -217,7 +217,6 @@ const Cart = () => {
   if (loading) {
     return <div className="cart-loading">Loading...</div>;
   }
-
   return (
     <div className="container cart-container">
       <h1 className="yourCart">Your Cart</h1>
@@ -249,7 +248,7 @@ const Cart = () => {
                         <strong>Price:</strong> {item.price}
                       </p>
                       <button
-                        onClick={() => handleMoveToCart(item.productId)}
+                        onClick={() => handleMoveToCart(item.productId, item.quantity)}
                         className="btn btn-primary move-to-cart-btn"
                         disabled={saveLoading}
                       >
@@ -339,7 +338,7 @@ const Cart = () => {
                       Remove
                     </button>
                     <button
-                      onClick={() => handleSaveForLater(item.productId)}
+                      onClick={() => handleSaveForLater(item.productId, item.quantity)}
                       style={{
                         marginLeft: '10px',
                         marginRight: '10px',
@@ -350,7 +349,7 @@ const Cart = () => {
                         border: 'none',
                         cursor: 'pointer',
                         transition: 'background-color 0.3s ease',
-                        width: '100px',
+                        width: "auto",
                         height: '40px',
                         '&:hover': {
                           backgroundColor: '#0056b3',
@@ -424,7 +423,7 @@ const Cart = () => {
                         <strong>Price:</strong> {item.price}
                       </p>
                       <button
-                        onClick={() => handleMoveToCart(item.productId)}
+                        onClick={() => handleMoveToCart(item.productId, item.quantity)}
                         className="btn btn-primary move-to-cart-btn"
                         disabled={saveLoading}
                       >

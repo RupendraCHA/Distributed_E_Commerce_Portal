@@ -5,9 +5,9 @@ import PropTypes from 'prop-types';
 import './MyOrders.css';
 import { useSelector } from 'react-redux';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import { VscFilePdf } from "react-icons/vsc";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { FaRegFilePdf } from "react-icons/fa";
 
 import jsPDF from "jspdf";
 import "jspdf-autotable";
@@ -17,6 +17,7 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const userRole = useSelector((state) => state.auth.user?.role);
+  const user = useSelector((state)=>state.auth.user)
 
   const server_Url = import.meta.env.VITE_API_SERVER_URL
 
@@ -87,219 +88,111 @@ const Orders = () => {
   };
 
 
-
-// const downloadOrderInvoice = (order) => {
-//   const doc = new jsPDF();
-
-//   // Image & Title Setup
-//   const logoUrl =
-//     "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738926639/Posetra_Logo1_bcwdlt.jpg"; // Replace with actual logo
-//   const imgWidth = 15;
-//   const imgHeight = 15;
-//   const marginLeft = 15; // Align to left margin
-//   const titleText = "Order Invoice";
-//   const titleFontSize = 18;
-//   const titleX = marginLeft + imgWidth + 5; // Position title next to image
-
-//   // Add Image & Title (Bold Title)
-//   doc.addImage(logoUrl, "PNG", marginLeft, 10, imgWidth, imgHeight);
-//   doc.setFontSize(titleFontSize);
-//   doc.setTextColor(44, 62, 80);
-//   doc.setFont("helvetica", "bold");
-//   doc.text(titleText, titleX, 18);
-
-//   let startY = 35; // Start position after title
-
-//   // Table Headers
-//   const columns = ["Product Code", "Name", "Quantity", "Price"];
-//   const rows = order.items.map((item) => [
-//     item.product,
-//     item.name,
-//     item.quantity,
-//     item.price,
-//   ]);
-
-//   // Add Table with header color matching logo
-//   doc.autoTable({
-//     startY,
-//     head: [columns],
-//     body: rows,
-//     theme: "striped",
-//     styles: { fontSize: 12, halign: "left" }, // Left-aligned text
-//     headStyles: { fillColor: [26, 35, 126], textColor: [255, 255, 255] }, // Dark Blue Header
-//   });
-
-//   let finalY = doc.autoTable.previous.finalY + 15; // More space after table
-
-//   // Order & Billing - Extreme Left & Right Layout
-//   const leftX = 15;
-//   const rightX = doc.internal.pageSize.width - 80; // Extreme right position
-
-//   // Order Details (Extreme Left - Bold Heading)
-//   doc.setFontSize(12);
-//   doc.setTextColor(30, 30, 30);
-//   doc.setFont("helvetica", "bold");
-//   doc.text("Order Details:", leftX, finalY);
-
-//   doc.setFontSize(11);
-//   doc.setTextColor(60, 60, 60);
-//   doc.setFont("helvetica", "normal");
-//   doc.text(`Order ID: ${order._id}`, leftX, finalY + 8);
-//   doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, leftX, finalY + 16);
-//   doc.text(`Paid with: ${order.paymentMethod}`, leftX, finalY + 24);
-//   doc.text(`Delivery Type: ${order.deliveryType}`, leftX, finalY + 32);
-
-//   // Billing Address (Extreme Right - Bold Heading)
-//   doc.setFontSize(12);
-//   doc.setTextColor(30, 30, 30);
-//   doc.setFont("helvetica", "bold");
-//   doc.text("Billing Address:", rightX, finalY);
-
-//   doc.setFontSize(11);
-//   doc.setTextColor(60, 60, 60);
-//   doc.setFont("helvetica", "normal");
-//   doc.text(order.address.addressLine1, rightX, finalY + 8);
-//   doc.text(
-//     `${order.address.city}, ${order.address.state} - ${order.address.zipCode}`,
-//     rightX,
-//     finalY + 16
-//   );
-
-//   finalY += 50; // Normal gap above Total Amount
-
-//   // Total Amount (Bold & Aligned Left)
-//   doc.setFontSize(18);
-//   doc.setTextColor(30, 30, 30);
-//   doc.setFont("helvetica", "bold");
-//   doc.text(`Total: $${order.total}`, leftX, finalY);
-
-//   finalY += 20; // Space before gratitude note
-
-//   // Gratitude Note (Centered at Bottom)
-//   doc.setFontSize(11);
-//   doc.setTextColor(60, 60, 60);
-//   doc.setFont("helvetica", "italic");
-//   doc.text(
-//     "Thank you for partnering with us! We appreciate your business and look forward to serving you again.",
-//     doc.internal.pageSize.width / 2,
-//     finalY,
-//     { align: "center" }
-//   );
-
-//   // Save PDF
-//   doc.save(`OrderInvoice.pdf`);
-// };
-
-const downloadOrderInvoice = (order) => {
+const downloadOrderInvoice = (order, createdAt) => {
   const doc = new jsPDF();
 
   // Image & Title Setup
   const logoUrl =
-    "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738926639/Posetra_Logo1_bcwdlt.jpg"; // Replace with actual logo
+    "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738926639/Posetra_Logo1_bcwdlt.jpg";
   const imgWidth = 15;
   const imgHeight = 15;
-  const marginLeft = 15; // Align to left margin
-  const titleText = "Order Invoice";
+  const marginLeft = 15;
+  const titleText = `Order Invoice`;
   const titleFontSize = 18;
-  const titleX = marginLeft  + 15; // Position title next to image
+  const titleX = marginLeft + 15;
 
-  // Add Image & Title (Bold Title)
+  // Add Image & Title
   doc.addImage(logoUrl, "PNG", marginLeft, 10, imgWidth, imgHeight);
   doc.setFontSize(titleFontSize);
   doc.setTextColor(44, 62, 80);
   doc.setFont("helvetica", "bold");
   doc.text(titleText, titleX, 18);
 
-  let startY = 35; // Start position after title
+  let startY = 35; // Position after title
 
   // Delivery Charge Calculation
   let deliveryCharge = 0;
   if (order.deliveryType === "premium") deliveryCharge = 10;
   if (order.deliveryType === "airMail") deliveryCharge = 100;
 
-  // Delivery Type
-  let deliveryType;
-  if (order.deliveryType === "standard") deliveryType = "Standard";
+  let deliveryType = "Standard";
   if (order.deliveryType === "premium") deliveryType = "Premium";
   if (order.deliveryType === "airMail") deliveryType = "Air";
 
-
-  const totalAmount = order.total + deliveryCharge;
+  // Calculate Total Amount
+  const subTotal = order.items.reduce(
+    (acc, item) => acc + Number(item.price.slice(1)) * item.quantity,
+    0
+  );
+  const totalAmount = subTotal + deliveryCharge;
 
   // Table Headers
-  const columns = ["Product Code", "Name", "Quantity", "Unit Price"];
+  // "Product Code",
+  const columns = ["Product Name", "Quantity", "Price"];
   const rows = order.items.map((item) => [
-    item.product,
+    // item.product,
     item.name,
     item.quantity,
-    `${item.price}`,
+    `$${Number(item.price.slice(1)) * item.quantity}`,
   ]);
 
-  // Add Delivery Charge Row
-  rows.push(["-", "Delivery Charge", "-", `$${deliveryCharge}`]);
+  rows.push(["", "", ""]);
+  // Add Delivery Charge Row (Bold)
+  rows.push(["", "Delivery Charge", { content: `$${deliveryCharge}`, styles: { fontStyle: "bold" } }]);
 
-  // Add Table with header color matching logo
+  // Add Total Amount Row (Bold)
+  rows.push([
+    // "", // Empty cell
+    { content: "", styles: {fillColor: [225, 255, 225] } }, // "Total Amount" text
+    { content: "Total Amount", styles: { fontStyle: "bold",fillColor: [225, 255, 225] } }, // "Total Amount" text
+    // { content: "", styles: {fillColor: [225, 255, 225] } }, // "Total Amount" text
+    { content: `$${totalAmount}`, styles: { fontStyle: "bold",fillColor: [225, 255, 225] } }, // Total amount value
+  ]);
+
+  // Product Table with grid lines
   doc.autoTable({
     startY,
     head: [columns],
     body: rows,
-    theme: "striped",
-    styles: { fontSize: 10, halign: "left" }, // Left-aligned text
-    headStyles: { fillColor: [26, 35, 126], textColor: [255, 255, 255] }, // Dark Blue Header
+    theme: "grid", // Adds lines to the table
+    styles: { fontSize: 10, halign: "left" },
+    headStyles: { fillColor: [26, 35, 126], textColor: [255, 255, 255] },
   });
 
-  let finalY = doc.autoTable.previous.finalY + 15; // More space after table
+  let finalY = doc.autoTable.previous.finalY + 10;
 
-  // Order & Billing - Extreme Left & Right Layout
-  const leftX = 15;
-  const rightX = doc.internal.pageSize.width - 80; // Extreme right position
+  // Order Details & Billing Address in One Table
+  const combinedDetails = [
+    [{ content: "Order Details", colSpan: 2, styles: { fontStyle: "bold", textColor: [255, 255, 255], fillColor: [26, 35, 126] } }],
+    ["Order ID", order._id],
+    ["Date", new Date(order.createdAt).toLocaleDateString()],
+    ["Payment Status", order.paymentMethod !== "" ? "Paid" : "Pending"],
+    // ["Payment Status", order.paymentMethod !== "" ? "Paid" : "Pending"],
+    ["Delivery Type", deliveryType],
+    ["", ""],
+    [{ content: "Billing Address", colSpan: 2, styles: { fontStyle: "bold", fillColor: [225, 255, 225], color: "red" } }],
+    ["Address", order.address.addressLine1],
+    ["", `${order.address.city}, ${order.address.state} - ${order.address.zipCode}`],
+  ];
 
-  // Order Details (Extreme Left - Bold Heading)
-  doc.setFontSize(12);
-  doc.setTextColor(30, 30, 30);
-  doc.setFont("helvetica", "bold");
-  doc.text("Order Details:", leftX, finalY);
+  doc.autoTable({
+    startY: finalY,
+    body: combinedDetails,
+    theme: "grid",
+    styles: { fontSize: 9, halign: "left" },
+    columnStyles: { 0: { fontStyle: "bold" } },
+  });
 
-  doc.setFontSize(11);
-  doc.setTextColor(60, 60, 60);
-  doc.setFont("helvetica", "normal");
-  doc.text(`Order ID: ${order._id}`, leftX, finalY + 8);
-  doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, leftX, finalY + 16);
-  doc.text(`Payment: ${order.paymentMethod}`, leftX, finalY + 24);
-  doc.text(`Delivery Type: ${deliveryType}`, leftX, finalY + 32);
-
-  // Billing Address (Extreme Right - Bold Heading)
-  doc.setFontSize(12);
-  doc.setTextColor(30, 30, 30);
-  doc.setFont("helvetica", "bold");
-  doc.text("Billing Address:", rightX, finalY);
-
-  doc.setFontSize(11);
-  doc.setTextColor(60, 60, 60);
-  doc.setFont("helvetica", "normal");
-  doc.text(order.address.addressLine1, rightX, finalY + 8);
-  doc.text(
-    `${order.address.city}, ${order.address.state} - ${order.address.zipCode}`,
-    rightX,
-    finalY + 16
-  );
-
-  finalY += 50; // Normal gap above Total Amount
-
-  // Total Amount (Bold & Aligned Left)
-  doc.setFontSize(18);
-  doc.setTextColor(30, 30, 30);
-  doc.setFont("helvetica", "bold");
-  doc.text(`Total: $${totalAmount}`, leftX, finalY);
+  finalY = doc.autoTable.previous.finalY + 10;
 
   finalY += 20; // Space before gratitude note
 
-  // Gratitude Note (Centered at Bottom)
+  // Gratitude Note (Centered & Semi-Bold)
   doc.setFontSize(11);
   doc.setTextColor(60, 60, 60);
-  doc.setFont("helvetica", "italic");
+  doc.setFont("helvetica", "bolditalic");
   doc.text(
-    "Thank you for partnering with us! We appreciate your business and look forward to serving you again.",
+    "Thank you for shopping with us! We appreciate your presence and looking forward to serving you again.",
     doc.internal.pageSize.width / 2,
     finalY,
     { align: "center" }
@@ -307,6 +200,8 @@ const downloadOrderInvoice = (order) => {
 
   // Save PDF
   doc.save(`OrderInvoice.pdf`);
+  // toast.success("Invoice Downloaded!");
+
 };
 
 const handleDownloadInvoice = async (orderId) => {
@@ -320,7 +215,6 @@ const handleDownloadInvoice = async (orderId) => {
     })
     downloadOrderInvoice(response.data.orderDetails)
     console.log("User Order", response.data)
-    toast.success("Invoice Downloaded!");
   }
 
   const updateOrderStatus = async (orderId, newStatus) => {
@@ -371,24 +265,16 @@ const handleDownloadInvoice = async (orderId) => {
             Placed on {format(new Date(order.createdAt), 'MMM dd, yyyy')}
           </p>
         </div>
-        {/* <span className={`status-badge ${order.status.toLowerCase()}`}>
-          {order.status}
-        </span> */}
-        <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",}}>
-          <div style={{display: "flex", flexDirection: "row", alignItems: "space-between", justifyContent: "space-between",}}>
-              <span className={`status-badge ${order.status.toLowerCase()}`}>
-                {order.status}
-              </span>
-            <div style={{ marginLeft: "5px"}}>
-              {/* <PictureAsPdfIcon onClick={() => downloadInvoice(order._id)} className='cursor-pointer' />
-              <p>PDF</p> */}
-              <PictureAsPdfIcon style={{color: "red", boxShadow: "2px 2px 1px black", borderRadius: "2px"}} onClick={() => handleDownloadInvoice(order._id)} className='cursor-pointer' />
-              {/* <VscFilePdf style={{color: "red",width: "20px", boxShadow: "2px 2px 2px black"}} onClick={() => handleDownloadInvoice(order._id)} className='cursor-pointer' /> */}
+          <div className='flex  flex-row items-center justify-center gap-10'>
+            <div className='flex flex-col items-center justify-center'>
+              <p className={`status-badge ${order.status.toLowerCase()}`}>{order.status}</p>
+              <p style={{fontWeight: "600", fontSize: "12px"}}>{new Date(order.createdAt).toLocaleString()}</p>
             </div>
+            {order.status === "Shipped on" && <div className='flex flex-col items-center justify-center' onClick={() => handleDownloadInvoice(order._id, order.createdAt)}>
+              {order.status === "Shipped on" && <p className={`status-badge invoice`}>Invoice</p>}
+              <FaRegFilePdf className='w-6 h-6 pdf-icon' />
+            </div>}
           </div>
-          
-          <p style={{fontSize: "13px", fontWeight: "600"}}>{new Date(order.createdAt).toLocaleString()}</p>
-        </div>
       </div>
 
       <div className="order-content">
