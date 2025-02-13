@@ -200,7 +200,7 @@ const downloadOrderInvoice = (order, createdAt) => {
 
   // Save PDF
   doc.save(`OrderInvoice.pdf`);
-  // toast.success("Invoice Downloaded!");
+  toast.success("Invoice Downloading!");
 
 };
 
