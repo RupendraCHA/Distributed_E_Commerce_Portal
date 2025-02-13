@@ -33,7 +33,7 @@ const Cart = () => {
     const fetchSavedItems = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(server_Url + '/savedItems', {
+        const response = await axios.get(server_Url + '/api/v1/savedItems', {
           headers: { Authorization: `Bearer ${token}` },
         });
         // const response = await axios.get('http://localhost:3002/savedItems', {
@@ -54,7 +54,7 @@ const Cart = () => {
       const token = localStorage.getItem('token');
 
       await axios.post(
-        server_Url + `/saveForLater/${productId}`,
+        server_Url + `/api/v1/saveForLater/${productId}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -72,7 +72,7 @@ const Cart = () => {
       dispatch(removeFromCart(productId));
 
       // Refresh saved items
-      const response = await axios.get(server_Url+'/savedItems', {
+      const response = await axios.get(server_Url+'/api/v1/savedItems', {
         headers: { Authorization: `Bearer ${token}` },
       });
       // const response = await axios.get('http://localhost:3002/savedItems', {
@@ -130,7 +130,7 @@ const Cart = () => {
       const token = localStorage.getItem('token');
 
       const response = await axios.post(
-        server_Url+`/moveToCart/${productId}`,
+        server_Url+`/api/v1/moveToCart/${productId}`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -149,7 +149,7 @@ const Cart = () => {
 
       // Refresh saved items
       const savedResponse = await axios.get(
-        server_Url+'/savedItems',
+        server_Url+'/api/v1/savedItems',
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -177,7 +177,7 @@ const Cart = () => {
       const token = localStorage.getItem('token');
 
       // Call the backend API to remove the item
-      await axios.delete(server_Url+`/cart/${productId}`, {
+      await axios.delete(server_Url+`/api/v1/cart/${productId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       // await axios.delete(`http://localhost:3002/cart/${productId}`, {
@@ -198,7 +198,7 @@ const Cart = () => {
     // Check if the user has an address before proceeding to payment
     const token = localStorage.getItem('token');
     try {
-      const response = await axios.get(server_Url+'/addresses', {
+      const response = await axios.get(server_Url+'/api/v1/addresses', {
         headers: { Authorization: `Bearer ${token}` },
       });
       // const response = await axios.get('http://localhost:3002/addresses', {

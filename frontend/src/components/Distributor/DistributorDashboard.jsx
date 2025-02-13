@@ -26,7 +26,7 @@ const DistributorDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        server_Url+'/distributor/details',
+        server_Url+'/api/v1/distributor/details',
         // 'http://localhost:3002/distributor/details',
         {
           headers: { Authorization: `Bearer ${token}` },

@@ -46,7 +46,7 @@ const AllProducts = () => {
     dispatch(addToCart(productWithQuantity));
     try {
       const response = await axios.post(
-        server_Url + '/addToCart',
+        server_Url + '/api/v1/addToCart',
         productWithQuantity,
         {
           headers: { Authorization: `Bearer ${token}` }, // Add token to headers
@@ -92,7 +92,7 @@ const AllProducts = () => {
     });
 
   const getSelectedItemsOnly = (value) => {
-    console.log("Search Items Here")
+    // console.log("Search Items Here")
     if (value !== ""){
     setSearchItem(productNameInput)
 

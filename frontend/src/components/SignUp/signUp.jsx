@@ -15,6 +15,9 @@ function SignUp() {
   const navigate = useNavigate();
   const [passwordRules, setRules] = useState(false);
 
+  const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
@@ -48,7 +51,7 @@ function SignUp() {
     } else {
       setErrors({});
       axios
-        .post('http://localhost:3002/register', { name, email, password, role })
+        .post(server_Url + '/api/v1/register', { name, email, password, role })
         .then((result) => {
           console.log(result);
           navigate('/login');

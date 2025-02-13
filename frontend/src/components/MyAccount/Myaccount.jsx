@@ -1,6 +1,8 @@
 // src/MyAccount/MyAccount.jsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const MyAccount = () => {
   const [userData, setUserData] = useState({ name: '', email: '' });
@@ -16,7 +18,7 @@ const MyAccount = () => {
     const fetchUserData = async () => {
       try {
         const token = localStorage.getItem('token'); // Retrieve the token from local storage
-        const response = await axios.get(server_Url + '/user', {
+        const response = await axios.get(server_Url + '/api/v1/user', {
           headers: { Authorization: `Bearer ${token}` }, // Include token in headers
         });
         // const response = await axios.get('http://localhost:3002/user', {
@@ -42,10 +44,14 @@ const MyAccount = () => {
     setIsSubmitting(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.put(server_Url + '/user', userData, {
+      const response = await axios.put(server_Url + '/api/v1/user', userData, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      alert('User data updated successfully.');
+      if (response.data.message){
+      toast.success(response.data.message);
+      }
+      // alert('User data updated successfully.');
+
     } catch (err) {
       console.error(err);
       alert('Failed to update user data.');
@@ -91,6 +97,7 @@ const MyAccount = () => {
           {isSubmitting ? 'Updating...' : 'Update'}
         </button>
       </form>
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };

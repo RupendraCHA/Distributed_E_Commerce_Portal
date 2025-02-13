@@ -29,7 +29,7 @@ const InventoryManagement = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        server_Url+'/distributor/inventory',
+        server_Url+'/api/v1/distributor/inventory',
         // 'http://localhost:3002/distributor/inventory',
         {
           headers: { Authorization: `Bearer ${token}` },

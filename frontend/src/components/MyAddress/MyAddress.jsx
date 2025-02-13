@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const MyAddress = () => {
+  const navigate = useNavigate();
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -26,7 +28,7 @@ const MyAddress = () => {
   const fetchAddresses = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(server_Url + '/addresses', {
+      const response = await axios.get(server_Url + '/api/v1/addresses', {
         headers: { Authorization: `Bearer ${token}` },
       });
       setAddresses(response.data);
@@ -55,7 +57,7 @@ const MyAddress = () => {
       if (editingAddress) {
         // Update existing address
         await axios.put(
-          server_Url + `/addresses/${editingAddress._id}`,
+          server_Url + `/api/v1/addresses/${editingAddress._id}`,
           // `http://localhost:3002/addresses/${editingAddress._id}`,
           formData,
           {
@@ -64,9 +66,13 @@ const MyAddress = () => {
         );
       } else {
         // Add new address
-        await axios.post(server_Url+'/addresses', formData, {
+        await axios.post(server_Url+'/api/v1/addresses', formData, {
           headers: { Authorization: `Bearer ${token}` },
         });
+
+        if (addresses.length === 0) {
+          navigate(-1); // Navigate back if no addresses exist
+        }
       }
       // Refresh addresses list
       await fetchAddresses();
@@ -108,7 +114,7 @@ const MyAddress = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(server_Url+`/addresses/${addressId}`, {
+      await axios.delete(server_Url+`/api/v1/addresses/${addressId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       await fetchAddresses();
@@ -126,7 +132,7 @@ const MyAddress = () => {
     try {
       const token = localStorage.getItem('token');
       await axios.put(
-        server_Url + `/addresses/${addressId}/primary`,
+        server_Url + `/api/v1/addresses/${addressId}/primary`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },

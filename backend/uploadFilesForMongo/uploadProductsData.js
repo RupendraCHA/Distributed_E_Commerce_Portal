@@ -2,8 +2,8 @@ const fs = require("fs")
 const { MongoClient,ObjectId } = require('mongodb');
 
 async function importMissingProducts(uri, databaseName, collectionName, filePath) {
+  const client = new MongoClient(uri);
   try {
-    const client = new MongoClient(uri);
     await client.connect();
 
     const database = client.db(databaseName);

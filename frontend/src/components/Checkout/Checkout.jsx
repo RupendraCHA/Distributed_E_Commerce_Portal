@@ -58,7 +58,7 @@ const Checkout = () => {
 
       if (role === 'distributor') {
         response = await axios.get(
-          server_Url + '/distributor/warehouses',
+          server_Url + '/api/v1/distributor/warehouses',
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -72,7 +72,7 @@ const Checkout = () => {
         setWarehouses(response.data);
         setSelectedWarehouse(response.data[0]); // Select first warehouse by default
       } else {
-        response = await axios.get(server_Url+ '/addresses', {
+        response = await axios.get(server_Url+ '/api/v1/addresses', {
           headers: { Authorization: `Bearer ${token}` },
         });
         // response = await axios.get('http://localhost:3002/addresses', {
@@ -153,7 +153,7 @@ const Checkout = () => {
       }
 
       const response = await axios.post(
-        server_Url+'/create-checkout-session',
+        server_Url+'/api/v1/create-checkout-session',
         // 'http://localhost:3002/create-checkout-session',
         {
           lineItems,

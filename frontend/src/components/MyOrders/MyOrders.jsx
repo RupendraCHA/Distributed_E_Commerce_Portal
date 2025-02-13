@@ -4,7 +4,14 @@ import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 import './MyOrders.css';
 import { useSelector } from 'react-redux';
-import DownloadForOfflineIcon from '@mui/icons-material/DownloadForOffline';
+import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
+import { VscFilePdf } from "react-icons/vsc";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+import jsPDF from "jspdf";
+import "jspdf-autotable";
+
 const Orders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +29,7 @@ const Orders = () => {
     try {
       const token = localStorage.getItem('token');
       // const orderUrl = userRole === "Consumer" ? 'http://localhost:3002/orders' : 'http://localhost:3002/admin/orders'
-      const response = await axios.get(server_Url + '/orders', {
+      const response = await axios.get(server_Url + '/api/v1/orders', {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -58,14 +65,15 @@ const Orders = () => {
 
   const downloadInvoice = async (orderId) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(server_Url + `/orders/${orderId}/invoice`, {
-        headers: { Authorization: `Bearer ${token}` },
+      // const token = localStorage.getItem("token");
+      const response = await axios.get(server_Url + `/api/v1/orders/${orderId}/invoice`, {
+        // headers: { Authorization: `Bearer ${token}` },
         responseType: "blob", // Important for handling files
       });
   
       // Create a URL for the file and trigger download
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      // const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(response.data);
       const link = document.createElement("a");
       link.href = url;
       link.setAttribute("download", `invoice-${orderId}.pdf`);
@@ -78,11 +86,248 @@ const Orders = () => {
     }
   };
 
+
+
+// const downloadOrderInvoice = (order) => {
+//   const doc = new jsPDF();
+
+//   // Image & Title Setup
+//   const logoUrl =
+//     "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738926639/Posetra_Logo1_bcwdlt.jpg"; // Replace with actual logo
+//   const imgWidth = 15;
+//   const imgHeight = 15;
+//   const marginLeft = 15; // Align to left margin
+//   const titleText = "Order Invoice";
+//   const titleFontSize = 18;
+//   const titleX = marginLeft + imgWidth + 5; // Position title next to image
+
+//   // Add Image & Title (Bold Title)
+//   doc.addImage(logoUrl, "PNG", marginLeft, 10, imgWidth, imgHeight);
+//   doc.setFontSize(titleFontSize);
+//   doc.setTextColor(44, 62, 80);
+//   doc.setFont("helvetica", "bold");
+//   doc.text(titleText, titleX, 18);
+
+//   let startY = 35; // Start position after title
+
+//   // Table Headers
+//   const columns = ["Product Code", "Name", "Quantity", "Price"];
+//   const rows = order.items.map((item) => [
+//     item.product,
+//     item.name,
+//     item.quantity,
+//     item.price,
+//   ]);
+
+//   // Add Table with header color matching logo
+//   doc.autoTable({
+//     startY,
+//     head: [columns],
+//     body: rows,
+//     theme: "striped",
+//     styles: { fontSize: 12, halign: "left" }, // Left-aligned text
+//     headStyles: { fillColor: [26, 35, 126], textColor: [255, 255, 255] }, // Dark Blue Header
+//   });
+
+//   let finalY = doc.autoTable.previous.finalY + 15; // More space after table
+
+//   // Order & Billing - Extreme Left & Right Layout
+//   const leftX = 15;
+//   const rightX = doc.internal.pageSize.width - 80; // Extreme right position
+
+//   // Order Details (Extreme Left - Bold Heading)
+//   doc.setFontSize(12);
+//   doc.setTextColor(30, 30, 30);
+//   doc.setFont("helvetica", "bold");
+//   doc.text("Order Details:", leftX, finalY);
+
+//   doc.setFontSize(11);
+//   doc.setTextColor(60, 60, 60);
+//   doc.setFont("helvetica", "normal");
+//   doc.text(`Order ID: ${order._id}`, leftX, finalY + 8);
+//   doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, leftX, finalY + 16);
+//   doc.text(`Paid with: ${order.paymentMethod}`, leftX, finalY + 24);
+//   doc.text(`Delivery Type: ${order.deliveryType}`, leftX, finalY + 32);
+
+//   // Billing Address (Extreme Right - Bold Heading)
+//   doc.setFontSize(12);
+//   doc.setTextColor(30, 30, 30);
+//   doc.setFont("helvetica", "bold");
+//   doc.text("Billing Address:", rightX, finalY);
+
+//   doc.setFontSize(11);
+//   doc.setTextColor(60, 60, 60);
+//   doc.setFont("helvetica", "normal");
+//   doc.text(order.address.addressLine1, rightX, finalY + 8);
+//   doc.text(
+//     `${order.address.city}, ${order.address.state} - ${order.address.zipCode}`,
+//     rightX,
+//     finalY + 16
+//   );
+
+//   finalY += 50; // Normal gap above Total Amount
+
+//   // Total Amount (Bold & Aligned Left)
+//   doc.setFontSize(18);
+//   doc.setTextColor(30, 30, 30);
+//   doc.setFont("helvetica", "bold");
+//   doc.text(`Total: $${order.total}`, leftX, finalY);
+
+//   finalY += 20; // Space before gratitude note
+
+//   // Gratitude Note (Centered at Bottom)
+//   doc.setFontSize(11);
+//   doc.setTextColor(60, 60, 60);
+//   doc.setFont("helvetica", "italic");
+//   doc.text(
+//     "Thank you for partnering with us! We appreciate your business and look forward to serving you again.",
+//     doc.internal.pageSize.width / 2,
+//     finalY,
+//     { align: "center" }
+//   );
+
+//   // Save PDF
+//   doc.save(`OrderInvoice.pdf`);
+// };
+
+const downloadOrderInvoice = (order) => {
+  const doc = new jsPDF();
+
+  // Image & Title Setup
+  const logoUrl =
+    "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738926639/Posetra_Logo1_bcwdlt.jpg"; // Replace with actual logo
+  const imgWidth = 15;
+  const imgHeight = 15;
+  const marginLeft = 15; // Align to left margin
+  const titleText = "Order Invoice";
+  const titleFontSize = 18;
+  const titleX = marginLeft  + 15; // Position title next to image
+
+  // Add Image & Title (Bold Title)
+  doc.addImage(logoUrl, "PNG", marginLeft, 10, imgWidth, imgHeight);
+  doc.setFontSize(titleFontSize);
+  doc.setTextColor(44, 62, 80);
+  doc.setFont("helvetica", "bold");
+  doc.text(titleText, titleX, 18);
+
+  let startY = 35; // Start position after title
+
+  // Delivery Charge Calculation
+  let deliveryCharge = 0;
+  if (order.deliveryType === "premium") deliveryCharge = 10;
+  if (order.deliveryType === "airMail") deliveryCharge = 100;
+
+  // Delivery Type
+  let deliveryType;
+  if (order.deliveryType === "standard") deliveryType = "Standard";
+  if (order.deliveryType === "premium") deliveryType = "Premium";
+  if (order.deliveryType === "airMail") deliveryType = "Air";
+
+
+  const totalAmount = order.total + deliveryCharge;
+
+  // Table Headers
+  const columns = ["Product Code", "Name", "Quantity", "Unit Price"];
+  const rows = order.items.map((item) => [
+    item.product,
+    item.name,
+    item.quantity,
+    `${item.price}`,
+  ]);
+
+  // Add Delivery Charge Row
+  rows.push(["-", "Delivery Charge", "-", `$${deliveryCharge}`]);
+
+  // Add Table with header color matching logo
+  doc.autoTable({
+    startY,
+    head: [columns],
+    body: rows,
+    theme: "striped",
+    styles: { fontSize: 10, halign: "left" }, // Left-aligned text
+    headStyles: { fillColor: [26, 35, 126], textColor: [255, 255, 255] }, // Dark Blue Header
+  });
+
+  let finalY = doc.autoTable.previous.finalY + 15; // More space after table
+
+  // Order & Billing - Extreme Left & Right Layout
+  const leftX = 15;
+  const rightX = doc.internal.pageSize.width - 80; // Extreme right position
+
+  // Order Details (Extreme Left - Bold Heading)
+  doc.setFontSize(12);
+  doc.setTextColor(30, 30, 30);
+  doc.setFont("helvetica", "bold");
+  doc.text("Order Details:", leftX, finalY);
+
+  doc.setFontSize(11);
+  doc.setTextColor(60, 60, 60);
+  doc.setFont("helvetica", "normal");
+  doc.text(`Order ID: ${order._id}`, leftX, finalY + 8);
+  doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, leftX, finalY + 16);
+  doc.text(`Payment: ${order.paymentMethod}`, leftX, finalY + 24);
+  doc.text(`Delivery Type: ${deliveryType}`, leftX, finalY + 32);
+
+  // Billing Address (Extreme Right - Bold Heading)
+  doc.setFontSize(12);
+  doc.setTextColor(30, 30, 30);
+  doc.setFont("helvetica", "bold");
+  doc.text("Billing Address:", rightX, finalY);
+
+  doc.setFontSize(11);
+  doc.setTextColor(60, 60, 60);
+  doc.setFont("helvetica", "normal");
+  doc.text(order.address.addressLine1, rightX, finalY + 8);
+  doc.text(
+    `${order.address.city}, ${order.address.state} - ${order.address.zipCode}`,
+    rightX,
+    finalY + 16
+  );
+
+  finalY += 50; // Normal gap above Total Amount
+
+  // Total Amount (Bold & Aligned Left)
+  doc.setFontSize(18);
+  doc.setTextColor(30, 30, 30);
+  doc.setFont("helvetica", "bold");
+  doc.text(`Total: $${totalAmount}`, leftX, finalY);
+
+  finalY += 20; // Space before gratitude note
+
+  // Gratitude Note (Centered at Bottom)
+  doc.setFontSize(11);
+  doc.setTextColor(60, 60, 60);
+  doc.setFont("helvetica", "italic");
+  doc.text(
+    "Thank you for partnering with us! We appreciate your business and look forward to serving you again.",
+    doc.internal.pageSize.width / 2,
+    finalY,
+    { align: "center" }
+  );
+
+  // Save PDF
+  doc.save(`OrderInvoice.pdf`);
+};
+
+const handleDownloadInvoice = async (orderId) => {
+    console.log("UserID", orderId)
+
+    const token = localStorage.getItem('token');
+
+    // const response = await axios.get(server_Url + `/api/v1/order/${orderId}/downloadInvoice`)
+    const response = await axios.get(server_Url + `/api/v1/ordersForInvoice/${orderId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    downloadOrderInvoice(response.data.orderDetails)
+    console.log("User Order", response.data)
+    toast.success("Invoice Downloaded!");
+  }
+
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       const token = localStorage.getItem('token');
       await axios.patch(
-        server_Url + `/orders/${orderId}/status`,
+        server_Url + `/api/v1/orders/${orderId}/status`,
         { status: newStatus },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -130,10 +375,18 @@ const Orders = () => {
           {order.status}
         </span> */}
         <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",}}>
-            <DownloadForOfflineIcon onClick={() => downloadInvoice(order._id)} className='cursor-pointer' />
-          <span className={`status-badge ${order.status.toLowerCase()}`}>
-          {order.status}
-          </span>
+          <div style={{display: "flex", flexDirection: "row", alignItems: "space-between", justifyContent: "space-between",}}>
+              <span className={`status-badge ${order.status.toLowerCase()}`}>
+                {order.status}
+              </span>
+            <div style={{ marginLeft: "5px"}}>
+              {/* <PictureAsPdfIcon onClick={() => downloadInvoice(order._id)} className='cursor-pointer' />
+              <p>PDF</p> */}
+              <PictureAsPdfIcon style={{color: "red", boxShadow: "2px 2px 1px black", borderRadius: "2px"}} onClick={() => handleDownloadInvoice(order._id)} className='cursor-pointer' />
+              {/* <VscFilePdf style={{color: "red",width: "20px", boxShadow: "2px 2px 2px black"}} onClick={() => handleDownloadInvoice(order._id)} className='cursor-pointer' /> */}
+            </div>
+          </div>
+          
           <p style={{fontSize: "13px", fontWeight: "600"}}>{new Date(order.createdAt).toLocaleString()}</p>
         </div>
       </div>
@@ -146,7 +399,7 @@ const Orders = () => {
             {order.items.map((item, index) => (
               <div key={index} className="order-item">
                 <div className="item-details">
-                  {console.log(item)}
+                  {/* {console.log(item)} */}
                   <p className="item-name">{item.name}</p>
                   <p className="text-gray-400 font-normal">{item.product}</p>
                   <p className="item-quantity font-medium">Quantity: {item.quantity}</p>
@@ -267,6 +520,7 @@ const Orders = () => {
           <OrderDetails key={order._id} order={order} />
         ))}
       </div>
+      <ToastContainer position="top-right" autoClose={3000} />
     </div>
   );
 };

@@ -45,7 +45,7 @@ function Login() {
     } else {
       setErrors({});
       axios
-        .post(server_Url+'/login', { email, password })
+        .post(server_Url+'/api/v1/login', { email, password })
         // .post('http://localhost:3002/login', { email, password })
         .then((response) => {
           // if (result.data.message === 'Success') {

@@ -18,7 +18,7 @@ const StripeCheckout = () => {
     try {
       // Replace this with your backend URL if it’s hosted elsewhere
       const response = await fetch(
-        server_Url + '/create-checkout-session',
+        server_Url + '/api/v1/create-checkout-session',
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
