@@ -170,22 +170,17 @@
     color: #718096;
 }
 
-.status-badge {
-    padding: 0.5rem 1rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    font-weight: 500;
-}
 
-.status-badge.confirmed {
+/* .status-badge1.confirmed {
     background-color: #c6f6d5;
     color: #22543d;
 }
 
-.status-badge.pending {
+.status-badge1.pending {
     background-color: #bee3f8;
     color: #2c5282;
-}
+} */
+
 
 .order-section {
     margin-bottom: 1.5rem;
@@ -353,17 +348,36 @@
         align-self: flex-end;
     }
 }
-
-.status-badge {
-    padding: 4px 8px;
-    border-radius: 12px;
+/* .status-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 9999px;
     font-size: 0.875rem;
     font-weight: 500;
-}
+} */
+.status-badge {
+    font-size: 14px;
+    font-weight: 600;
+    border-radius: 4px;
+    padding: 2px 8px;
+    text-align: center;
 
+}
+.invoice{
+    background-color: #000;
+    color: white;
+    cursor: pointer;
+}
+.pdf-icon{
+    color: red;
+    box-shadow: 1px 1px 1px red;
+    border-radius: 2px;
+    padding: 2px 1px;
+    cursor: pointer;
+}
 .status-badge.confirmed {
     background-color: #d1fae5;
     color: #065f46;
+
 }
 
 .status-badge.processing {
@@ -374,6 +388,7 @@
 .status-badge.shipped {
     background-color: #dbeafe;
     color: #1e40af;
+    /* color: #12c721; */
 }
 
 .status-badge.delivered {
