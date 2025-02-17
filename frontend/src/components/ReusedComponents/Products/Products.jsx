@@ -214,7 +214,7 @@ const Products = ({ iterationData, currentSection }) => {
               </li>
             );
           })}
-          <li
+          {(currentSection === 'Products') && <><li
                 // key={index}
                 className="card"
                 // onClick={() => handleProductSelection("Materials")}
@@ -234,7 +234,7 @@ const Products = ({ iterationData, currentSection }) => {
                 <h2>More can be added...</h2>
                 <p className="card-text"></p>
                 {/* <button>View</button> */}
-          </li>
+          </li></>}
         
       </ul>
     </section>
