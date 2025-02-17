@@ -213,6 +213,27 @@ const Products = ({ iterationData, currentSection }) => {
               </li>
             );
           })}
+          <li
+                // key={index}
+                className="card"
+                // onClick={() => handleProductSelection("Materials")}
+                onClick={() => navigate("/product/materials")}
+              >
+                {getImage("Materials")}
+                <h2>Materials</h2>
+                <p className="card-text"></p>
+                <button>View</button>
+          </li>
+          <li
+                // key={index}
+                className="card"
+                // onClick={() => handleProductSelection("Materials")}
+              >
+                {/* {getImage("Materials")} */}
+                <h2>More can be added...</h2>
+                <p className="card-text"></p>
+                {/* <button>View</button> */}
+          </li>
         
       </ul>
     </section>

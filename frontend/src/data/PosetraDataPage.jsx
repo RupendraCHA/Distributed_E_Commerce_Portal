@@ -5,9 +5,9 @@ export const productsData = [
   //"Smartphones",
   "Sneakers",
   'Medicines',
-  'Materials',
+  // 'Materials',
   'Equipment',
-  "More can be added.."
+  // "More can be added.."
   // 'Haneya',
   // 'DMAG',
   // 'Hanelytics',

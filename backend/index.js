@@ -98,6 +98,85 @@ app.get("/", (req, res) => {
 });
 
 
+const getSapDataDetails = async () => {
+  const url = "http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/Material_data1Set?$format=json";
+  const username = "NikhilA";
+  const password = "Nikhil@12345";
+  // Encode the credentials in base64 for Basic Authentication
+  const headers = new Headers();
+  headers.set('Authorization', 'Basic ' + btoa(username + ":" + password));
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: headers
+});
+let updatedData;
+// Check if the response is okay
+let dataFieldsForSAP = []
+if (response.ok) {
+    const data = await response.json();
+    
+    // # 3) Destructuring the fields, adding them into an Array and consoling them
+
+    data.d.results.map((eachRecord) => {
+        let newObject = {
+         productId:eachRecord.Product_ID,
+          productName:eachRecord.Product,
+          category :eachRecord.Material_Category,
+          brand :"",
+          description:eachRecord.Material_Description,
+          price:eachRecord.Price_Of_Product, 
+          weight:eachRecord.Allowed_Packaging_Weight,
+          stock:eachRecord.Storage_percentage,
+          expirationDate:eachRecord.Expiration_Date,
+          image : "",
+        }
+        dataFieldsForSAP.push(newObject)
+      })
+    // console.log(dataFieldsForSAP)
+
+    const getProductId = (product) => {
+        return product.productId.slice(0,1).toUpperCase() + product.productId.slice(1, product.productId.length)
+    }
+    const updatedData1 = dataFieldsForSAP.map((product) => {
+      if (product.productName === "AGRPUMP"){
+        return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206530/41jM54U8FgL._AC_UF1000_1000_QL80__pyongi.jpg" }
+      }
+      else if (product.productName === "BENALIUM"){
+        return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206617/images_hqeypc.jpg" }
+      }
+      else if (product.productName === "BRASS"){
+        return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206705/brass-metal-components_bxwkyf.jpg" }
+      }
+      else if (product.productName === "LED"){
+        return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206775/led-bulb-raw-material-500x500_otjrgh.webp" }
+      }
+      else if (product.productName === "MNIPICKAXES"){
+        return {...product, productId: getProductId(product), category: "Materials", brand: "Materials", weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206885/ImageForArticle_1446_17219052982689037_kgkxpu.webp" }
+      }
+      else if (product.productName === "SITTAPER"){
+        return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738207536/images_1_a6hh4a.jpg" }
+      }
+      else if (product.productName === "SULPHUR"){
+        return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208651/360_F_85756492_i638LcwoFrymrBj96ZMHP4nL4BOolKfK_ai3zwv.jpg" }
+      }
+      else if (product.productName === "THORIUM"){
+        return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208805/b90b79a0-fcb7-40ea-955d-729b1a85e92b_484973f3_wrdyaa.webp" }
+      }
+      else if (product.productName === "TIE"){
+        return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", productName: "URANIUM", category: 'fashion accessories', description: "This is Radioactive element & generates Nuclear Energy", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208888/uranium-chemical-element_gojtdh.webp" }
+      }
+      else if (product.productName === "TILE"){
+        return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208950/1711451520993_ylgnow.jpg" }
+      }
+    })
+    updatedData = updatedData1
+  }
+  // console.log("U",updatedData)
+  return updatedData
+}
+
+// const SAP = getSapDataDetails()
+
 // Get dashboard stats
 // /api/v1/admin/dashboard API
 app.get("/api/v1/admin/dashboard", authenticateToken, isAdmin, async (req, res) => {
@@ -186,15 +265,52 @@ app.post("/api/v1/create-checkout-session", async (req, res) => {
   }
 });
 
-app.get("/getDataFromSap", async (req, res) => {
-  const url = "http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/Material_data1Set?$format=json";
+
+app.get("/api/v1/getDataFromSap", async (req, res) => {
+  try {
+      const updatedData = await getSapDataDetails()
+      res.status(200).json({success: true, data:updatedData})
+    
+  } catch (error) {
+      console.error('Error:', error);
+    
+  }
+})
+
+app.get("/api/v1/distributors/products", async (req, res) => {
+  try {
+    let allProductsData;
+    const distributors = await DistributorModel.find();
+    
+    // Consolidate product quantities from all distributors using reduce
+    const productQuantities = distributors.reduce((acc, distributor) => {
+      distributor.warehouses.forEach((warehouse) => {
+        warehouse.inventory.forEach((item) => {
+          acc[item.productId] = (acc[item.productId] || 0) + item.quantity;
+        });
+      });
+      return acc;
+    }, {});
+    console.log(distributors)
+    // Fetch all products
+    const products = await ProductModel.find();
+    console.log(products)
+    
+    // Map product data and merge quantity from productQuantities
+    const finalProductList = products.map((product) => productQuantities[product.productId] > 0? {
+      ...product.toObject(),
+      quantity: productQuantities[product.productId] || 0,  // Ensure default is 0
+    }: {}).filter((product)=> product.productId);
+
+    // Log to verify the final list of products
+    // console.log(finalProductList);
+
+    const url = "http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/Material_data1Set?$format=json";
   const username = "NikhilA";
   const password = "Nikhil@12345";
   // Encode the credentials in base64 for Basic Authentication
   const headers = new Headers();
   headers.set('Authorization', 'Basic ' + btoa(username + ":" + password));
-
-  try {
       // Make the request to the OData service
       const response = await fetch(url, {
           method: 'GET',
@@ -210,7 +326,7 @@ app.get("/getDataFromSap", async (req, res) => {
 
           data.d.results.map((eachRecord) => {
               let newObject = {
-               // product_ID:eachRecord.Product_ID,
+               productId:eachRecord.Product_ID,
                 productName:eachRecord.Product,
                 category :eachRecord.Material_Category,
                 brand :"",
@@ -223,50 +339,62 @@ app.get("/getDataFromSap", async (req, res) => {
               }
               dataFieldsForSAP.push(newObject)
             })
+          // console.log(dataFieldsForSAP)
+
+          const getProductId = (product) => {
+              return product.productId.slice(0,1).toUpperCase() + product.productId.slice(1, product.productId.length)
+          }
           const updatedData = dataFieldsForSAP.map((product) => {
             if (product.productName === "AGRPUMP"){
-              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206530/41jM54U8FgL._AC_UF1000_1000_QL80__pyongi.jpg" }
+              return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206530/41jM54U8FgL._AC_UF1000_1000_QL80__pyongi.jpg" }
             }
             else if (product.productName === "BENALIUM"){
-              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206617/images_hqeypc.jpg" }
+              return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206617/images_hqeypc.jpg" }
             }
             else if (product.productName === "BRASS"){
-              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206705/brass-metal-components_bxwkyf.jpg" }
+              return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206705/brass-metal-components_bxwkyf.jpg" }
             }
             else if (product.productName === "LED"){
-              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206775/led-bulb-raw-material-500x500_otjrgh.webp" }
+              return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206775/led-bulb-raw-material-500x500_otjrgh.webp" }
             }
             else if (product.productName === "MNIPICKAXES"){
-              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206885/ImageForArticle_1446_17219052982689037_kgkxpu.webp" }
+              return {...product, productId: getProductId(product), category: "Materials", brand: "Materials", weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206885/ImageForArticle_1446_17219052982689037_kgkxpu.webp" }
             }
             else if (product.productName === "SITTAPER"){
-              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738207536/images_1_a6hh4a.jpg" }
+              return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738207536/images_1_a6hh4a.jpg" }
             }
             else if (product.productName === "SULPHUR"){
-              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208651/360_F_85756492_i638LcwoFrymrBj96ZMHP4nL4BOolKfK_ai3zwv.jpg" }
+              return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208651/360_F_85756492_i638LcwoFrymrBj96ZMHP4nL4BOolKfK_ai3zwv.jpg" }
             }
             else if (product.productName === "THORIUM"){
-              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208805/b90b79a0-fcb7-40ea-955d-729b1a85e92b_484973f3_wrdyaa.webp" }
+              return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208805/b90b79a0-fcb7-40ea-955d-729b1a85e92b_484973f3_wrdyaa.webp" }
             }
             else if (product.productName === "TIE"){
-              return {...product, productName: "URANIUM", category: 'fashion accessories', description: "This is Radioactive element & generates Nuclear Energy", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208888/uranium-chemical-element_gojtdh.webp" }
+              return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", productName: "URANIUM", category: 'fashion accessories', description: "This is Radioactive element & generates Nuclear Energy", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208888/uranium-chemical-element_gojtdh.webp" }
             }
             else if (product.productName === "TILE"){
-              return {...product, image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208950/1711451520993_ylgnow.jpg" }
+              return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208950/1711451520993_ylgnow.jpg" }
             }
           })
-          console.log("updatedData",updatedData)
-          res.status(200).json({success: true, data:updatedData})
+
+          allProductsData = await getSapDataDetails()
+          // console.log("updatedDataForDetails",updatedData)
+          // res.status(200).json({success: true, data:updatedData})
           // res.status(200).json({success: true, data:dataFieldsForSAP})
 
         } else {
           console.error('Failed to fetch data', response.status);
       }
+      // console.log("AllProductsData",allProductsData)
+      // console.log("AllProductsData1",finalProductList)
+      const allProductsDetails = [ ...finalProductList, ...allProductsData]
+      // console.log("AllProductsDetails",allProductsDetails, "Successfull!!!")
+    // res.status(200).json(finalProductList);
+    res.status(200).json(allProductsDetails);
   } catch (error) {
-      console.error('Error:', error);
+    res.status(500).json({ message: "Server error", error: error.message });
   }
-})
-
+});
 
 app.post("/confirm-payment", authenticateToken, async (req, res) => {
   try {
@@ -488,37 +616,7 @@ app.get("/api/v1/allorders",authenticateToken, async (req, res) => {
   }
 });
 
-app.get("/distributors/products", async (req, res) => {
-  try {
-    const distributors = await DistributorModel.find();
-    
-    // Consolidate product quantities from all distributors using reduce
-    const productQuantities = distributors.reduce((acc, distributor) => {
-      distributor.warehouses.forEach((warehouse) => {
-        warehouse.inventory.forEach((item) => {
-          acc[item.productId] = (acc[item.productId] || 0) + item.quantity;
-        });
-      });
-      return acc;
-    }, {});
-    
-    // Fetch all products
-    const products = await ProductModel.find();
-    
-    // Map product data and merge quantity from productQuantities
-    const finalProductList = products.map((product) => productQuantities[product.productId] > 0? {
-      ...product.toObject(),
-      quantity: productQuantities[product.productId] || 0,  // Ensure default is 0
-    }: {}).filter((product)=> product.productId);
 
-    // Log to verify the final list of products
-    console.log(finalProductList);
-
-    res.status(200).json(finalProductList);
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
 
 
 app.post("/api/v1/login", async (req, res) => {
@@ -1410,7 +1508,7 @@ app.get("/api/v1/distributor/details", authenticateToken, async (req, res) => {
 app.get('/products', async (req, res) => {
   try {
       const productCategory = req.query.productCategory;
-      console.log({ productCategory });
+      // console.log({ productCategory });
 
       let products = await ProductModel.find({});
 

@@ -21,7 +21,7 @@ function InitialPage() {
                 <div>
                   <Link to=
                   {userRole === "user" ? "/distributors/products"
-                    : 
+                    :
                   "/products"}><button className="hover:bg-red-700  text-xl border-2 border-solid py-3 px-5 rounded-2">Shop Now</button></Link>
                 </div>
               </div>

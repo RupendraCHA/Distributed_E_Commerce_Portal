@@ -68,7 +68,8 @@ import('../components/TrackShipping/TrackShipping.jsx')
 const FullFilledOrderDetails = React.lazy(() => 
   import('../components/FulfilledOrders/FilfilledOrderDetails.jsx')
 )
-
+const SAPDataDetails = React.lazy(() => 
+import ('../components/ReusedComponents/SAPDataDetails/SAPDataDetails.jsx'))
 
 import {
   productsData,
@@ -181,6 +182,10 @@ export const privateRoutes = [
   {
     path: "/consumerOrderFullfilled",
     element: FullFilledOrderDetails
+  },
+  {
+    path: "/product/materials",
+    element: SAPDataDetails
   }
 ];
 

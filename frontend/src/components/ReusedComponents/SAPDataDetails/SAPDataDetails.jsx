@@ -13,9 +13,10 @@ import {
   Button,
   Breadcrumbs,
 } from '@mui/material';
-import './ProductList.css'; // Keep this for any additional styles
+// import './ProductList.css';
+ // Keep this for any additional styles
 import axios from 'axios';
-import { categories } from '../../../data/PosetraDataPage';
+// import { categories } from '../../../data/PosetraDataPage';
 const ProductList = ({ productList, title, hideHeader }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -26,8 +27,11 @@ const ProductList = ({ productList, title, hideHeader }) => {
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const { productcategory } = useParams();
   const [productDataList, setDataList] = useState([])
+  const [sapDataDetails, setSapDataDetails] = useState([])
 
   const server_Url = import.meta.env.VITE_API_SERVER_URL
+
+
   const handleAddToCart = async (product) => {
     // console.log(product)
     const token = localStorage.getItem('token');
@@ -81,17 +85,21 @@ const ProductList = ({ productList, title, hideHeader }) => {
       }; // Capitalize the label
     });
 
-  const getSelectedItemsOnly = () => {
+  const getSelectedItemsOnly = async () => {
     console.log("Search Items Here")
-    let productsDataList = productList.filter((product) =>
+    const response = await axios.get(server_Url + "/api/v1/getDataFromSap")
+
+    let productsDataList = response.data.data.filter((product) =>
       product.productName.toLowerCase().includes(searchItem.toLowerCase()) || 
     product.description.toLowerCase().includes(searchItem.toLowerCase())
     );
-    setDataList(productsDataList)
+    setSapDataDetails(productsDataList)
   }
 
-  const getAllProducts = () => {
-    setDataList(productList)
+  const getAllProducts = async () => {
+    const response = await axios.get(server_Url + "/api/v1/getDataFromSap")
+
+    setSapDataDetails(response.data.data)
     setSearchItem("")
   }
 
@@ -103,27 +111,26 @@ const ProductList = ({ productList, title, hideHeader }) => {
     }
   }
 
-  const handleInputChange = (e) => {
+  const handleInputChange = async (e) => {
     setSearchItem(e.target.value)
 
     if (e.target.value === "") {
-      setDataList(productList)
+    const response = await axios.get(server_Url + "/api/v1/getDataFromSap")
+
+        setSapDataDetails(response.data.data)
     } 
   }
 
   const handleOdataInfo = async () => {
     const response = await axios.get(server_Url + "/api/v1/getDataFromSap")
-    console.log(response.data)
+    setSapDataDetails(response.data.data)
+    console.log(response.data.data)
   }
+
   
   useEffect(() => {
-    if(productcategory === "Odata"){
-      setDataList(categories["Odata"])
-    }
-    else{
-      setDataList(productList)
-    }
-  }, [productList])
+    handleOdataInfo()
+  }, [])
   
 
   return (
@@ -140,13 +147,14 @@ const ProductList = ({ productList, title, hideHeader }) => {
         {breadcrumbs.map((item, index) => (
           <Link
             key={index}
-            to={item.path}
+            // to={item.path}
+            to="/products"
             style={{ textDecoration: 'none', color: 'inherit' }}
           >
             <Typography className="routes" style={{backgroundColor: "#000", color: "#fff", padding: "4px 10px"}}>{item.label}</Typography>
           </Link>
         ))}
-      </Breadcrumbs> }
+      </Breadcrumbs>}
       <div>
         {/* <label htmlFor='searchItem' className='search-input-label'>Search items related to <span style={{color: "#506bf2"}}>{categoryName}</span> here</label> */}
         <div className='productlist-search-icon-input-container'>
@@ -159,9 +167,9 @@ const ProductList = ({ productList, title, hideHeader }) => {
     </div>
      
       
-      {productDataList.length > 0 ? <Grid container spacing={2}>
+      {sapDataDetails.length > 0 ? <Grid container spacing={2}>
         {/* <button className='btn btn-primary' onClick={handleOdataInfo}>Get Data From SAP</button> */}
-        {productDataList.map((product, index) => (
+        {sapDataDetails.map((product, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
             <Card className="product-card-section">
               <img
@@ -220,10 +228,12 @@ const ProductList = ({ productList, title, hideHeader }) => {
         ))}
       </Grid> : (
         <div className='no-items-text-container'>
-          <div>
+          {searchItem !== "" ? <div>
             <h1>There are no items available with the name you entered..</h1>
             <button onClick={getAllProducts}>View All Products</button>
-          </div>
+          </div> : <div>
+                <h1>Loading...</h1>
+            </div>}
         </div>
       )}
     </div>

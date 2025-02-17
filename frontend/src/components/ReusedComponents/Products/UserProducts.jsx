@@ -4,6 +4,7 @@ import ProductList from '../ProductList/ProductList';
 import './Products.css';
 
 const Products = () => {
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,7 +14,7 @@ const Products = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get(`${server_Url}/distributors/products`);
+        const response = await axios.get(`${server_Url}/api/v1/distributors/products`);
         setProducts(response.data);
       } catch (error) {
         setError(error.message);
@@ -23,6 +24,7 @@ const Products = () => {
     };
     fetchProducts();
   }, []);
+
 
   if (loading) return <p>Loading products...</p>;
   if (error) return <p>Error: {error}</p>;
