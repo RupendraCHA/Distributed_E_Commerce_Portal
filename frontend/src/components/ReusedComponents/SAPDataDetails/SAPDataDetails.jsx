@@ -120,11 +120,11 @@ const ProductList = ({ productList, title, hideHeader }) => {
     } 
   }
 
-  // const handleOdataInfo = async () => {
-  //   const response = await axios.get(server_Url + "/api/v1/getDataFromSap")
-  //   setSapDataDetails(response.data.data)
-  //   console.log(response.data.data)
-  // }
+  const handleOdataInfo = async () => {
+    const response = await axios.get(server_Url + "/api/v1/getDataFromSap")
+    setSapDataDetails(response.data.data)
+    console.log(response.data.data)
+  }
 
   
   useEffect(() => {
