@@ -25,14 +25,18 @@ const AllProducts = () => {
   const { enqueueSnackbar } = useSnackbar();
   const [sapData, setSapData] = useState({});
   const [searchItem, setSearchItem] = useState("")
-  const [productDataList, setDataList] = useState(posetraProducts)
+  const [productDataList, setDataList] = useState([])
+  const [loading, setLoading] = useState(false)
 
   const server_Url = import.meta.env.VITE_API_SERVER_URL
 
-
-
   useEffect(() => {
     getSelectedItemsOnly(productNameInput)
+    const getSapDetails = async () => {
+      const response = await axios.get(`${server_Url}/api/v1/distributors/products`);
+      setDataList(response.data);
+    }
+    getSapDetails()
   },[])
 
 
@@ -96,7 +100,7 @@ const AllProducts = () => {
     if (value !== ""){
     setSearchItem(productNameInput)
 
-      let productsDataList = posetraProducts.filter((product) =>
+      let productsDataList = productDataList.filter((product) =>
         product.productName.toLowerCase().includes(value.toLowerCase()) || 
     product.description.toLowerCase().includes(value.toLowerCase())
 
@@ -111,27 +115,34 @@ const AllProducts = () => {
     // }
   }
 
-  const getSelectedItemsFromSearch = () => {
+  const getSelectedItemsFromSearch = async () => {
     // setSearchItem(productNameInput)
-    let productsDataList = posetraProducts.filter((product) =>
+    setLoading(true)
+    const response = await axios.get(`${server_Url}/api/v1/distributors/products`);
+      // setDataList(response.data);
+    let productsDataList = response.data.filter((product) =>
       product.productName.toLowerCase().includes(searchItem.toLowerCase()) ||
     product.description.toLowerCase().includes(searchItem.toLowerCase())
 
     );
+    setLoading(false)
     setDataList(productsDataList)
   }
 
-  const handleInputChange = (e) => {
+  const handleInputChange = async (e) => {
     setSearchItem(e.target.value)
     if (e.target.value === ""){
+    const response = await axios.get(`${server_Url}/api/v1/distributors/products`);
+      setDataList(response.data);
 
-      setDataList(posetraProducts)
+
     }
 
   }
 
-  const getAllProducts = () => {
-    setDataList(posetraProducts)
+  const getAllProducts = async () => {
+    const response = await axios.get(`${server_Url}/api/v1/distributors/products`);
+      setDataList(response.data);
     setSearchItem("")
 
   }
@@ -240,10 +251,12 @@ const AllProducts = () => {
       </Grid>}
       {productDataList.length <= 0 &&
         <div className='no-items-text-container'>
-          <div>
+          {searchItem !== "" || loading === true ? <div>
             <h1>There are no items available with the name you entered..</h1>
             <button onClick={getAllProducts}>View All Products</button>
-          </div>
+          </div> : <div>
+                <h1>Loading...</h1>
+            </div>}
         </div>
       }
     </div>
@@ -251,7 +264,7 @@ const AllProducts = () => {
 };
 
 export default AllProducts;
-posetraProducts.propTypes = {
-  productList: PropTypes.array.isRequired,
-  title: PropTypes.string.isRequired,
-};
+// posetraProducts.propTypes = {
+//   productList: PropTypes.array.isRequired,
+//   title: PropTypes.string.isRequired,
+// };

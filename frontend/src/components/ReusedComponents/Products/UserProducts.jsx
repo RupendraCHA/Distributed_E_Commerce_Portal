@@ -4,7 +4,6 @@ import ProductList from '../ProductList/ProductList';
 import './Products.css';
 
 const Products = () => {
-
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

@@ -41,6 +41,7 @@ const Products = ({ iterationData, currentSection }) => {
     if (categoryName !== "") {
       dispatch(setItemName(categoryName));
       navigate('/viewProducts');
+      // navigate('/distributors/products');
     }
   };
 
