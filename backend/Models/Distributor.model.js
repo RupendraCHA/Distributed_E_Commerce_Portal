@@ -45,6 +45,10 @@ const warehouseSchema = new mongoose.Schema({
         type: Number,
         default: 0,
       },
+      newPrice: { // Add updatedPrice field
+        type: String,
+        default: null, // Default to null if no updated price
+      },
     },
   ],
 });

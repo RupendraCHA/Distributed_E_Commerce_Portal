@@ -616,6 +616,74 @@ app.get("/api/v1/allorders",authenticateToken, async (req, res) => {
   }
 });
 
+app.get("/distributors/products", async (req, res) => {
+  try {
+    const distributors = await DistributorModel.find();
+    const products = await ProductModel.find();
+    const productDataMap = {};
+
+    function extractFloats(text) {
+      return text ? text.match(/\d+(\.\d+)?/g)?.map(Number)[0] || 0 : 0; // Extract float safely
+    }
+
+    for (const distributor of distributors) {
+      // Fetch employee (user) using distributor's userId
+      const employee = await EmployeeModel.findById(distributor.userId);
+      const markUpValue = employee?.markUpValue || 0; // Default to 0 if not found
+
+      distributor.warehouses.forEach((warehouse) => {
+        warehouse.inventory.forEach((item) => {
+          const product = products.find((p) => p.productId === item.productId);
+          const productPrice = product ? extractFloats(product.price) : 0; // Get product price
+          const basePrice = extractFloats(item.newPrice) || productPrice; // Prioritize newPrice
+          const finalPrice = basePrice + (basePrice * markUpValue) / 100; // Apply markup
+
+          const key = `${item.productId}_${basePrice}`;
+
+          if (!productDataMap[key]) {
+            productDataMap[key] = {
+              productId: item.productId,
+              quantity: 0,
+              price: finalPrice,
+              warehouseDetails: [],
+              distributors: new Set(),
+            };
+          }
+
+          productDataMap[key].quantity += item.quantity;
+          productDataMap[key].warehouseDetails.push({
+            warehouseId: warehouse._id,
+            warehouseName: warehouse.city,
+            warehouseLocation: warehouse.addressLine1,
+          });
+
+          productDataMap[key].distributors.add(distributor._id);
+        });
+      });
+    }
+
+    const finalProductList = Object.values(productDataMap)
+      .map((productInfo) => {
+        const product = products.find((p) => p.productId === productInfo.productId);
+        return product
+          ? {
+              ...product.toObject(),
+              quantity: productInfo.quantity,
+              price: `$${productInfo.price || product.price || 0}`,
+              distributorIds: Array.from(productInfo.distributors),
+              warehouseDetails: productInfo.warehouseDetails,
+            }
+          : null;
+      })
+      .filter((product) => product !== null);
+
+    res.status(200).json(finalProductList);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+
 
 
 
@@ -690,6 +758,43 @@ app.put("/api/v1/user", authenticateToken, (req, res) => {
       console.error(err);
       res.status(500).json({ message: "Internal server error" });
     });
+});
+
+app.get("/api/v1/user/markup", authenticateToken, async (req, res) => {
+  try {
+    const user = await EmployeeModel.findById(req.user.id);
+    console.log({user})
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ markUpValue: user.markUpValue });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Update markup value for authenticated user
+app.put("/api/v1/user/markup", authenticateToken, async (req, res) => {
+  try {
+    const { markUpValue } = req.body;
+
+    if (isNaN(markUpValue) || markUpValue < 0) {
+      return res.status(400).json({ message: "Invalid markup value" });
+    }
+
+    const user = await EmployeeModel.findByIdAndUpdate(
+      req.user.id,
+      { markUpValue },
+      { new: true }
+    );
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    res.json({ message: "Markup value updated successfully", markUpValue: user.markUpValue });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Internal server error" });
+  }
 });
 
 app.get("/api/v1/addresses", authenticateToken, async (req, res) => {
@@ -1533,49 +1638,95 @@ app.get("/api/v1/distributor/inventory", authenticateToken, async (req, res) => 
       return res.status(404).json({ message: "Distributor not found" });
     }
 
-    // Fetch product details for all products in the inventory
-    const productIds = distributor.warehouses.flatMap((warehouse) =>
-      warehouse.inventory.map((item) => item.productId)
-    );
+    // Create a map of productId to price (consider updatedPrice first, then fallback to price)
+    const productPriceMap = distributor.products.reduce((map, product) => {
+      map[product.productId.toString()] = product.updatedPrice || product.price; // Prefer updatedPrice, fallback to price
+      return map;
+    }, {});
 
-    // const products = await ProductModel.find({
-    //   _id: { $in: productIds },
-    // });
+    // Flatten the inventory data for all warehouses and map prices from productPriceMap
+    const inventoryPromises = distributor.warehouses.flatMap((warehouse) =>
+      warehouse.inventory.map(async (item) => {
+        // Get the price from the productPriceMap (updatedPrice or price)
+        let price = item.newPrice || productPriceMap[item.productId];
 
-    // // Create a map of productId to product details for quick lookup
-    // const productMap = products.reduce((map, product) => {
-    //   map[product._id.toString()] = product;
-    //   return map;
-    // }, {});
+        // If price is not found in the distributor model, fetch from ProductModel
+        if (!price) {
+          const product = await ProductModel.findOne({ productId: item.productId });
+          price = product?.price || 0; // Fallback to 0 if no price found in ProductModel
+        }
 
-    // Flatten the inventory data for all warehouses
-    const inventory = distributor.warehouses.flatMap((warehouse) =>
-      warehouse.inventory.map((item) => {
-        // console.log(warehouse)
-        // const product = productMap[item.productId];
         return {
           _id: item._id,
           productId: item.productId,
-          productName: item.productId, // Fallback if product not found
+          productName: item.productId, // Use the productName from distributor's inventory
           warehouseId: warehouse._id,
           warehouseName: warehouse.city,
           warehouseLocation: warehouse.addressLine1,
           quantity: item.quantity,
+          price: price, // Use the price from the map or ProductModel
           minimumStock: item.minimumStock || 0, // Default to 0 if not set
           reorderPoint: item.reorderPoint || 0, // Default to 0 if not set
         };
       })
     );
 
+    // Wait for all promises to resolve before sending the response
+    const inventory = await Promise.all(inventoryPromises);
+
     // Return the inventory data
     res.status(200).json(inventory);
   } catch (error) {
     console.error("Error fetching inventory:", error);
-    res
-      .status(500)
-      .json({ message: "Failed to fetch inventory", error: error.message });
+    res.status(500).json({ message: "Failed to fetch inventory", error: error.message });
   }
 });
+
+
+
+
+// Update Price for Product in Distributor
+app.post("/api/v1/distributor/update-price", authenticateToken, async (req, res) => {
+  const { productId, warehouseId, newPrice } = req.body;
+
+  try {
+    // Find the distributor associated with the logged-in user
+    const distributor = await DistributorModel.findOne({ userId: req.user.id });
+
+    if (!distributor) {
+      return res.status(404).json({ message: "Distributor not found" });
+    }
+
+    // Find the warehouse containing the inventory
+    const warehouse = distributor.warehouses.id(warehouseId);
+    if (!warehouse) {
+      return res.status(404).json({ message: "Warehouse not found" });
+    }
+
+    // Find the product in the warehouse's inventory
+    const inventoryItem = warehouse.inventory.find(item => item.productId === productId);
+    if (!inventoryItem) {
+      return res.status(404).json({ message: "Product not found in warehouse" });
+    }
+
+    // Update the newPrice in the inventory item if it differs from the existing one
+    if (inventoryItem.newPrice !== newPrice) {
+      inventoryItem.newPrice = newPrice;
+    }
+
+    // Save the distributor with the updated price in the warehouse inventory
+    await distributor.save();
+
+    // Respond with the updated inventory
+    res.status(200).json({ message: "Price updated successfully", distributor });
+  } catch (error) {
+    console.error("Error updating price:", error);
+    res.status(500).json({ message: "Failed to update price", error: error.message });
+  }
+});
+
+
+
 
 app.get("/api/v1/inventories", authenticateToken, async (req, res) => {
   try {

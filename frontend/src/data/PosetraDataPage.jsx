@@ -73,6 +73,7 @@ export const DashboardsData = [
   'Shipped Orders',
   'Track Orders',
   'Returns',
+  'Settings',
   'Refunds',
   'Logout',
 ];

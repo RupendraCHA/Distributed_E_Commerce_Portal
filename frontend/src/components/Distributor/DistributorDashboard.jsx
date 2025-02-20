@@ -64,7 +64,43 @@ const DistributorDashboard = () => {
         <FaBuilding className="mr-2" />
         Distributor Dashboard
       </h1>
-
+      {/* Warehouses */}
+      <div className="bg-white rounded-lg shadow p-6 mb-6">
+        <h2 className="text-xl font-semibold mb-4">Warehouses</h2>
+        {distributor.warehouses.length === 0 ? (
+          <p className="text-sm text-gray-500">No warehouses found</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {distributor.warehouses.map((warehouse) => (
+              <div key={warehouse._id} className="border rounded-lg p-4">
+                <h3 className="text-lg font-medium mb-2 flex items-center">
+                  <FaMapMarker className="mr-2" />
+                  {warehouse.city}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {warehouse.addressLine1}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {warehouse.addressLine2}
+                </p>
+                <p className="text-sm text-gray-600">
+                  {warehouse.city}, {warehouse.state} {warehouse.zipCode}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Phone: {warehouse.phone}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Capacity: {warehouse.capacity} units
+                </p>
+                <p className="text-sm text-gray-600">
+                  Status: {warehouse.isActive ? 'Active' : 'Inactive'}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+       
       {/* Company Details */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <h2 className="text-xl font-semibold mb-4">Company Details</h2>
@@ -125,42 +161,7 @@ const DistributorDashboard = () => {
         </div>
       </div>
 
-      {/* Warehouses */}
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 className="text-xl font-semibold mb-4">Warehouses</h2>
-        {distributor.warehouses.length === 0 ? (
-          <p className="text-sm text-gray-500">No warehouses found</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {distributor.warehouses.map((warehouse) => (
-              <div key={warehouse._id} className="border rounded-lg p-4">
-                <h3 className="text-lg font-medium mb-2 flex items-center">
-                  <FaMapMarker className="mr-2" />
-                  {warehouse.city}
-                </h3>
-                <p className="text-sm text-gray-600">
-                  {warehouse.addressLine1}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {warehouse.addressLine2}
-                </p>
-                <p className="text-sm text-gray-600">
-                  {warehouse.city}, {warehouse.state} {warehouse.zipCode}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Phone: {warehouse.phone}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Capacity: {warehouse.capacity} units
-                </p>
-                <p className="text-sm text-gray-600">
-                  Status: {warehouse.isActive ? 'Active' : 'Inactive'}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+
 
       {/* Products
       <div className="bg-white rounded-lg shadow p-6 mb-6">

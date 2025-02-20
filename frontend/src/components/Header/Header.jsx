@@ -318,8 +318,22 @@ const Header = () => {
                         autoFocusItem={Boolean(anchorEl)}
                         id="menu-list-grow"
                       >
-                        {DashboardsData.map((option, index) => (
-                          <MenuItem
+                        {DashboardsData.map((option, index) => {
+                          if(option === "Settings" && userRole === 'distributor')
+                          {
+                            return <MenuItem
+                            onClick={handleClose}
+                            className="text-blue-500"
+                          >
+                            <Link
+                              className="font-bold text-red-500 text-0.3xl cursor-pointer"
+                              to={`/settings`}
+                            >
+                              {option}
+                            </Link>
+                          </MenuItem>
+                          }
+                          return <MenuItem
                             key={index}
                             onClick={handleClose}
                             className="text-blue-500"
@@ -339,7 +353,8 @@ const Header = () => {
                               {option}
                             </Link>}
                           </MenuItem>
-                        ))}
+                      })}
+                        
                       </MenuList>
                     </Paper>
                   </ClickAwayListener>

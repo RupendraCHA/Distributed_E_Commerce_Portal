@@ -17,6 +17,9 @@ const UserProducts = React.lazy(() =>
 const Checkout = React.lazy(() =>
   import('../components/Checkout/Checkout.jsx')
 );
+const Settings = React.lazy(() =>
+  import('../components/Settings/Settings.jsx')
+);
 const Cart = React.lazy(() => import('../components/Cart/Cart.jsx'));
 const MyAccount = React.lazy(() =>
   import('../components/MyAccount/Myaccount.jsx')
@@ -158,6 +161,10 @@ export const privateRoutes = [
   {
     path: '/payment',
     element: PlaceOrder,
+  },
+  {
+    path: "/settings",
+    element: Settings,
   },
   {
     path: '/stripePayment',

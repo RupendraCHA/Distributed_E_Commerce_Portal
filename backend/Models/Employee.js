@@ -19,6 +19,10 @@ const EmployeeSchema = new mongoose.Schema({
     enum: ["user", "admin", "distributor", "reseller"],
     default: "user",
   },
+  markUpValue: {
+    type: Number,
+    default: 15,  // Default markup value
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -29,5 +33,4 @@ const EmployeeSchema = new mongoose.Schema({
 });
 
 const EmployeeModel = mongoose.model("employees", EmployeeSchema);
-
 module.exports = EmployeeModel;
