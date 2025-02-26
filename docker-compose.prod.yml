@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  frontend:
+    image: nikhilappasani/posetra-frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5173:5173"  
+
+  backend:
+    image: nikhilappasani/posetra-backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "3002:3002"
+    env_file:
+      - .env
+
+# docker-compose -f docker-compose.prod.yml up -d --build

@@ -11,7 +11,7 @@ import {
   MenuItem,
 } from '@mui/material'; // MUI components
 import { useSelector, useDispatch } from 'react-redux';
-import { DashboardsData } from '../../data/PosetraDataPage';
+import { DashboardsData, SourcingData } from '../../data/PosetraDataPage';
 import { setCartItems } from '../../store/cartSlice'; // Import the setCartItems action
 import axios from 'axios';
 
@@ -23,6 +23,7 @@ const Header = () => {
   const dispatch = useDispatch();
 
   const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorElForSourcing, setAnchorElForSourcing] = useState(null);
   const [distributorAnchorEl, setDistributorAnchorEl] = useState(null);
   const [text, setText] = useState('')
   // Distribution routes
@@ -80,12 +81,21 @@ const Header = () => {
   const handleProfileClick = (event) => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
+  const handleSouricng = (event) => {
+    setAnchorElForSourcing(
+      anchorElForSourcing
+      ? null : event.currentTarget);
+  };
 
   const handleDistributorClick = (event) => {
     setDistributorAnchorEl(distributorAnchorEl ? null : event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
+  };
+  const handleSourcingPopperClose = () => {
+    setAnchorElForSourcing(null);
+    setAnchorEl(null)
   };
 
   const handleDistributorClose = () => {
@@ -130,14 +140,42 @@ const Header = () => {
                         Manufacturing
                       </Link>
                   </li>
-                  <li className="">
-                      <Link
-                        // to="/products"
-                        className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
-                      >
+                  <li className="text-whiteColor cursor-pointer" onClick={handleSouricng}>
                         Sourcing
-                      </Link>
                   </li>
+                  <Popper
+                    open={Boolean(anchorElForSourcing)}
+                    anchorEl={anchorElForSourcing}
+                    placement="bottom-start"
+                    modifiers={[
+                      {
+                        name: 'offset',
+                        options: {
+                          offset: [0, 10],
+                        },
+                      },
+                    ]}
+                  >
+                    <ClickAwayListener onClickAway={handleSourcingPopperClose}>
+                      <Paper>
+                        <MenuList
+                          autoFocusItem={Boolean(anchorElForSourcing)}
+                          id="menu-list-grow"
+                        >
+                          
+                          {SourcingData.map((value)=>{
+                                  return <MenuItem
+                                  className="text-blue-500"
+                                  onClick={handleSourcingPopperClose}
+                                >
+                                  {value}
+                                  </MenuItem>
+                              })}
+                              
+                        </MenuList>
+                      </Paper>
+                    </ClickAwayListener>
+                  </Popper>
                   <li className="">
                     <Link
                       to="/products"
@@ -299,6 +337,8 @@ const Header = () => {
                 <div className='text-whiteColor' style={{
                   marginLeft:"10px"
                 }}>{user.name}</div>
+
+
                 <Popper
                   open={Boolean(anchorEl)}
                   anchorEl={anchorEl}

@@ -15,6 +15,14 @@ export const productsData = [
   // 'Posetra',
 ];
 export const solutionsData = ['Industry', 'Use Case'];
+export const SourcingData = [
+  'Purchase Requisition', 
+  'Purchase order',
+  'Inbound delivery',
+  'Goods receipt',
+  'Vendor bill',
+  'Vendor Master'
+  ];
 export const pricingData = [
   'List Price',
   'Discounts',

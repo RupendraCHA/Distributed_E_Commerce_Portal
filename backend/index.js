@@ -18,7 +18,7 @@ const {
   DistributorModel,
   ProductModel
 } = require("./Models");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { isAdmin } = require("./authentication");
 const { authenticateToken } = require("./authentication");

@@ -77,6 +77,7 @@ import ('../components/ReusedComponents/SAPDataDetails/SAPDataDetails.jsx'))
 import {
   productsData,
   solutionsData,
+  SourcingData,
   pricingData,
   InventoryData,
   QuotationData,
