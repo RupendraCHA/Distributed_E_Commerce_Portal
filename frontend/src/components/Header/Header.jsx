@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import LocalShippingIcon from '@mui/icons-material/LocalShipping'; // Profile icon
@@ -16,7 +16,8 @@ import { setCartItems } from '../../store/cartSlice'; // Import the setCartItems
 import axios from 'axios';
 
 const Header = () => {
-  const user = useSelector((state)=>state.auth.user)
+  const navigate = useNavigate();
+  const user = useSelector((state) => state.auth.user);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const userRole = useSelector((state) => state.auth.user?.role);
   const cartItems = useSelector((state) => state.cart.cartItems);
@@ -25,7 +26,7 @@ const Header = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [anchorElForSourcing, setAnchorElForSourcing] = useState(null);
   const [distributorAnchorEl, setDistributorAnchorEl] = useState(null);
-  const [text, setText] = useState('')
+  const [text, setText] = useState('');
   // Distribution routes
   const distributorRoutes = [
     {
@@ -46,8 +47,7 @@ const Header = () => {
     },
   ];
 
-  const server_Url = import.meta.env.VITE_API_SERVER_URL
-
+  const server_Url = import.meta.env.VITE_API_SERVER_URL;
 
   // Fetch cart items when the component is mounted
   useEffect(() => {
@@ -56,7 +56,7 @@ const Header = () => {
       const fetchCartItems = async () => {
         try {
           const token = localStorage.getItem('token');
-          const response = await axios.get(server_Url+'/api/v1/cart', {
+          const response = await axios.get(server_Url + '/api/v1/cart', {
             headers: { Authorization: `Bearer ${token}` },
           });
           // const response = await axios.get('http://localhost:3002/cart', {
@@ -82,9 +82,7 @@ const Header = () => {
     setAnchorEl(anchorEl ? null : event.currentTarget);
   };
   const handleSouricng = (event) => {
-    setAnchorElForSourcing(
-      anchorElForSourcing
-      ? null : event.currentTarget);
+    setAnchorElForSourcing(anchorElForSourcing ? null : event.currentTarget);
   };
 
   const handleDistributorClick = (event) => {
@@ -93,9 +91,10 @@ const Header = () => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const handleSourcingPopperClose = () => {
+  const handleSourcingPopperClose = (path) => {
+    navigate(path);
     setAnchorElForSourcing(null);
-    setAnchorEl(null)
+    setAnchorEl(null);
   };
 
   const handleDistributorClose = () => {
@@ -121,27 +120,30 @@ const Header = () => {
           <nav>
             <ul className="flex gap-4 font-semibold">
               {/* Your existing navigation items */}
-              
-              {
-                userRole != "user" && 
+
+              {userRole != 'user' && (
                 <>
-                  <li className=''>
+                  <li className="">
                     <Link
                       // to="/products"
                       className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
                     >
                       Accounting
                     </Link>
-                  </li><li className=''>
-                      <Link
-                        // to="/products"
-                        className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
-                      >
-                        Manufacturing
-                      </Link>
                   </li>
-                  <li className="text-whiteColor cursor-pointer" onClick={handleSouricng}>
-                        Sourcing
+                  <li className="">
+                    <Link
+                      // to="/products"
+                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                    >
+                      Manufacturing
+                    </Link>
+                  </li>
+                  <li
+                    className="text-whiteColor cursor-pointer"
+                    onClick={handleSouricng}
+                  >
+                    Sourcing
                   </li>
                   <Popper
                     open={Boolean(anchorElForSourcing)}
@@ -162,16 +164,16 @@ const Header = () => {
                           autoFocusItem={Boolean(anchorElForSourcing)}
                           id="menu-list-grow"
                         >
-                          
-                          {SourcingData.map((value)=>{
-                                  return <MenuItem
-                                  className="text-blue-500"
-                                  onClick={handleSourcingPopperClose}
-                                >
-                                  {value}
-                                  </MenuItem>
-                              })}
-                              
+                          {SourcingData.map(({ title, path }) => {
+                            return (
+                              <MenuItem
+                                className="text-blue-500"
+                                onClick={() => handleSourcingPopperClose(path)}
+                              >
+                                {title}
+                              </MenuItem>
+                            );
+                          })}
                         </MenuList>
                       </Paper>
                     </ClickAwayListener>
@@ -241,19 +243,17 @@ const Header = () => {
                     </Link>
                   </li>
                 </>
-              }
-              {
-                userRole === "user" && (
-                  <li className="">
-                    <Link
-                      to="/distributors/products"
-                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
-                    >
-                      Products
-                    </Link>
-                  </li>
-                )
-              }
+              )}
+              {userRole === 'user' && (
+                <li className="">
+                  <Link
+                    to="/distributors/products"
+                    className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                  >
+                    Products
+                  </Link>
+                </li>
+              )}
 
               {/* Add Distributor Icon and Dropdown if user is a distributor */}
               {userRole === 'distributor' && (
@@ -323,7 +323,10 @@ const Header = () => {
               </li>
 
               {/* Profile Icon */}
-              <li className="relative flex items-center justify-center cursor-pointer" onClick={handleProfileClick}>
+              <li
+                className="relative flex items-center justify-center cursor-pointer"
+                onClick={handleProfileClick}
+              >
                 <AccountCircleIcon
                   style={{
                     marginTop: '5px',
@@ -332,12 +335,15 @@ const Header = () => {
                     cursor: 'pointer',
                     color: 'white',
                   }}
-                  
                 />
-                <div className='text-whiteColor' style={{
-                  marginLeft:"10px"
-                }}>{user.name}</div>
-
+                <div
+                  className="text-whiteColor"
+                  style={{
+                    marginLeft: '10px',
+                  }}
+                >
+                  {user.name}
+                </div>
 
                 <Popper
                   open={Boolean(anchorEl)}
@@ -359,48 +365,58 @@ const Header = () => {
                         id="menu-list-grow"
                       >
                         {DashboardsData.map((option, index) => {
-                          if(option === "Settings" && userRole === 'distributor')
-                          {
-                            return <MenuItem
-                            onClick={handleClose}
-                            className="text-blue-500"
-                          >
-                            <Link
-                              className="font-bold text-red-500 text-0.3xl cursor-pointer"
-                              to={`/settings`}
-                            >
-                              {option}
-                            </Link>
-                          </MenuItem>
+                          if (
+                            option === 'Settings' &&
+                            userRole === 'distributor'
+                          ) {
+                            return (
+                              <MenuItem
+                                onClick={handleClose}
+                                className="text-blue-500"
+                              >
+                                <Link
+                                  className="font-bold text-red-500 text-0.3xl cursor-pointer"
+                                  to={`/settings`}
+                                >
+                                  {option}
+                                </Link>
+                              </MenuItem>
+                            );
                           }
-                          return <MenuItem
-                            key={index}
-                            onClick={handleClose}
-                            className="text-blue-500"
-                          >
-                            {option !== "Shipped Orders" && <Link
-                              className="font-bold text-red-500 text-0.3xl cursor-pointer"
-                              to={`/${option.replace(' ', '-').toLowerCase()}`}
+                          return (
+                            <MenuItem
+                              key={index}
+                              onClick={handleClose}
+                              className="text-blue-500"
                             >
-                            {/* {console.log(option)} */}
-                              {option}
-                            </Link>}
-                            {option === "Shipped Orders" && <Link
-                              className="font-bold text-red-500 text-0.3xl cursor-pointer"
-                              to='/trackShipping'
-                            >
-                            {/* {console.log(option)} */}
-                              {option}
-                            </Link>}
-                          </MenuItem>
-                      })}
-                        
+                              {option !== 'Shipped Orders' && (
+                                <Link
+                                  className="font-bold text-red-500 text-0.3xl cursor-pointer"
+                                  to={`/${option
+                                    .replace(' ', '-')
+                                    .toLowerCase()}`}
+                                >
+                                  {/* {console.log(option)} */}
+                                  {option}
+                                </Link>
+                              )}
+                              {option === 'Shipped Orders' && (
+                                <Link
+                                  className="font-bold text-red-500 text-0.3xl cursor-pointer"
+                                  to="/trackShipping"
+                                >
+                                  {/* {console.log(option)} */}
+                                  {option}
+                                </Link>
+                              )}
+                            </MenuItem>
+                          );
+                        })}
                       </MenuList>
                     </Paper>
                   </ClickAwayListener>
                 </Popper>
               </li>
-              
             </ul>
           </nav>
         )}

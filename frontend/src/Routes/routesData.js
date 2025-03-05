@@ -58,21 +58,33 @@ const InventoryManagement = React.lazy(() =>
   import('../components/Distributor/InventoryManagement.jsx')
 );
 
-const posetraAllProducts = React.lazy(() => 
+const posetraAllProducts = React.lazy(() =>
   import('../components/ReusedComponents/AllProducts/AllProducts.jsx')
-)
+);
 
-const inventoryOrders = React.lazy(() => 
-import('../components/InventoryAndOrders/InventoryOrders.jsx')
-)
-const TrackShipping = React.lazy(() => 
-import('../components/TrackShipping/TrackShipping.jsx')
-)
-const FullFilledOrderDetails = React.lazy(() => 
+const inventoryOrders = React.lazy(() =>
+  import('../components/InventoryAndOrders/InventoryOrders.jsx')
+);
+const TrackShipping = React.lazy(() =>
+  import('../components/TrackShipping/TrackShipping.jsx')
+);
+const FullFilledOrderDetails = React.lazy(() =>
   import('../components/FulfilledOrders/FilfilledOrderDetails.jsx')
-)
-const SAPDataDetails = React.lazy(() => 
-import ('../components/ReusedComponents/SAPDataDetails/SAPDataDetails.jsx'))
+);
+const SAPDataDetails = React.lazy(() =>
+  import('../components/ReusedComponents/SAPDataDetails/SAPDataDetails.jsx')
+);
+
+const CreatePurchaseRequisition = React.lazy(() =>
+  import('../components/PurchaseRequisition/CreatePurchaseRequisition.jsx')
+);
+const PurchaseRequisition = React.lazy(() =>
+  import('../components/PurchaseRequisition/index.jsx')
+);
+
+const EditPurchaseRequisition = React.lazy(() =>
+  import('../components/PurchaseRequisition/EditPurchaseRequisition.jsx')
+);
 
 import {
   productsData,
@@ -149,7 +161,7 @@ export const privateRoutes = [
   },
   {
     path: '/distributors/products',
-    element: UserProducts
+    element: UserProducts,
   },
   {
     path: '/cart',
@@ -164,7 +176,7 @@ export const privateRoutes = [
     element: PlaceOrder,
   },
   {
-    path: "/settings",
+    path: '/settings',
     element: Settings,
   },
   {
@@ -177,24 +189,36 @@ export const privateRoutes = [
   },
   {
     path: '/viewProducts',
-    element: posetraAllProducts
+    element: posetraAllProducts,
   },
   {
     path: '/inventoryOrders',
-    element: inventoryOrders
+    element: inventoryOrders,
   },
   {
     path: '/trackShipping',
-    element: TrackShipping
+    element: TrackShipping,
   },
   {
-    path: "/consumerOrderFullfilled",
-    element: FullFilledOrderDetails
+    path: '/consumerOrderFullfilled',
+    element: FullFilledOrderDetails,
   },
   {
-    path: "/product/materials",
-    element: SAPDataDetails
-  }
+    path: '/product/materials',
+    element: SAPDataDetails,
+  },
+  {
+    path: '/sourcing/purchase-requisitions',
+    element: PurchaseRequisition,
+  },
+  {
+    path: '/sourcing/create-requisition',
+    element: CreatePurchaseRequisition,
+  },
+  {
+    path: '/sourcing/edit-requisition/:id',
+    element: EditPurchaseRequisition,
+  },
 ];
 
 export const adminRoutes = [
