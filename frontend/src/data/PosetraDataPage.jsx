@@ -22,7 +22,7 @@ export const SourcingData = [
   },
   {
     title: 'Purchase Order',
-    path: '/sourcing/purchase-order',
+    path: '/sourcing/purchase-orders',
   },
   {
     title: 'Inbound Delivery',

@@ -26,6 +26,7 @@ const { authenticateToken } = require("./authentication");
 const posetraProducts = require("./data/posetraProducts");
 const RequisitionModel = require("./Models/RequisitionSchema");
 const MaterialModel = require("./Models/MaterialsModel");
+const PurchaseOrderModel = require("./Models/PurchaseOrderSchema");
 const app = express();
 app.use(express.json());
 app.use(
@@ -1989,6 +1990,96 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error("Error updating requisition:", error.message);
     res.status(500).json({ message: "Error updating requisition" });
+  }
+});
+
+app.post("/api/v1/purchase-order", authenticateToken, async (req, res) => {
+  try {
+    const { vendorId, vendorName, documentDate, items } = req.body;
+
+    const newPO = new PurchaseOrderModel({
+      userId: req.user.id,
+      vendorId,
+      vendorName,
+      documentDate,
+      items: items.map((item, index) => ({
+        sNo: index + 1,
+        itemNo: `ITM${String(index + 1).padStart(3, "0")}`,
+        ...item,
+      })),
+    });
+
+    await newPO.save();
+    res.status(201).json({
+      message: "Purchase Order created successfully",
+      purchaseOrder: newPO,
+    });
+  } catch (error) {
+    console.error("Error creating Purchase Order:", error.message);
+    res.status(500).json({ message: "Error creating Purchase Order" });
+  }
+});
+
+// 📌 Get all Purchase Orders
+app.get("/api/v1/purchase-orders", authenticateToken, async (req, res) => {
+  try {
+    const purchaseOrders = await PurchaseOrderModel.find({
+      userId: req.user.id,
+    });
+    res.json(purchaseOrders);
+  } catch (error) {
+    console.error("Error fetching Purchase Orders:", error.message);
+    res.status(500).json({ message: "Error fetching Purchase Orders" });
+  }
+});
+
+// 📌 Get a single Purchase Order by ID
+app.get("/api/v1/purchase-order/:id", authenticateToken, async (req, res) => {
+  try {
+    const purchaseOrder = await PurchaseOrderModel.findOne({
+      _id: req.params.id,
+      userId: req.user.id,
+    });
+    if (!purchaseOrder)
+      return res.status(404).json({ message: "Purchase Order not found" });
+
+    res.json(purchaseOrder);
+  } catch (error) {
+    console.error("Error fetching Purchase Order:", error.message);
+    res.status(500).json({ message: "Error fetching Purchase Order" });
+  }
+});
+
+// 📌 Update a Purchase Order
+app.put("/api/v1/purchase-order/:id", authenticateToken, async (req, res) => {
+  try {
+    const { vendorId, vendorName, documentDate, items } = req.body;
+
+    const updatedPO = await PurchaseOrderModel.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      {
+        vendorId,
+        vendorName,
+        documentDate,
+        items: items.map((item, index) => ({
+          sNo: index + 1,
+          itemNo: `ITM${String(index + 1).padStart(3, "0")}`,
+          ...item,
+        })),
+      },
+      { new: true }
+    );
+
+    if (!updatedPO)
+      return res.status(404).json({ message: "Purchase Order not found" });
+
+    res.status(200).json({
+      message: "Purchase Order updated successfully",
+      purchaseOrder: updatedPO,
+    });
+  } catch (error) {
+    console.error("Error updating Purchase Order:", error.message);
+    res.status(500).json({ message: "Error updating Purchase Order" });
   }
 });
 

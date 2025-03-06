@@ -86,6 +86,16 @@ const EditPurchaseRequisition = React.lazy(() =>
   import('../components/PurchaseRequisition/EditPurchaseRequisition.jsx')
 );
 
+const PurchaseOrderList = React.lazy(() =>
+  import('../components/PurchaseOrder/index.jsx')
+);
+const CreatePurchaseOrder = React.lazy(() =>
+  import('../components/PurchaseOrder/CreatePurchaseOrder.jsx')
+);
+const EditPurchaseOrder = React.lazy(() =>
+  import('../components/PurchaseOrder/EditPurchaseOrder.jsx')
+);
+
 import {
   productsData,
   solutionsData,
@@ -218,6 +228,18 @@ export const privateRoutes = [
   {
     path: '/sourcing/edit-requisition/:id',
     element: EditPurchaseRequisition,
+  },
+  {
+    path: '/sourcing/purchase-orders',
+    element: PurchaseOrderList,
+  },
+  {
+    path: '/sourcing/purchase-orders/create',
+    element: CreatePurchaseOrder,
+  },
+  {
+    path: '/sourcing/purchase-orders/edit/:id',
+    element: EditPurchaseOrder,
   },
 ];
 
