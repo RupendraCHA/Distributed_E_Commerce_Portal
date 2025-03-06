@@ -1,7 +1,11 @@
 [
   {
+    "sNo": 1,
+    "itemNo": "ITM001",
     "materialId": "MAT001",
     "materialName": "Advil",
+    "shortText": "Pain reliever",
+    "materialGroup": "Medicines",
     "category": "Medicines",
     "brand": "Morton",
     "price": "$12",
@@ -12,8 +16,12 @@
     "image": "https://res.cloudinary.com/dppznstlh/image/upload/v1727211295/Advil_vdvmdx.jpg"
   },
   {
+    "sNo": 2,
+    "itemNo": "ITM002",
     "materialId": "MAT002",
     "materialName": "Salty Fries",
+    "shortText": "Crispy salted fries",
+    "materialGroup": "Snacks",
     "category": "Fries",
     "brand": "Morton",
     "price": "$12",
@@ -24,8 +32,12 @@
     "image": "https://res.cloudinary.com/dppznstlh/image/upload/v1729196336/fries_os1rib.webp"
   },
   {
+    "sNo": 3,
+    "itemNo": "ITM003",
     "materialId": "MAT003",
     "materialName": "Morton Iodized Salt",
+    "shortText": "All-purpose salt",
+    "materialGroup": "Seasoning",
     "category": "Salt",
     "brand": "Morton",
     "price": "$3.89",
@@ -36,8 +48,12 @@
     "image": "https://res.cloudinary.com/dppznstlh/image/upload/v1727203126/Iodized_salt_f0nq9t.webp"
   },
   {
+    "sNo": 4,
+    "itemNo": "ITM004",
     "materialId": "MAT004",
     "materialName": "Hershey's Milk Chocolate Bar",
+    "shortText": "Classic chocolate bar",
+    "materialGroup": "Chocolates",
     "category": "Chocolates",
     "brand": "Hershey's",
     "price": "$1.50",
@@ -48,8 +64,12 @@
     "image": "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094465/Hershey_27s_Milk_Chocolate_rgbolq.webp"
   },
   {
+    "sNo": 5,
+    "itemNo": "ITM005",
     "materialId": "MAT005",
     "materialName": "Ghirardelli Dark Chocolate Squares",
+    "shortText": "Luxury dark chocolate",
+    "materialGroup": "Chocolates",
     "category": "Chocolates",
     "brand": "Ghirardelli",
     "price": "$8",
@@ -60,8 +80,12 @@
     "image": "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094655/darkchocmintsquares_lockup_xayur5.webp"
   },
   {
+    "sNo": 6,
+    "itemNo": "ITM006",
     "materialId": "MAT006",
     "materialName": "Morton Sea Salt",
+    "shortText": "Natural sea salt",
+    "materialGroup": "Seasoning",
     "category": "Salt",
     "brand": "Morton",
     "price": "$5.99",
@@ -72,8 +96,12 @@
     "image": "https://res.cloudinary.com/dppznstlh/image/upload/v1729188380/sea_salt_uiamum.webp"
   },
   {
+    "sNo": 7,
+    "itemNo": "ITM007",
     "materialId": "MAT007",
     "materialName": "Kit Kat",
+    "shortText": "Crispy wafer chocolate",
+    "materialGroup": "Chocolates",
     "category": "Chocolates",
     "brand": "Nestlé",
     "price": "$1.20",
@@ -84,8 +112,12 @@
     "image": "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738094842/kk-chunky-480.jpg_e688sy.webp"
   },
   {
+    "sNo": 8,
+    "itemNo": "ITM008",
     "materialId": "MAT008",
     "materialName": "Uranium",
+    "shortText": "Radioactive element",
+    "materialGroup": "Chemicals",
     "category": "Chemical Elements",
     "brand": "",
     "price": "$500 usd/kg",
@@ -96,8 +128,12 @@
     "image": "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208888/uranium-chemical-element_gojtdh.webp"
   },
   {
+    "sNo": 9,
+    "itemNo": "ITM009",
     "materialId": "MAT009",
     "materialName": "Morton Kosher Salt",
+    "shortText": "Coarse kosher salt",
+    "materialGroup": "Seasoning",
     "category": "Salt",
     "brand": "Morton",
     "price": "$3.49",
@@ -108,8 +144,12 @@
     "image": "https://res.cloudinary.com/dppznstlh/image/upload/v1729188380/kosher_salt_h01ti6.webp"
   },
   {
+    "sNo": 10,
+    "itemNo": "ITM010",
     "materialId": "MAT010",
     "materialName": "Milky Way",
+    "shortText": "Chocolate nougat bar",
+    "materialGroup": "Chocolates",
     "category": "Chocolates",
     "brand": "Mars",
     "price": "$1.20",

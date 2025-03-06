@@ -1,6 +1,3 @@
-// FRONTEND: Create Purchase Requisition (Excel-like Table)
-// File: src/pages/CreatePurchaseRequisition.jsx
-
 import React, { useState, useEffect } from 'react';
 import {
   Container,
@@ -22,14 +19,31 @@ const CreatePurchaseRequisition = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
   const [materials, setMaterials] = useState([]);
   const [rows, setRows] = useState([
-    { materialId: '', materialName: '', quantity: 1, deliveryDate: '' },
+    {
+      sNo: 1,
+      itemNo: '',
+      materialId: '',
+      materialName: '',
+      shortText: '',
+      materialGroup: '',
+      quantity: 1,
+      unit: '',
+      deliveryDate: '',
+      plant: '',
+      storageLocation: '',
+      purchasingGroup: '',
+      requisitioner: '',
+      trackingNo: '',
+      vendor: '',
+      fixedVendorIS: '',
+    },
   ]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios
-      .get(server_Url + '/api/v1/getMaterialIds')
-      .then((res) => setMaterials(res.data));
+    axios.get(server_Url + '/api/v1/getMaterialIds').then((res) => {
+      setMaterials(res.data);
+    });
   }, []);
 
   const handleChange = (index, field, value) => {
@@ -37,10 +51,14 @@ const CreatePurchaseRequisition = () => {
     updatedRows[index][field] = value;
 
     if (field === 'materialId') {
-      const selectedMaterials = materials.find((p) => p.materialId === value);
-      updatedRows[index].materialName = selectedMaterials
-        ? selectedMaterials.materialName
-        : '';
+      const selectedMaterial = materials.find((p) => p.materialId === value);
+      if (selectedMaterial) {
+        updatedRows[index].materialName = selectedMaterial.materialName;
+        updatedRows[index].shortText = selectedMaterial.shortText || '-';
+        updatedRows[index].materialGroup =
+          selectedMaterial.materialGroup || '-';
+        updatedRows[index].itemNo = `ITM${String(index + 1).padStart(3, '0')}`;
+      }
     }
 
     setRows(updatedRows);
@@ -49,13 +67,30 @@ const CreatePurchaseRequisition = () => {
   const addRow = () => {
     setRows([
       ...rows,
-      { materialId: '', materialName: '', quantity: 1, deliveryDate: '' },
+      {
+        sNo: rows.length + 1,
+        itemNo: '',
+        materialId: '',
+        materialName: '',
+        shortText: '',
+        materialGroup: '',
+        quantity: 1,
+        unit: '',
+        deliveryDate: '',
+        plant: '',
+        storageLocation: '',
+        purchasingGroup: '',
+        requisitioner: '',
+        trackingNo: '',
+        vendor: '',
+        fixedVendorIS: '',
+      },
     ]);
   };
 
   const removeRow = (index) => {
     const updatedRows = rows.filter((_, i) => i !== index);
-    setRows(updatedRows);
+    setRows(updatedRows.map((row, i) => ({ ...row, sNo: i + 1 }))); // Re-number sNo
   };
 
   const handleSave = () => {
@@ -76,71 +111,177 @@ const CreatePurchaseRequisition = () => {
   return (
     <Container>
       <h2>Create Purchase Requisition</h2>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Material ID</TableCell>
-            <TableCell>Material Name</TableCell>
-            <TableCell>Quantity</TableCell>
-            <TableCell>Delivery Date</TableCell>
-            <TableCell>Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((row, index) => (
-            <TableRow key={index}>
-              <TableCell>
-                <Autocomplete
-                  options={materials.map((p) => p.materialId)}
-                  value={row.materialId}
-                  onChange={(event, newValue) =>
-                    handleChange(index, 'materialId', newValue)
-                  }
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Material ID"
-                      variant="outlined"
-                    />
-                  )}
-                />
-              </TableCell>
-              <TableCell>
-                <TextField value={row.materialName} disabled fullWidth />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  type="number"
-                  value={row.quantity}
-                  onChange={(e) =>
-                    handleChange(index, 'quantity', e.target.value)
-                  }
-                  fullWidth
-                />
-              </TableCell>
-              <TableCell>
-                <TextField
-                  type="date"
-                  value={row.deliveryDate}
-                  onChange={(e) =>
-                    handleChange(index, 'deliveryDate', e.target.value)
-                  }
-                  fullWidth
-                />
-              </TableCell>
-              <TableCell>
-                <IconButton
-                  color="secondary"
-                  onClick={() => removeRow(index)}
-                  disabled={rows.length === 1}
+      <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+        <Table style={{ minWidth: '1500px' }}>
+          <TableHead>
+            <TableRow>
+              {[
+                'S.No',
+                'Item No',
+                'Material ID',
+                'Material Name',
+                'Short Text',
+                'Material Group',
+                'Quantity',
+                'Unit',
+                'Delivery Date',
+                'Plant',
+                'Storage Location',
+                'Purchasing Group',
+                'Requisitioner',
+                'Tracking No',
+                'Vendor',
+                'Fixed Vendor IS',
+                'Action',
+              ].map((header) => (
+                <TableCell
+                  key={header}
+                  style={{ minWidth: '120px', fontWeight: 'bold' }}
                 >
-                  <Delete />
-                </IconButton>
-              </TableCell>
+                  {header}
+                </TableCell>
+              ))}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {rows.map((row, index) => (
+              <TableRow key={index}>
+                <TableCell>{row.sNo}</TableCell>
+                <TableCell>
+                  <TextField value={row.itemNo} disabled fullWidth />
+                </TableCell>
+                <TableCell>
+                  <Autocomplete
+                    options={materials.map((p) => p.materialId)}
+                    value={row.materialId}
+                    onChange={(event, newValue) =>
+                      handleChange(index, 'materialId', newValue)
+                    }
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Material ID"
+                        variant="outlined"
+                        fullWidth
+                      />
+                    )}
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField value={row.materialName} disabled fullWidth />
+                </TableCell>
+                <TableCell>
+                  <TextField value={row.shortText} disabled fullWidth />
+                </TableCell>
+                <TableCell>
+                  <TextField value={row.materialGroup} disabled fullWidth />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="number"
+                    value={row.quantity}
+                    onChange={(e) =>
+                      handleChange(index, 'quantity', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={row.unit}
+                    onChange={(e) =>
+                      handleChange(index, 'unit', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="date"
+                    value={row.deliveryDate}
+                    onChange={(e) =>
+                      handleChange(index, 'deliveryDate', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={row.plant}
+                    onChange={(e) =>
+                      handleChange(index, 'plant', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={row.storageLocation}
+                    onChange={(e) =>
+                      handleChange(index, 'storageLocation', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={row.purchasingGroup}
+                    onChange={(e) =>
+                      handleChange(index, 'purchasingGroup', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={row.requisitioner}
+                    onChange={(e) =>
+                      handleChange(index, 'requisitioner', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={row.trackingNo}
+                    onChange={(e) =>
+                      handleChange(index, 'trackingNo', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={row.vendor}
+                    onChange={(e) =>
+                      handleChange(index, 'vendor', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={row.fixedVendorIS}
+                    onChange={(e) =>
+                      handleChange(index, 'fixedVendorIS', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <IconButton
+                    color="secondary"
+                    onClick={() => removeRow(index)}
+                    disabled={rows.length === 1}
+                  >
+                    <Delete />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
       <Button
         startIcon={<Add />}
         onClick={addRow}

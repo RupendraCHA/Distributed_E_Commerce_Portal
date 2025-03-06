@@ -1822,39 +1822,24 @@ app.get("/products", async (req, res) => {
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
-app.get("/products", async (req, res) => {
-  try {
-    const productCategory = req.query.productCategory;
-    // console.log({ productCategory });
-
-    let products = await ProductModel.find({});
-
-    if (productCategory !== "undefined") {
-      products = products.filter(
-        (product) =>
-          product.category.toLowerCase() === productCategory.toLowerCase()
-      );
-    }
-    return res.status(200).json(products);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-});
 
 app.get("/api/v1/getMaterialIds", async (req, res) => {
   try {
-    console.log("called");
-    const materials = await MaterialModel.find({}, "materialId materialName");
+    console.log("Fetching material IDs...");
+    const materials = await MaterialModel.find(
+      {},
+      "sNo itemNo materialId materialName shortText materialGroup unit"
+    );
     res.json(materials);
   } catch (error) {
+    console.error("Error fetching materials:", error.message);
     res.status(500).json({ message: "Server Error" });
   }
 });
 
 app.post("/api/v1/requisition", authenticateToken, async (req, res) => {
   try {
-    console.log("User ID:", req.user.id);
+    console.log("Creating requisition for user:", req.user.id);
     const { materials } = req.body;
 
     // Validate materials exist in DB
@@ -1869,10 +1854,37 @@ app.post("/api/v1/requisition", authenticateToken, async (req, res) => {
         .json({ message: "Some materials are invalid or do not exist." });
     }
 
+    // Assign missing item numbers and additional fields
+    const enrichedMaterials = materials.map((m, index) => {
+      const foundMaterial = existingMaterials.find(
+        (mat) => mat.materialId === m.materialId
+      );
+      return {
+        sNo: index + 1,
+        itemNo: foundMaterial
+          ? foundMaterial.itemNo
+          : `ITM${String(index + 1).padStart(3, "0")}`,
+        materialId: m.materialId,
+        materialName: foundMaterial ? foundMaterial.materialName : "",
+        shortText: foundMaterial ? foundMaterial.shortText : "",
+        materialGroup: foundMaterial ? foundMaterial.materialGroup : "",
+        unit: foundMaterial ? foundMaterial.unit : "",
+        quantity: m.quantity,
+        deliveryDate: m.deliveryDate,
+        plant: m.plant || "",
+        storageLocation: m.storageLocation || "",
+        purchasingGroup: m.purchasingGroup || "",
+        requisitioner: m.requisitioner || "",
+        trackingNo: m.trackingNo || "",
+        vendor: m.vendor || "",
+        fixedVendorIS: m.fixedVendorIS || "",
+      };
+    });
+
     // Save requisition
     const newRequisition = new RequisitionModel({
       userId: req.user.id,
-      materials,
+      materials: enrichedMaterials,
     });
 
     await newRequisition.save();
@@ -1888,9 +1900,11 @@ app.post("/api/v1/requisition", authenticateToken, async (req, res) => {
 
 app.get("/api/v1/requisition", authenticateToken, async (req, res) => {
   try {
+    console.log("Fetching requisitions for user:", req.user.id);
     const requisitions = await RequisitionModel.find({ userId: req.user.id });
     res.json(requisitions);
   } catch (error) {
+    console.error("Error fetching requisitions:", error.message);
     res.status(500).json({ message: "Server Error" });
   }
 });
@@ -1898,14 +1912,17 @@ app.get("/api/v1/requisition", authenticateToken, async (req, res) => {
 // Get a single requisition by ID
 app.get("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
   try {
+    console.log("Fetching requisition ID:", req.params.id);
     const requisition = await RequisitionModel.findOne({
       _id: req.params.id,
       userId: req.user.id,
     });
     if (!requisition)
       return res.status(404).json({ message: "Requisition not found" });
+
     res.json(requisition);
   } catch (error) {
+    console.error("Error fetching requisition:", error.message);
     res.status(500).json({ message: "Error fetching requisition" });
   }
 });
@@ -1913,6 +1930,7 @@ app.get("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
 // Update a requisition
 app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
   try {
+    console.log("Updating requisition ID:", req.params.id);
     const { materials } = req.body;
 
     // Validate materials exist in DB
@@ -1927,10 +1945,37 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
         .json({ message: "Some materials are invalid or do not exist." });
     }
 
+    // Assign missing item numbers and additional fields
+    const enrichedMaterials = materials.map((m, index) => {
+      const foundMaterial = existingMaterials.find(
+        (mat) => mat.materialId === m.materialId
+      );
+      return {
+        sNo: index + 1,
+        itemNo: foundMaterial
+          ? foundMaterial.itemNo
+          : `ITM${String(index + 1).padStart(3, "0")}`,
+        materialId: m.materialId,
+        materialName: foundMaterial ? foundMaterial.materialName : "",
+        shortText: foundMaterial ? foundMaterial.shortText : "",
+        materialGroup: foundMaterial ? foundMaterial.materialGroup : "",
+        unit: foundMaterial ? foundMaterial.unit : "",
+        quantity: m.quantity,
+        deliveryDate: m.deliveryDate,
+        plant: m.plant || "",
+        storageLocation: m.storageLocation || "",
+        purchasingGroup: m.purchasingGroup || "",
+        requisitioner: m.requisitioner || "",
+        trackingNo: m.trackingNo || "",
+        vendor: m.vendor || "",
+        fixedVendorIS: m.fixedVendorIS || "",
+      };
+    });
+
     // Update requisition
     const updatedRequisition = await RequisitionModel.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
-      { materials },
+      { materials: enrichedMaterials },
       { new: true }
     );
 

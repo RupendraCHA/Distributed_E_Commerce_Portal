@@ -47,41 +47,57 @@ const PurchaseRequisitionList = () => {
         <TableHead>
           <TableRow>
             <TableCell>S.No</TableCell>
-            <TableCell>Materials</TableCell>
+            <TableCell>Item No</TableCell>
+            <TableCell>Material</TableCell>
+            <TableCell>Short Text</TableCell>
+            <TableCell>Quantity</TableCell>
+            <TableCell>Unit</TableCell>
             <TableCell>Delivery Date</TableCell>
+            <TableCell>Material Group</TableCell>
+            <TableCell>Plant</TableCell>
+            <TableCell>Storage Location</TableCell>
+            <TableCell>Purchasing Group</TableCell>
+            <TableCell>Requisitioner</TableCell>
+            <TableCell>Tracking No</TableCell>
+            <TableCell>Vendor</TableCell>
+            <TableCell>Fixed Vendor IS</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {requisitions.map((req, index) => (
-            <TableRow key={index}>
-              <TableCell>{index + 1}</TableCell>
-              <TableCell>
-                {req.materials.map((material, idx) => (
-                  <div key={idx}>
-                    {material.materialName} ({material.quantity})
-                  </div>
-                ))}
-              </TableCell>
-              <TableCell>
-                {req.materials.map((material, idx) => (
-                  <div key={idx}>{material.deliveryDate}</div>
-                ))}
-              </TableCell>
-              <TableCell>
-                <Tooltip title="Edit">
-                  <IconButton
-                    color="primary"
-                    onClick={() =>
-                      navigate(`/sourcing/edit-requisition/${req._id}`)
-                    }
-                  >
-                    <Edit />
-                  </IconButton>
-                </Tooltip>
-              </TableCell>
-            </TableRow>
-          ))}
+          {requisitions.map((req, index) =>
+            req.materials.map((material, idx) => (
+              <TableRow key={`${index}-${idx}`}>
+                <TableCell>{index + 1}</TableCell>
+                <TableCell>{material.itemNo || '-'}</TableCell>
+                <TableCell>{material.materialName || '-'}</TableCell>
+                <TableCell>{material.shortText || '-'}</TableCell>
+                <TableCell>{material.quantity || '-'}</TableCell>
+                <TableCell>{material.unit || '-'}</TableCell>
+                <TableCell>{material.deliveryDate || '-'}</TableCell>
+                <TableCell>{material.materialGroup || '-'}</TableCell>
+                <TableCell>{material.plant || '-'}</TableCell>
+                <TableCell>{material.storageLocation || '-'}</TableCell>
+                <TableCell>{material.purchasingGroup || '-'}</TableCell>
+                <TableCell>{material.requisitioner || '-'}</TableCell>
+                <TableCell>{material.trackingNo || '-'}</TableCell>
+                <TableCell>{material.vendor || '-'}</TableCell>
+                <TableCell>{material.fixedVendorIS || '-'}</TableCell>
+                <TableCell>
+                  <Tooltip title="Edit">
+                    <IconButton
+                      color="primary"
+                      onClick={() =>
+                        navigate(`/sourcing/edit-requisition/${req._id}`)
+                      }
+                    >
+                      <Edit />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </Container>
