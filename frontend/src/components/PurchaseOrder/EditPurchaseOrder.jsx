@@ -53,6 +53,7 @@ const EditPurchaseOrder = () => {
         updatedItems[index].shortText = selectedMaterial.shortText || '-';
         updatedItems[index].materialGroup =
           selectedMaterial.materialGroup || '-';
+        updatedItems[index].unit = selectedMaterial.unit || '-';
         updatedItems[index].itemNo = `ITM${String(index + 1).padStart(3, '0')}`;
       }
     }
@@ -78,11 +79,27 @@ const EditPurchaseOrder = () => {
           quantity: 1,
           unit: '',
           deliveryDate: '',
+          startDate: '',
+          endDate: '',
           plant: '',
           storageLocation: '',
+          batch: '',
+          stockSegment: '',
+          requestSegment: '',
+          requirementNo: '',
+          requisitioner: '',
           netPrice: '',
           currency: 'INR',
           taxCode: '',
+          infoRecord: '',
+          outlineAgreement: '',
+          issuingStorageLocation: '',
+          servicePerformer: '',
+          revisionLevel: '',
+          supplierMatNo: '',
+          supplierSubrange: '',
+          supplierBatch: '',
+          commodityCode: '',
         },
       ],
     });
@@ -147,7 +164,7 @@ const EditPurchaseOrder = () => {
 
       {/* Scrollable Table */}
       <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
-        <Table style={{ minWidth: '1500px' }}>
+        <Table style={{ minWidth: '2200px' }}>
           <TableHead>
             <TableRow>
               {[
@@ -160,11 +177,27 @@ const EditPurchaseOrder = () => {
                 'Quantity',
                 'Unit',
                 'Delivery Date',
+                'Start Date',
+                'End Date',
                 'Plant',
                 'Storage Location',
+                'Batch',
+                'Stock Segment',
+                'Request Segment',
+                'Requirement No',
+                'Requisitioner',
                 'Net Price',
                 'Currency',
                 'Tax Code',
+                'Info Record',
+                'Outline Agreement',
+                'Issuing Storage Location',
+                'Service Performer',
+                'Revision Level',
+                'Supplier Mat. No',
+                'Supplier Subrange',
+                'Supplier Batch',
+                'Commodity Code',
                 'Action',
               ].map((header) => (
                 <TableCell
@@ -179,9 +212,25 @@ const EditPurchaseOrder = () => {
           <TableBody>
             {purchaseOrder.items.map((item, index) => (
               <TableRow key={index}>
-                <TableCell>{item.sNo}</TableCell>
-                <TableCell>
-                  <TextField value={item.itemNo} disabled fullWidth />
+                <TableCell key={item.sNo}>
+                  <TextField
+                    type={'text'}
+                    value={item.sNo}
+                    onChange={(e) => handleChange(index, 'sNo', e.target.value)}
+                    fullWidth
+                    disabled
+                  />
+                </TableCell>
+                <TableCell key={item.itemNo}>
+                  <TextField
+                    type={'text'}
+                    value={item.itemNo}
+                    onChange={(e) =>
+                      handleChange(index, 'itemNo', e.target.value)
+                    }
+                    fullWidth
+                    disabled
+                  />
                 </TableCell>
                 <TableCell>
                   <Autocomplete
@@ -200,84 +249,83 @@ const EditPurchaseOrder = () => {
                     )}
                   />
                 </TableCell>
-                <TableCell>
-                  <TextField value={item.materialName} disabled fullWidth />
-                </TableCell>
-                <TableCell>
-                  <TextField value={item.shortText} disabled fullWidth />
-                </TableCell>
-                <TableCell>
-                  <TextField value={item.materialGroup} disabled fullWidth />
-                </TableCell>
-                <TableCell>
+                <TableCell key={item.materialName}>
                   <TextField
-                    type="number"
-                    value={item.quantity}
+                    type={'text'}
+                    value={item.materialName}
                     onChange={(e) =>
-                      handleChange(index, 'quantity', e.target.value)
+                      handleChange(index, 'materialName', e.target.value)
                     }
                     fullWidth
+                    disabled
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell key={item.shortText}>
                   <TextField
-                    value={item.unit}
+                    type={'text'}
+                    value={item.shortText}
                     onChange={(e) =>
-                      handleChange(index, 'unit', e.target.value)
+                      handleChange(index, 'shortText', e.target.value)
                     }
                     fullWidth
+                    disabled
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell key={item.materialGroup}>
                   <TextField
-                    type="date"
-                    value={item.deliveryDate}
+                    type={'text'}
+                    value={item.materialGroup}
                     onChange={(e) =>
-                      handleChange(index, 'deliveryDate', e.target.value)
+                      handleChange(index, 'shortText', e.target.value)
                     }
                     fullWidth
+                    disabled
                   />
                 </TableCell>
-                <TableCell>
-                  <TextField
-                    value={item.plant}
-                    onChange={(e) =>
-                      handleChange(index, 'plant', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={item.storageLocation}
-                    onChange={(e) =>
-                      handleChange(index, 'storageLocation', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type="number"
-                    value={item.netPrice}
-                    onChange={(e) =>
-                      handleChange(index, 'netPrice', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField value={item.currency} disabled fullWidth />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={item.taxCode}
-                    onChange={(e) =>
-                      handleChange(index, 'taxCode', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
+                {[
+                  'quantity',
+                  'unit',
+                  'deliveryDate',
+                  'startDate',
+                  'endDate',
+                  'plant',
+                  'storageLocation',
+                  'batch',
+                  'stockSegment',
+                  'requestSegment',
+                  'requirementNo',
+                  'requisitioner',
+                  'netPrice',
+                  'currency',
+                  'taxCode',
+                  'infoRecord',
+                  'outlineAgreement',
+                  'issuingStorageLocation',
+                  'servicePerformer',
+                  'revisionLevel',
+                  'supplierMatNo',
+                  'supplierSubrange',
+                  'supplierBatch',
+                  'commodityCode',
+                ].map((field) => (
+                  <TableCell key={field}>
+                    <TextField
+                      type={
+                        field.includes('Date')
+                          ? 'date'
+                          : field.includes('quantity') ||
+                            field.includes('netPrice')
+                          ? 'number'
+                          : 'text'
+                      }
+                      value={item[field]}
+                      onChange={(e) =>
+                        handleChange(index, field, e.target.value)
+                      }
+                      fullWidth
+                    />
+                  </TableCell>
+                ))}
                 <TableCell>
                   <IconButton
                     color="secondary"
@@ -293,12 +341,20 @@ const EditPurchaseOrder = () => {
         </Table>
       </div>
 
-      {/* Action Buttons */}
+      <Button
+        startIcon={<Add />}
+        onClick={addRow}
+        variant="outlined"
+        color="primary"
+        style={{ marginTop: '10px' }}
+      >
+        Add Row
+      </Button>
       <Button
         onClick={handleEditSave}
         variant="contained"
         color="primary"
-        style={{ marginTop: '10px' }}
+        style={{ marginTop: '10px', marginLeft: '10px' }}
       >
         Save Changes
       </Button>

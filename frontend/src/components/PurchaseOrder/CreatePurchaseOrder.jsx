@@ -21,7 +21,7 @@ const CreatePurchaseOrder = () => {
   const [rows, setRows] = useState([
     {
       sNo: 1,
-      itemNo: '',
+      itemNo: 'ITM001',
       materialId: '',
       materialName: '',
       shortText: '',
@@ -29,11 +29,27 @@ const CreatePurchaseOrder = () => {
       quantity: 1,
       unit: '',
       deliveryDate: '',
+      startDate: '',
+      endDate: '',
       plant: '',
       storageLocation: '',
+      batch: '',
+      stockSegment: '',
+      requestSegment: '',
+      requirementNo: '',
+      requisitioner: '',
       netPrice: '',
       currency: 'INR',
       taxCode: '',
+      infoRecord: '',
+      outlineAgreement: '',
+      issuingStorageLocation: '',
+      servicePerformer: '',
+      revisionLevel: '',
+      supplierMatNo: '',
+      supplierSubrange: '',
+      supplierBatch: '',
+      commodityCode: '',
     },
   ]);
   const [vendorId, setVendorId] = useState('');
@@ -58,6 +74,7 @@ const CreatePurchaseOrder = () => {
         updatedRows[index].shortText = selectedMaterial.shortText || '-';
         updatedRows[index].materialGroup =
           selectedMaterial.materialGroup || '-';
+        updatedRows[index].unit = selectedMaterial.unit || '-';
         updatedRows[index].itemNo = `ITM${String(index + 1).padStart(3, '0')}`;
       }
     }
@@ -70,7 +87,7 @@ const CreatePurchaseOrder = () => {
       ...rows,
       {
         sNo: rows.length + 1,
-        itemNo: '',
+        itemNo: `ITM${String(rows.length + 1).padStart(3, '0')}`,
         materialId: '',
         materialName: '',
         shortText: '',
@@ -78,18 +95,40 @@ const CreatePurchaseOrder = () => {
         quantity: 1,
         unit: '',
         deliveryDate: '',
+        startDate: '',
+        endDate: '',
         plant: '',
         storageLocation: '',
+        batch: '',
+        stockSegment: '',
+        requestSegment: '',
+        requirementNo: '',
+        requisitioner: '',
         netPrice: '',
         currency: 'INR',
         taxCode: '',
+        infoRecord: '',
+        outlineAgreement: '',
+        issuingStorageLocation: '',
+        servicePerformer: '',
+        revisionLevel: '',
+        supplierMatNo: '',
+        supplierSubrange: '',
+        supplierBatch: '',
+        commodityCode: '',
       },
     ]);
   };
 
   const removeRow = (index) => {
     const updatedRows = rows.filter((_, i) => i !== index);
-    setRows(updatedRows.map((row, i) => ({ ...row, sNo: i + 1 }))); // Re-number sNo
+    setRows(
+      updatedRows.map((row, i) => ({
+        ...row,
+        sNo: i + 1,
+        itemNo: `ITM${String(i + 1).padStart(3, '0')}`,
+      }))
+    ); // Re-number sNo
   };
 
   const handleSave = () => {
@@ -136,7 +175,7 @@ const CreatePurchaseOrder = () => {
 
       {/* Scrollable Table */}
       <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
-        <Table style={{ minWidth: '1500px' }}>
+        <Table style={{ minWidth: '2200px' }}>
           <TableHead>
             <TableRow>
               {[
@@ -149,11 +188,27 @@ const CreatePurchaseOrder = () => {
                 'Quantity',
                 'Unit',
                 'Delivery Date',
+                'Start Date',
+                'End Date',
                 'Plant',
                 'Storage Location',
+                'Batch',
+                'Stock Segment',
+                'Request Segment',
+                'Requirement No',
+                'Requisitioner',
                 'Net Price',
                 'Currency',
                 'Tax Code',
+                'Info Record',
+                'Outline Agreement',
+                'Issuing Storage Location',
+                'Service Performer',
+                'Revision Level',
+                'Supplier Mat. No',
+                'Supplier Subrange',
+                'Supplier Batch',
+                'Commodity Code',
                 'Action',
               ].map((header) => (
                 <TableCell
@@ -166,16 +221,14 @@ const CreatePurchaseOrder = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row, index) => (
+            {rows.map((item, index) => (
               <TableRow key={index}>
-                <TableCell>{row.sNo}</TableCell>
-                <TableCell>
-                  <TextField value={row.itemNo} disabled fullWidth />
-                </TableCell>
+                <TableCell>{item.sNo}</TableCell>
+                <TableCell>{item.itemNo}</TableCell>
                 <TableCell>
                   <Autocomplete
                     options={materials.map((p) => p.materialId)}
-                    value={row.materialId}
+                    value={item.materialId}
                     onChange={(event, newValue) =>
                       handleChange(index, 'materialId', newValue)
                     }
@@ -189,84 +242,83 @@ const CreatePurchaseOrder = () => {
                     )}
                   />
                 </TableCell>
-                <TableCell>
-                  <TextField value={row.materialName} disabled fullWidth />
-                </TableCell>
-                <TableCell>
-                  <TextField value={row.shortText} disabled fullWidth />
-                </TableCell>
-                <TableCell>
-                  <TextField value={row.materialGroup} disabled fullWidth />
-                </TableCell>
-                <TableCell>
+                <TableCell key={item.materialName}>
                   <TextField
-                    type="number"
-                    value={row.quantity}
+                    type={'text'}
+                    value={item.materialName}
                     onChange={(e) =>
-                      handleChange(index, 'quantity', e.target.value)
+                      handleChange(index, 'materialName', e.target.value)
                     }
                     fullWidth
+                    disabled
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell key={item.shortText}>
                   <TextField
-                    value={row.unit}
+                    type={'text'}
+                    value={item.shortText}
                     onChange={(e) =>
-                      handleChange(index, 'unit', e.target.value)
+                      handleChange(index, 'shortText', e.target.value)
                     }
                     fullWidth
+                    disabled
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell key={item.materialGroup}>
                   <TextField
-                    type="date"
-                    value={row.deliveryDate}
+                    type={'text'}
+                    value={item.materialGroup}
                     onChange={(e) =>
-                      handleChange(index, 'deliveryDate', e.target.value)
+                      handleChange(index, 'materialGroup', e.target.value)
                     }
                     fullWidth
+                    disabled
                   />
                 </TableCell>
-                <TableCell>
-                  <TextField
-                    value={row.plant}
-                    onChange={(e) =>
-                      handleChange(index, 'plant', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={row.storageLocation}
-                    onChange={(e) =>
-                      handleChange(index, 'storageLocation', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type="number"
-                    value={row.netPrice}
-                    onChange={(e) =>
-                      handleChange(index, 'netPrice', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField value={row.currency} disabled fullWidth />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={row.taxCode}
-                    onChange={(e) =>
-                      handleChange(index, 'taxCode', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
+                {[
+                  'quantity',
+                  'unit',
+                  'deliveryDate',
+                  'startDate',
+                  'endDate',
+                  'plant',
+                  'storageLocation',
+                  'batch',
+                  'stockSegment',
+                  'requestSegment',
+                  'requirementNo',
+                  'requisitioner',
+                  'netPrice',
+                  'currency',
+                  'taxCode',
+                  'infoRecord',
+                  'outlineAgreement',
+                  'issuingStorageLocation',
+                  'servicePerformer',
+                  'revisionLevel',
+                  'supplierMatNo',
+                  'supplierSubrange',
+                  'supplierBatch',
+                  'commodityCode',
+                ].map((field) => (
+                  <TableCell key={field}>
+                    <TextField
+                      type={
+                        field.includes('Date')
+                          ? 'date'
+                          : field.includes('quantity') ||
+                            field.includes('netPrice')
+                          ? 'number'
+                          : 'text'
+                      }
+                      value={item[field]}
+                      onChange={(e) =>
+                        handleChange(index, field, e.target.value)
+                      }
+                      fullWidth
+                    />
+                  </TableCell>
+                ))}
                 <TableCell>
                   <IconButton
                     color="secondary"
@@ -282,7 +334,6 @@ const CreatePurchaseOrder = () => {
         </Table>
       </div>
 
-      {/* Action Buttons */}
       <Button
         startIcon={<Add />}
         onClick={addRow}

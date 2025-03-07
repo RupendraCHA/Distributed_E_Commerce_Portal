@@ -1824,6 +1824,7 @@ app.get("/products", async (req, res) => {
   }
 });
 
+// Get all material IDs
 app.get("/api/v1/getMaterialIds", async (req, res) => {
   try {
     console.log("Fetching material IDs...");
@@ -1838,12 +1839,12 @@ app.get("/api/v1/getMaterialIds", async (req, res) => {
   }
 });
 
+// Create a new purchase requisition
 app.post("/api/v1/requisition", authenticateToken, async (req, res) => {
   try {
     console.log("Creating requisition for user:", req.user.id);
     const { materials } = req.body;
 
-    // Validate materials exist in DB
     const materialIds = materials.map((m) => m.materialId);
     const existingMaterials = await MaterialModel.find({
       materialId: { $in: materialIds },
@@ -1855,7 +1856,6 @@ app.post("/api/v1/requisition", authenticateToken, async (req, res) => {
         .json({ message: "Some materials are invalid or do not exist." });
     }
 
-    // Assign missing item numbers and additional fields
     const enrichedMaterials = materials.map((m, index) => {
       const foundMaterial = existingMaterials.find(
         (mat) => mat.materialId === m.materialId
@@ -1879,10 +1879,16 @@ app.post("/api/v1/requisition", authenticateToken, async (req, res) => {
         trackingNo: m.trackingNo || "",
         vendor: m.vendor || "",
         fixedVendorIS: m.fixedVendorIS || "",
+        status: "Open", // Default status
+        readVendorSPG: m.readVendorSPG || "",
+        splitIndicator: m.splitIndicator || "",
+        purchasingOrg: m.purchasingOrg || "",
+        agreement: m.agreement || "",
+        itemInfoRecord: m.itemInfoRecord || "",
+        mpnMaterial: m.mpnMaterial || "",
       };
     });
 
-    // Save requisition
     const newRequisition = new RequisitionModel({
       userId: req.user.id,
       materials: enrichedMaterials,
@@ -1899,6 +1905,7 @@ app.post("/api/v1/requisition", authenticateToken, async (req, res) => {
   }
 });
 
+// Get all requisitions for the logged-in user
 app.get("/api/v1/requisition", authenticateToken, async (req, res) => {
   try {
     console.log("Fetching requisitions for user:", req.user.id);
@@ -1918,6 +1925,7 @@ app.get("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
       _id: req.params.id,
       userId: req.user.id,
     });
+
     if (!requisition)
       return res.status(404).json({ message: "Requisition not found" });
 
@@ -1934,7 +1942,6 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
     console.log("Updating requisition ID:", req.params.id);
     const { materials } = req.body;
 
-    // Validate materials exist in DB
     const materialIds = materials.map((m) => m.materialId);
     const existingMaterials = await MaterialModel.find({
       materialId: { $in: materialIds },
@@ -1946,7 +1953,6 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
         .json({ message: "Some materials are invalid or do not exist." });
     }
 
-    // Assign missing item numbers and additional fields
     const enrichedMaterials = materials.map((m, index) => {
       const foundMaterial = existingMaterials.find(
         (mat) => mat.materialId === m.materialId
@@ -1970,10 +1976,16 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
         trackingNo: m.trackingNo || "",
         vendor: m.vendor || "",
         fixedVendorIS: m.fixedVendorIS || "",
+        status: m.status || "Open",
+        readVendorSPG: m.readVendorSPG || "",
+        splitIndicator: m.splitIndicator || "",
+        purchasingOrg: m.purchasingOrg || "",
+        agreement: m.agreement || "",
+        itemInfoRecord: m.itemInfoRecord || "",
+        mpnMaterial: m.mpnMaterial || "",
       };
     });
 
-    // Update requisition
     const updatedRequisition = await RequisitionModel.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
       { materials: enrichedMaterials },
@@ -1993,9 +2005,14 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
   }
 });
 
+// 📌 Create a new Purchase Order
 app.post("/api/v1/purchase-order", authenticateToken, async (req, res) => {
   try {
     const { vendorId, vendorName, documentDate, items } = req.body;
+
+    if (!vendorId || !vendorName || !documentDate || !items.length) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
 
     const newPO = new PurchaseOrderModel({
       userId: req.user.id,
@@ -2005,7 +2022,34 @@ app.post("/api/v1/purchase-order", authenticateToken, async (req, res) => {
       items: items.map((item, index) => ({
         sNo: index + 1,
         itemNo: `ITM${String(index + 1).padStart(3, "0")}`,
-        ...item,
+        materialId: item.materialId || "",
+        materialName: item.materialName || "",
+        shortText: item.shortText || "",
+        materialGroup: item.materialGroup || "",
+        quantity: item.quantity || 1,
+        unit: item.unit || "",
+        deliveryDate: item.deliveryDate || "",
+        startDate: item.startDate || "",
+        endDate: item.endDate || "",
+        plant: item.plant || "",
+        storageLocation: item.storageLocation || "",
+        batch: item.batch || "",
+        stockSegment: item.stockSegment || "",
+        requestSegment: item.requestSegment || "",
+        requirementNo: item.requirementNo || "",
+        requisitioner: item.requisitioner || "",
+        netPrice: item.netPrice || 0,
+        currency: item.currency || "INR",
+        taxCode: item.taxCode || "",
+        infoRecord: item.infoRecord || "",
+        outlineAgreement: item.outlineAgreement || "",
+        issuingStorageLocation: item.issuingStorageLocation || "",
+        servicePerformer: item.servicePerformer || "",
+        revisionLevel: item.revisionLevel || "",
+        supplierMatNo: item.supplierMatNo || "",
+        supplierSubrange: item.supplierSubrange || "",
+        supplierBatch: item.supplierBatch || "",
+        commodityCode: item.commodityCode || "",
       })),
     });
 
@@ -2055,6 +2099,10 @@ app.put("/api/v1/purchase-order/:id", authenticateToken, async (req, res) => {
   try {
     const { vendorId, vendorName, documentDate, items } = req.body;
 
+    if (!vendorId || !vendorName || !documentDate || !items.length) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
     const updatedPO = await PurchaseOrderModel.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
       {
@@ -2064,7 +2112,34 @@ app.put("/api/v1/purchase-order/:id", authenticateToken, async (req, res) => {
         items: items.map((item, index) => ({
           sNo: index + 1,
           itemNo: `ITM${String(index + 1).padStart(3, "0")}`,
-          ...item,
+          materialId: item.materialId || "",
+          materialName: item.materialName || "",
+          shortText: item.shortText || "",
+          materialGroup: item.materialGroup || "",
+          quantity: item.quantity || 1,
+          unit: item.unit || "",
+          deliveryDate: item.deliveryDate || "",
+          startDate: item.startDate || "",
+          endDate: item.endDate || "",
+          plant: item.plant || "",
+          storageLocation: item.storageLocation || "",
+          batch: item.batch || "",
+          stockSegment: item.stockSegment || "",
+          requestSegment: item.requestSegment || "",
+          requirementNo: item.requirementNo || "",
+          requisitioner: item.requisitioner || "",
+          netPrice: item.netPrice || 0,
+          currency: item.currency || "INR",
+          taxCode: item.taxCode || "",
+          infoRecord: item.infoRecord || "",
+          outlineAgreement: item.outlineAgreement || "",
+          issuingStorageLocation: item.issuingStorageLocation || "",
+          servicePerformer: item.servicePerformer || "",
+          revisionLevel: item.revisionLevel || "",
+          supplierMatNo: item.supplierMatNo || "",
+          supplierSubrange: item.supplierSubrange || "",
+          supplierBatch: item.supplierBatch || "",
+          commodityCode: item.commodityCode || "",
         })),
       },
       { new: true }

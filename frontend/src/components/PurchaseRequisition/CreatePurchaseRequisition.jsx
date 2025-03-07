@@ -21,6 +21,7 @@ const CreatePurchaseRequisition = () => {
   const [rows, setRows] = useState([
     {
       sNo: 1,
+      status: '',
       itemNo: '',
       materialId: '',
       materialName: '',
@@ -36,6 +37,12 @@ const CreatePurchaseRequisition = () => {
       trackingNo: '',
       vendor: '',
       fixedVendorIS: '',
+      readVendorSPG: '',
+      splitIndicator: '',
+      purchasingOrg: '',
+      agreement: '',
+      itemInfoRecord: '',
+      mpnMaterial: '',
     },
   ]);
   const navigate = useNavigate();
@@ -69,6 +76,7 @@ const CreatePurchaseRequisition = () => {
       ...rows,
       {
         sNo: rows.length + 1,
+        status: '',
         itemNo: '',
         materialId: '',
         materialName: '',
@@ -84,6 +92,12 @@ const CreatePurchaseRequisition = () => {
         trackingNo: '',
         vendor: '',
         fixedVendorIS: '',
+        readVendorSPG: '',
+        splitIndicator: '',
+        purchasingOrg: '',
+        agreement: '',
+        itemInfoRecord: '',
+        mpnMaterial: '',
       },
     ]);
   };
@@ -112,11 +126,12 @@ const CreatePurchaseRequisition = () => {
     <Container>
       <h2>Create Purchase Requisition</h2>
       <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
-        <Table style={{ minWidth: '1500px' }}>
+        <Table style={{ minWidth: '1800px' }}>
           <TableHead>
             <TableRow>
               {[
                 'S.No',
+                'Status',
                 'Item No',
                 'Material ID',
                 'Material Name',
@@ -132,6 +147,12 @@ const CreatePurchaseRequisition = () => {
                 'Tracking No',
                 'Vendor',
                 'Fixed Vendor IS',
+                'Read Vendor SPG',
+                'Split Indicator',
+                'Purchasing Organization',
+                'Agreement',
+                'Item Info Record',
+                'MPN Material',
                 'Action',
               ].map((header) => (
                 <TableCell
@@ -148,6 +169,15 @@ const CreatePurchaseRequisition = () => {
               <TableRow key={index}>
                 <TableCell>{row.sNo}</TableCell>
                 <TableCell>
+                  <TextField
+                    value={row.status}
+                    onChange={(e) =>
+                      handleChange(index, 'status', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
                   <TextField value={row.itemNo} disabled fullWidth />
                 </TableCell>
                 <TableCell>
@@ -158,12 +188,7 @@ const CreatePurchaseRequisition = () => {
                       handleChange(index, 'materialId', newValue)
                     }
                     renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Material ID"
-                        variant="outlined"
-                        fullWidth
-                      />
+                      <TextField {...params} label="Material ID" fullWidth />
                     )}
                   />
                 </TableCell>
@@ -176,103 +201,37 @@ const CreatePurchaseRequisition = () => {
                 <TableCell>
                   <TextField value={row.materialGroup} disabled fullWidth />
                 </TableCell>
-                <TableCell>
-                  <TextField
-                    type="number"
-                    value={row.quantity}
-                    onChange={(e) =>
-                      handleChange(index, 'quantity', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={row.unit}
-                    onChange={(e) =>
-                      handleChange(index, 'unit', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type="date"
-                    value={row.deliveryDate}
-                    onChange={(e) =>
-                      handleChange(index, 'deliveryDate', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={row.plant}
-                    onChange={(e) =>
-                      handleChange(index, 'plant', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={row.storageLocation}
-                    onChange={(e) =>
-                      handleChange(index, 'storageLocation', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={row.purchasingGroup}
-                    onChange={(e) =>
-                      handleChange(index, 'purchasingGroup', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={row.requisitioner}
-                    onChange={(e) =>
-                      handleChange(index, 'requisitioner', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={row.trackingNo}
-                    onChange={(e) =>
-                      handleChange(index, 'trackingNo', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={row.vendor}
-                    onChange={(e) =>
-                      handleChange(index, 'vendor', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={row.fixedVendorIS}
-                    onChange={(e) =>
-                      handleChange(index, 'fixedVendorIS', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
+                {[
+                  { key: 'quantity', type: 'number' },
+                  { key: 'unit' },
+                  { key: 'deliveryDate', type: 'date' },
+                  { key: 'plant' },
+                  { key: 'storageLocation' },
+                  { key: 'purchasingGroup' },
+                  { key: 'requisitioner' },
+                  { key: 'trackingNo' },
+                  { key: 'vendor' },
+                  { key: 'fixedVendorIS' },
+                  { key: 'readVendorSPG' },
+                  { key: 'splitIndicator' },
+                  { key: 'purchasingOrg' },
+                  { key: 'agreement' },
+                  { key: 'itemInfoRecord' },
+                  { key: 'mpnMaterial' },
+                ].map(({ key, type }) => (
+                  <TableCell key={key}>
+                    <TextField
+                      type={type || 'text'}
+                      value={row[key]}
+                      onChange={(e) => handleChange(index, key, e.target.value)}
+                      fullWidth
+                    />
+                  </TableCell>
+                ))}
                 <TableCell>
                   <IconButton
                     color="secondary"
                     onClick={() => removeRow(index)}
-                    disabled={rows.length === 1}
                   >
                     <Delete />
                   </IconButton>
@@ -297,7 +256,7 @@ const CreatePurchaseRequisition = () => {
         color="primary"
         style={{ marginTop: '10px', marginLeft: '10px' }}
       >
-        Save
+        Save Purchase Order
       </Button>
     </Container>
   );

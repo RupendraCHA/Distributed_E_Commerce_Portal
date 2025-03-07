@@ -1,6 +1,3 @@
-// FRONTEND: React Component for Purchase Requisition List (With User Authentication)
-// File: src/pages/PurchaseRequisitionList.jsx
-
 import React, { useState, useEffect } from 'react';
 import {
   Container,
@@ -12,6 +9,8 @@ import {
   IconButton,
   Tooltip,
   Button,
+  TableContainer,
+  Paper,
 } from '@mui/material';
 import { Edit } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
@@ -43,46 +42,72 @@ const PurchaseRequisitionList = () => {
         Create
       </Button>
 
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>S.No</TableCell>
-            <TableCell>Item No</TableCell>
-            <TableCell>Material</TableCell>
-            <TableCell>Short Text</TableCell>
-            <TableCell>Quantity</TableCell>
-            <TableCell>Unit</TableCell>
-            <TableCell>Delivery Date</TableCell>
-            <TableCell>Material Group</TableCell>
-            <TableCell>Plant</TableCell>
-            <TableCell>Storage Location</TableCell>
-            <TableCell>Purchasing Group</TableCell>
-            <TableCell>Requisitioner</TableCell>
-            <TableCell>Tracking No</TableCell>
-            <TableCell>Vendor</TableCell>
-            <TableCell>Fixed Vendor IS</TableCell>
-            <TableCell>Actions</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {requisitions.map((req, index) =>
-            req.materials.map((material, idx) => (
-              <TableRow key={`${index}-${idx}`}>
+      {/* Scrollable Table Container */}
+      <TableContainer
+        component={Paper}
+        style={{ maxHeight: '500px', overflowY: 'auto' }}
+      >
+        <Table stickyHeader>
+          <TableHead>
+            <TableRow>
+              <TableCell>S.No</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Item No</TableCell>
+              <TableCell>Material</TableCell>
+              <TableCell>Short Text</TableCell>
+              <TableCell>Quantity</TableCell>
+              <TableCell>Unit</TableCell>
+              <TableCell>Delivery Date</TableCell>
+              <TableCell>Material Group</TableCell>
+              <TableCell>Plant</TableCell>
+              <TableCell>Storage Location</TableCell>
+              <TableCell>Purchasing Group</TableCell>
+              <TableCell>Requisitioner</TableCell>
+              <TableCell>Tracking No</TableCell>
+              <TableCell>Vendor</TableCell>
+              <TableCell>Fixed Vendor IS</TableCell>
+              <TableCell>Read Vendor SPG</TableCell>
+              <TableCell>Split Indicator (SPIt)</TableCell>
+              <TableCell>Purchasing Organization (POrg)</TableCell>
+              <TableCell>Agreement</TableCell>
+              <TableCell>Item Info Record</TableCell>
+              <TableCell>MPN Material</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {requisitions.map((req, index) => (
+              <TableRow key={req._id}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{material.itemNo || '-'}</TableCell>
-                <TableCell>{material.materialName || '-'}</TableCell>
-                <TableCell>{material.shortText || '-'}</TableCell>
-                <TableCell>{material.quantity || '-'}</TableCell>
-                <TableCell>{material.unit || '-'}</TableCell>
-                <TableCell>{material.deliveryDate || '-'}</TableCell>
-                <TableCell>{material.materialGroup || '-'}</TableCell>
-                <TableCell>{material.plant || '-'}</TableCell>
-                <TableCell>{material.storageLocation || '-'}</TableCell>
-                <TableCell>{material.purchasingGroup || '-'}</TableCell>
-                <TableCell>{material.requisitioner || '-'}</TableCell>
-                <TableCell>{material.trackingNo || '-'}</TableCell>
-                <TableCell>{material.vendor || '-'}</TableCell>
-                <TableCell>{material.fixedVendorIS || '-'}</TableCell>
+                <TableCell>{req.status || '-'}</TableCell>
+                {[
+                  { key: 'itemNo' },
+                  { key: 'materialName' },
+                  { key: 'shortText' },
+                  { key: 'quantity' },
+                  { key: 'unit', defaultValue: '-' },
+                  { key: 'deliveryDate' },
+                  { key: 'materialGroup' },
+                  { key: 'plant', defaultValue: '-' },
+                  { key: 'storageLocation', defaultValue: '-' },
+                  { key: 'purchasingGroup', defaultValue: '-' },
+                  { key: 'requisitioner', defaultValue: '-' },
+                  { key: 'trackingNo', defaultValue: '-' },
+                  { key: 'vendor', defaultValue: '-' },
+                  { key: 'fixedVendorIS', defaultValue: '-' },
+                  { key: 'readVendorSPG', defaultValue: '-' },
+                  { key: 'splitIndicator', defaultValue: '-' },
+                  { key: 'purchasingOrg', defaultValue: '-' },
+                  { key: 'agreement', defaultValue: '-' },
+                  { key: 'itemInfoRecord', defaultValue: '-' },
+                  { key: 'mpnMaterial', defaultValue: '-' },
+                ].map(({ key, defaultValue }) => (
+                  <TableCell key={key}>
+                    {req.materials.map((mat) => (
+                      <div key={mat.materialId}>{mat[key] || defaultValue}</div>
+                    ))}
+                  </TableCell>
+                ))}
                 <TableCell>
                   <Tooltip title="Edit">
                     <IconButton
@@ -96,10 +121,10 @@ const PurchaseRequisitionList = () => {
                   </Tooltip>
                 </TableCell>
               </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Container>
   );
 };

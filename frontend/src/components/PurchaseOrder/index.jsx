@@ -44,7 +44,7 @@ const PurchaseOrderList = () => {
 
       {/* Purchase Orders Table */}
       <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
-        <Table style={{ minWidth: '1800px' }}>
+        <Table style={{ minWidth: '2200px' }}>
           <TableHead>
             <TableRow>
               {[
@@ -58,11 +58,27 @@ const PurchaseOrderList = () => {
                 'Quantity',
                 'Unit',
                 'Delivery Date',
+                'Start Date',
+                'End Date',
                 'Plant',
                 'Storage Location',
+                'Batch',
+                'Stock Segment',
+                'Request Segment',
+                'Requirement No',
+                'Requisitioner',
                 'Net Price',
                 'Currency',
                 'Tax Code',
+                'Info Record',
+                'Outline Agreement',
+                'Issuing Storage Location',
+                'Service Performer',
+                'Revision Level',
+                'Supplier Mat. No',
+                'Supplier Subrange',
+                'Supplier Batch',
+                'Commodity Code',
                 'Actions',
               ].map((header) => (
                 <TableCell
@@ -98,11 +114,27 @@ const PurchaseOrderList = () => {
                   <TableCell>{item.quantity}</TableCell>
                   <TableCell>{item.unit}</TableCell>
                   <TableCell>{item.deliveryDate}</TableCell>
+                  <TableCell>{item.startDate || '-'}</TableCell>
+                  <TableCell>{item.endDate || '-'}</TableCell>
                   <TableCell>{item.plant}</TableCell>
                   <TableCell>{item.storageLocation}</TableCell>
+                  <TableCell>{item.batch || '-'}</TableCell>
+                  <TableCell>{item.stockSegment || '-'}</TableCell>
+                  <TableCell>{item.requestSegment || '-'}</TableCell>
+                  <TableCell>{item.requirementNo || '-'}</TableCell>
+                  <TableCell>{item.requisitioner || '-'}</TableCell>
                   <TableCell>{item.netPrice}</TableCell>
                   <TableCell>{item.currency}</TableCell>
                   <TableCell>{item.taxCode}</TableCell>
+                  <TableCell>{item.infoRecord || '-'}</TableCell>
+                  <TableCell>{item.outlineAgreement || '-'}</TableCell>
+                  <TableCell>{item.issuingStorageLocation || '-'}</TableCell>
+                  <TableCell>{item.servicePerformer || '-'}</TableCell>
+                  <TableCell>{item.revisionLevel || '-'}</TableCell>
+                  <TableCell>{item.supplierMatNo || '-'}</TableCell>
+                  <TableCell>{item.supplierSubrange || '-'}</TableCell>
+                  <TableCell>{item.supplierBatch || '-'}</TableCell>
+                  <TableCell>{item.commodityCode || '-'}</TableCell>
                   {itemIndex === 0 && (
                     <TableCell rowSpan={po.items.length}>
                       <Tooltip title="Edit">

@@ -21,6 +21,13 @@ const RequisitionSchema = new mongoose.Schema(
         trackingNo: { type: String, default: "" }, // Tracking Number
         vendor: { type: String, default: "" }, // Vendor
         fixedVendorIS: { type: String, default: "" }, // Fixed Vendor IS
+        status: { type: String, default: "Open" }, // Status of the requisition (Open, Approved, Rejected)
+        readVendorSPG: { type: String, default: "" }, // Read Vendor SPG
+        splitIndicator: { type: String, default: "" }, // Split Indicator (SPIt)
+        purchasingOrg: { type: String, default: "" }, // Purchasing Organization (POrg)
+        agreement: { type: String, default: "" }, // Agreement Number
+        itemInfoRecord: { type: String, default: "" }, // Item Info Record
+        mpnMaterial: { type: String, default: "" }, // Manufacturer Part Number (MPN Material)
       },
     ],
   },

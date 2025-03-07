@@ -72,6 +72,7 @@ const EditPurchaseRequisition = () => {
         ...requisition.materials,
         {
           sNo: requisition.materials.length + 1,
+          status: '',
           itemNo: `ITM${String(requisition.materials.length + 1).padStart(
             3,
             '0'
@@ -90,6 +91,12 @@ const EditPurchaseRequisition = () => {
           trackingNo: '',
           vendor: '',
           fixedVendorIS: '',
+          readVendorSPG: '',
+          splitIndicator: '',
+          purchasingOrg: '',
+          agreement: '',
+          itemInfoRecord: '',
+          mpnMaterial: '',
         },
       ],
     });
@@ -123,11 +130,12 @@ const EditPurchaseRequisition = () => {
     <Container>
       <h2>Edit Purchase Requisition</h2>
       <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
-        <Table style={{ minWidth: '1500px' }}>
+        <Table style={{ minWidth: '1800px' }}>
           <TableHead>
             <TableRow>
               {[
                 'S.No',
+                'Status',
                 'Item No',
                 'Material ID',
                 'Material Name',
@@ -143,6 +151,12 @@ const EditPurchaseRequisition = () => {
                 'Tracking No',
                 'Vendor',
                 'Fixed Vendor IS',
+                'Read Vendor SPG',
+                'Split Indicator',
+                'Purchasing Organization',
+                'Agreement',
+                'Item Info Record',
+                'MPN Material',
                 'Action',
               ].map((header) => (
                 <TableCell
@@ -159,6 +173,15 @@ const EditPurchaseRequisition = () => {
               <TableRow key={index}>
                 <TableCell>{material.sNo}</TableCell>
                 <TableCell>
+                  <TextField
+                    value={material.status}
+                    onChange={(e) =>
+                      handleChange(index, 'status', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
                   <TextField value={material.itemNo} disabled fullWidth />
                 </TableCell>
                 <TableCell>
@@ -169,12 +192,7 @@ const EditPurchaseRequisition = () => {
                       handleChange(index, 'materialId', newValue)
                     }
                     renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Material ID"
-                        variant="outlined"
-                        fullWidth
-                      />
+                      <TextField {...params} label="Material ID" fullWidth />
                     )}
                   />
                 </TableCell>
@@ -191,103 +209,37 @@ const EditPurchaseRequisition = () => {
                     fullWidth
                   />
                 </TableCell>
-                <TableCell>
-                  <TextField
-                    type="number"
-                    value={material.quantity}
-                    onChange={(e) =>
-                      handleChange(index, 'quantity', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={material.unit}
-                    onChange={(e) =>
-                      handleChange(index, 'unit', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type="date"
-                    value={material.deliveryDate}
-                    onChange={(e) =>
-                      handleChange(index, 'deliveryDate', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={material.plant}
-                    onChange={(e) =>
-                      handleChange(index, 'plant', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={material.storageLocation}
-                    onChange={(e) =>
-                      handleChange(index, 'storageLocation', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={material.purchasingGroup}
-                    onChange={(e) =>
-                      handleChange(index, 'purchasingGroup', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={material.requisitioner}
-                    onChange={(e) =>
-                      handleChange(index, 'requisitioner', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={material.trackingNo}
-                    onChange={(e) =>
-                      handleChange(index, 'trackingNo', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={material.vendor}
-                    onChange={(e) =>
-                      handleChange(index, 'vendor', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    value={material.fixedVendorIS}
-                    onChange={(e) =>
-                      handleChange(index, 'fixedVendorIS', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
+                {[
+                  { key: 'quantity', type: 'number' },
+                  { key: 'unit' },
+                  { key: 'deliveryDate', type: 'date' },
+                  { key: 'plant' },
+                  { key: 'storageLocation' },
+                  { key: 'purchasingGroup' },
+                  { key: 'requisitioner' },
+                  { key: 'trackingNo' },
+                  { key: 'vendor' },
+                  { key: 'fixedVendorIS' },
+                  { key: 'readVendorSPG' },
+                  { key: 'splitIndicator' },
+                  { key: 'purchasingOrg' },
+                  { key: 'agreement' },
+                  { key: 'itemInfoRecord' },
+                  { key: 'mpnMaterial' },
+                ].map(({ key, type }) => (
+                  <TableCell key={key}>
+                    <TextField
+                      type={type || 'text'}
+                      value={material[key]}
+                      onChange={(e) => handleChange(index, key, e.target.value)}
+                      fullWidth
+                    />
+                  </TableCell>
+                ))}
                 <TableCell>
                   <IconButton
                     color="secondary"
                     onClick={() => removeRow(index)}
-                    disabled={requisition.materials.length === 1}
                   >
                     <Delete />
                   </IconButton>
@@ -298,12 +250,21 @@ const EditPurchaseRequisition = () => {
         </Table>
       </div>
       <Button
-        onClick={handleEditSave}
-        variant="contained"
+        startIcon={<Add />}
+        onClick={addRow}
+        variant="outlined"
         color="primary"
         style={{ marginTop: '10px' }}
       >
-        Save Changes
+        Add Row
+      </Button>
+      <Button
+        onClick={handleEditSave}
+        variant="contained"
+        color="primary"
+        style={{ marginTop: '10px', marginLeft: '10px' }}
+      >
+        Save Purchase Order
       </Button>
     </Container>
   );
