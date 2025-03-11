@@ -3,8 +3,8 @@ const mongoose = require("mongoose");
 const PurchaseOrderSchema = new mongoose.Schema(
   {
     userId: { type: String, required: true }, // User who created the PO
-    vendorId: { type: String, required: true }, // Vendor ID
-    vendorName: { type: String, required: true }, // Vendor Name
+    supplierId: { type: String, required: true }, // Ssupplier ID
+    supplierName: { type: String, required: true }, // Ssupplier Name
     documentDate: { type: String, required: true }, // Purchase Order Document Date
     items: [
       {
