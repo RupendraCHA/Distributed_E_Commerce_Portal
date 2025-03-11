@@ -49,7 +49,7 @@ const PurchaseOrderList = () => {
             <TableRow>
               {[
                 'S.No',
-                'Vendor',
+                'Supplier',
                 'Document Date',
                 'Material ID',
                 'Material Name',
@@ -100,7 +100,7 @@ const PurchaseOrderList = () => {
                         {index + 1}
                       </TableCell>
                       <TableCell rowSpan={po.items.length}>
-                        {po.vendorName} ({po.vendorId})
+                        {po.supplierName} ({po.supplierId})
                       </TableCell>
                       <TableCell rowSpan={po.items.length}>
                         {po.documentDate}

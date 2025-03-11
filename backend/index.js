@@ -17,6 +17,7 @@ const {
   SavedItemModel,
   DistributorModel,
   ProductModel,
+  GoodsReceiptModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -1877,7 +1878,7 @@ app.post("/api/v1/requisition", authenticateToken, async (req, res) => {
         purchasingGroup: m.purchasingGroup || "",
         requisitioner: m.requisitioner || "",
         trackingNo: m.trackingNo || "",
-        vendor: m.vendor || "",
+        supplier: m.supplier || "",
         fixedVendorIS: m.fixedVendorIS || "",
         status: "Open", // Default status
         readVendorSPG: m.readVendorSPG || "",
@@ -1974,7 +1975,7 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
         purchasingGroup: m.purchasingGroup || "",
         requisitioner: m.requisitioner || "",
         trackingNo: m.trackingNo || "",
-        vendor: m.vendor || "",
+        supplier: m.supplier || "",
         fixedVendorIS: m.fixedVendorIS || "",
         status: m.status || "Open",
         readVendorSPG: m.readVendorSPG || "",
@@ -2008,16 +2009,16 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
 // 📌 Create a new Purchase Order
 app.post("/api/v1/purchase-order", authenticateToken, async (req, res) => {
   try {
-    const { vendorId, vendorName, documentDate, items } = req.body;
+    const { supplierId, supplierName, documentDate, items } = req.body;
 
-    if (!vendorId || !vendorName || !documentDate || !items.length) {
+    if (!supplierId || !supplierName || !documentDate || !items.length) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
     const newPO = new PurchaseOrderModel({
       userId: req.user.id,
-      vendorId,
-      vendorName,
+      supplierId,
+      supplierName,
       documentDate,
       items: items.map((item, index) => ({
         sNo: index + 1,
@@ -2097,17 +2098,17 @@ app.get("/api/v1/purchase-order/:id", authenticateToken, async (req, res) => {
 // 📌 Update a Purchase Order
 app.put("/api/v1/purchase-order/:id", authenticateToken, async (req, res) => {
   try {
-    const { vendorId, vendorName, documentDate, items } = req.body;
+    const { supplierId, supplierName, documentDate, items } = req.body;
 
-    if (!vendorId || !vendorName || !documentDate || !items.length) {
+    if (!supplierId || !supplierName || !documentDate || !items.length) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
     const updatedPO = await PurchaseOrderModel.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
       {
-        vendorId,
-        vendorName,
+        supplierId,
+        supplierName,
         documentDate,
         items: items.map((item, index) => ({
           sNo: index + 1,
@@ -2155,6 +2156,120 @@ app.put("/api/v1/purchase-order/:id", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error("Error updating Purchase Order:", error.message);
     res.status(500).json({ message: "Error updating Purchase Order" });
+  }
+});
+
+// 📌 Create a new Goods Receipt Purchase Order
+app.post("/api/v1/goods-receipt", authenticateToken, async (req, res) => {
+  try {
+    const { supplierId, supplierName, documentDate, items } = req.body;
+
+    if (!supplierId || !supplierName || !documentDate || !items.length) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const newGR = new GoodsReceiptModel({
+      userId: req.user.id,
+      supplierId,
+      supplierName,
+      documentDate,
+      items: items.map((item, index) => ({
+        sNo: index + 1,
+        materialId: item.materialId || "",
+        materialName: item.materialName || "",
+        shortText: item.shortText || "",
+        quantity: item.quantity || 1,
+        unit: item.unit || "",
+        plant: item.plant || "",
+        storageLocation: item.storageLocation || "",
+        movementType: item.movementType || "101",
+        stockType: item.stockType || "Unrestricted",
+        goodsRecipient: item.goodsRecipient || "",
+        itemOK: item.itemOK || true,
+      })),
+    });
+
+    await newGR.save();
+    res.status(201).json({
+      message: "Goods Receipt created successfully",
+      goodsReceipt: newGR,
+    });
+  } catch (error) {
+    console.error("Error creating Goods Receipt:", error.message);
+    res.status(500).json({ message: "Error creating Goods Receipt" });
+  }
+});
+
+// 📌 Get all Goods Receipt Purchase Orders
+app.get("/api/v1/goods-receipts", authenticateToken, async (req, res) => {
+  try {
+    const goodsReceipts = await GoodsReceiptModel.find({ userId: req.user.id });
+    res.json(goodsReceipts);
+  } catch (error) {
+    console.error("Error fetching Goods Receipts:", error.message);
+    res.status(500).json({ message: "Error fetching Goods Receipts" });
+  }
+});
+
+// 📌 Get a single Goods Receipt by ID
+app.get("/api/v1/goods-receipt/:id", authenticateToken, async (req, res) => {
+  try {
+    const goodsReceipt = await GoodsReceiptModel.findOne({
+      _id: req.params.id,
+      userId: req.user.id,
+    });
+    if (!goodsReceipt)
+      return res.status(404).json({ message: "Goods Receipt not found" });
+    res.json(goodsReceipt);
+  } catch (error) {
+    console.error("Error fetching Goods Receipt:", error.message);
+    res.status(500).json({ message: "Error fetching Goods Receipt" });
+  }
+});
+
+// 📌 Update a Goods Receipt Purchase Order
+app.put("/api/v1/goods-receipt/:id", authenticateToken, async (req, res) => {
+  try {
+    const { supplierId, supplierName, documentDate, items } = req.body;
+
+    if (!supplierId || !supplierName || !documentDate || !items.length) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const updatedGR = await GoodsReceiptModel.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      {
+        supplierId,
+        supplierName,
+        documentDate,
+        items: items.map((item, index) => ({
+          sNo: index + 1,
+          materialId: item.materialId || "",
+          materialName: item.materialName || "",
+          shortText: item.shortText || "",
+          quantity: item.quantity || 1,
+          unit: item.unit || "",
+          plant: item.plant || "",
+          storageLocation: item.storageLocation || "",
+          movementType: item.movementType || "101",
+          stockType: item.stockType || "Unrestricted",
+          goodsRecipient: item.goodsRecipient || "",
+          itemOK: item.itemOK || true,
+        })),
+      },
+      { new: true }
+    );
+
+    if (!updatedGR)
+      return res.status(404).json({ message: "Goods Receipt not found" });
+
+    res.status(200).json({
+      message: "Goods Receipt updated successfully",
+      goodsReceipt: updatedGR,
+    });
+  } catch (error) {
+    console.error("Error updating Goods Receipt:", error.message);
+    res.status(500).json({ message: "Error updating Goods Receipt" });
   }
 });
 

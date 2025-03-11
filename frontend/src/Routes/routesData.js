@@ -96,6 +96,16 @@ const EditPurchaseOrder = React.lazy(() =>
   import('../components/PurchaseOrder/EditPurchaseOrder.jsx')
 );
 
+const GoodsReceiptOrder = React.lazy(() =>
+  import('../components/GoodsRecieptOrder/index.jsx')
+);
+const CreateGoodsReceiptOrder = React.lazy(() =>
+  import('../components/GoodsRecieptOrder/CreateGoodsRecieptOrder.jsx')
+);
+const EditGoodsReceiptOrder = React.lazy(() =>
+  import('../components/GoodsRecieptOrder/EditGoodsRecieptOrder.jsx')
+);
+
 import {
   productsData,
   solutionsData,
@@ -240,6 +250,18 @@ export const privateRoutes = [
   {
     path: '/sourcing/purchase-orders/edit/:id',
     element: EditPurchaseOrder,
+  },
+  {
+    path: '/sourcing/goods-receipt-orders',
+    element: GoodsReceiptOrder,
+  },
+  {
+    path: '/sourcing/goods-receipt-orders/create',
+    element: CreateGoodsReceiptOrder,
+  },
+  {
+    path: '/sourcing/goods-receipt-orders/edit/:id',
+    element: EditGoodsReceiptOrder,
   },
 ];
 

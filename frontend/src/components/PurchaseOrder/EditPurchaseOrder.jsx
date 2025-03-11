@@ -21,8 +21,8 @@ const EditPurchaseOrder = () => {
   const navigate = useNavigate();
   const [materials, setMaterials] = useState([]);
   const [purchaseOrder, setPurchaseOrder] = useState({
-    vendorId: '',
-    vendorName: '',
+    supplierId: '',
+    supplierName: '',
     documentDate: '',
     items: [],
   });
@@ -131,21 +131,21 @@ const EditPurchaseOrder = () => {
     <Container>
       <h2>Edit Purchase Order</h2>
 
-      {/* Vendor and Document Date Inputs */}
+      {/* Supplier and Document Date Inputs */}
       <TextField
-        label="Vendor ID"
-        value={purchaseOrder.vendorId}
+        label="Supplier ID"
+        value={purchaseOrder.supplierId}
         onChange={(e) =>
-          setPurchaseOrder({ ...purchaseOrder, vendorId: e.target.value })
+          setPurchaseOrder({ ...purchaseOrder, supplierId: e.target.value })
         }
         fullWidth
         margin="normal"
       />
       <TextField
-        label="Vendor Name"
-        value={purchaseOrder.vendorName}
+        label="Supplier Name"
+        value={purchaseOrder.supplierName}
         onChange={(e) =>
-          setPurchaseOrder({ ...purchaseOrder, vendorName: e.target.value })
+          setPurchaseOrder({ ...purchaseOrder, supplierName: e.target.value })
         }
         fullWidth
         margin="normal"

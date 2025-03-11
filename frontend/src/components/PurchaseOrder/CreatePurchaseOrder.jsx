@@ -52,8 +52,8 @@ const CreatePurchaseOrder = () => {
       commodityCode: '',
     },
   ]);
-  const [vendorId, setVendorId] = useState('');
-  const [vendorName, setVendorName] = useState('');
+  const [supplierId, setSupplierId] = useState('');
+  const [supplierName, setSupplierName] = useState('');
   const [documentDate, setDocumentDate] = useState('');
   const navigate = useNavigate();
 
@@ -69,6 +69,7 @@ const CreatePurchaseOrder = () => {
 
     if (field === 'materialId') {
       const selectedMaterial = materials.find((p) => p.materialId === value);
+      console.log({ selectedMaterial });
       if (selectedMaterial) {
         updatedRows[index].materialName = selectedMaterial.materialName;
         updatedRows[index].shortText = selectedMaterial.shortText || '-';
@@ -136,30 +137,30 @@ const CreatePurchaseOrder = () => {
     axios
       .post(
         server_Url + '/api/v1/purchase-order',
-        { vendorId, vendorName, documentDate, items: rows },
+        { supplierId, supplierName, documentDate, items: rows },
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then(() => {
         navigate('/sourcing/purchase-orders');
       });
   };
-
+  console.log({ rows });
   return (
     <Container>
       <h2>Create Purchase Order</h2>
 
-      {/* Vendor and Document Date Inputs */}
+      {/* Supplier and Document Date Inputs */}
       <TextField
-        label="Vendor ID"
-        value={vendorId}
-        onChange={(e) => setVendorId(e.target.value)}
+        label="Supplier ID"
+        value={supplierId}
+        onChange={(e) => setSupplierId(e.target.value)}
         fullWidth
         margin="normal"
       />
       <TextField
-        label="Vendor Name"
-        value={vendorName}
-        onChange={(e) => setVendorName(e.target.value)}
+        label="Supplier Name"
+        value={supplierName}
+        onChange={(e) => setSupplierName(e.target.value)}
         fullWidth
         margin="normal"
       />

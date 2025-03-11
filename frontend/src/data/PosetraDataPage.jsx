@@ -30,7 +30,7 @@ export const SourcingData = [
   },
   {
     title: 'Goods receipt',
-    path: '/sourcing/goods-receipt',
+    path: '/sourcing/goods-receipt-orders',
   },
   {
     title: 'Vendor bill',
