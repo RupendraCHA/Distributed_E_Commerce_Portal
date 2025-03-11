@@ -21,7 +21,7 @@ const CreatePurchaseOrder = () => {
   const [rows, setRows] = useState([
     {
       sNo: 1,
-      itemNo: 'ITM001',
+      itemNo: '-',
       materialId: '',
       materialName: '',
       shortText: '',
@@ -59,7 +59,8 @@ const CreatePurchaseOrder = () => {
 
   useEffect(() => {
     axios.get(server_Url + '/api/v1/getMaterialIds').then((res) => {
-      setMaterials(res.data);
+      const sortedMaterials = res.data.sort((a, b) => a.sNo - b.sNo);
+      setMaterials(sortedMaterials);
     });
   }, []);
 
@@ -76,7 +77,7 @@ const CreatePurchaseOrder = () => {
         updatedRows[index].materialGroup =
           selectedMaterial.materialGroup || '-';
         updatedRows[index].unit = selectedMaterial.unit || '-';
-        updatedRows[index].itemNo = `ITM${String(index + 1).padStart(3, '0')}`;
+        updatedRows[index].itemNo = selectedMaterial.itemNo || '-';
       }
     }
 
@@ -88,7 +89,7 @@ const CreatePurchaseOrder = () => {
       ...rows,
       {
         sNo: rows.length + 1,
-        itemNo: `ITM${String(rows.length + 1).padStart(3, '0')}`,
+        itemNo: `-`,
         materialId: '',
         materialName: '',
         shortText: '',
@@ -144,7 +145,7 @@ const CreatePurchaseOrder = () => {
         navigate('/sourcing/purchase-orders');
       });
   };
-  console.log({ rows });
+  console.log({ materials });
   return (
     <Container>
       <h2>Create Purchase Order</h2>
@@ -317,6 +318,7 @@ const CreatePurchaseOrder = () => {
                         handleChange(index, field, e.target.value)
                       }
                       fullWidth
+                      disabled={field === 'currency'}
                     />
                   </TableCell>
                 ))}

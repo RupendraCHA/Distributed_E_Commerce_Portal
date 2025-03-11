@@ -33,7 +33,10 @@ const EditPurchaseOrder = () => {
       .get(server_Url + '/api/v1/getMaterialIds', {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setMaterials(res.data));
+      .then((res) => {
+        const sortedMaterials = res.data.sort((a, b) => a.sNo - b.sNo);
+        setMaterials(sortedMaterials);
+      });
 
     axios
       .get(`${server_Url}/api/v1/purchase-order/${id}`, {
@@ -54,7 +57,7 @@ const EditPurchaseOrder = () => {
         updatedItems[index].materialGroup =
           selectedMaterial.materialGroup || '-';
         updatedItems[index].unit = selectedMaterial.unit || '-';
-        updatedItems[index].itemNo = `ITM${String(index + 1).padStart(3, '0')}`;
+        updatedItems[index].itemNo = selectedMaterial.itemNo || '-';
       }
     }
 
@@ -68,10 +71,7 @@ const EditPurchaseOrder = () => {
         ...purchaseOrder.items,
         {
           sNo: purchaseOrder.items.length + 1,
-          itemNo: `ITM${String(purchaseOrder.items.length + 1).padStart(
-            3,
-            '0'
-          )}`,
+          itemNo: `-`,
           materialId: '',
           materialName: '',
           shortText: '',
@@ -323,6 +323,7 @@ const EditPurchaseOrder = () => {
                         handleChange(index, field, e.target.value)
                       }
                       fullWidth
+                      disabled={field === 'currency'}
                     />
                   </TableCell>
                 ))}

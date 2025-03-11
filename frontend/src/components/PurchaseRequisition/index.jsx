@@ -47,7 +47,7 @@ const PurchaseRequisitionList = () => {
         component={Paper}
         style={{ maxHeight: '500px', overflowY: 'auto' }}
       >
-        <Table stickyHeader>
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell>S.No</TableCell>
