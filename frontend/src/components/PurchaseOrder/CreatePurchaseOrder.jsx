@@ -243,7 +243,7 @@ const CreatePurchaseOrder = () => {
                     )}
                   />
                 </TableCell>
-                <TableCell key={item.materialName}>
+                <TableCell>
                   <TextField
                     type={'text'}
                     value={item.materialName}
@@ -254,7 +254,7 @@ const CreatePurchaseOrder = () => {
                     disabled
                   />
                 </TableCell>
-                <TableCell key={item.shortText}>
+                <TableCell>
                   <TextField
                     type={'text'}
                     value={item.shortText}
@@ -265,7 +265,7 @@ const CreatePurchaseOrder = () => {
                     disabled
                   />
                 </TableCell>
-                <TableCell key={item.materialGroup}>
+                <TableCell>
                   <TextField
                     type={'text'}
                     value={item.materialGroup}
