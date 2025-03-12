@@ -1,0 +1,11 @@
+version: '3.8'
+
+services:
+  posetra:
+    build: .
+    image: nikhilappasani/posetra-app:latest
+    ports:
+      - "5173:5173"
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production

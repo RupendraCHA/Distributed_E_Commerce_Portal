@@ -1,12 +1,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const PDFDocument = require('pdfkit');
-const fs = require('fs');
-const path = require('path');
-const mustache = require('mustache');
-const puppeteer = require('puppeteer');
-require("dotenv/config.js")
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
+const path = require("path");
+const mustache = require("mustache");
+const puppeteer = require("puppeteer");
+require("dotenv/config.js");
 const Stripe = require("stripe");
 
 const {
@@ -16,14 +16,19 @@ const {
   CartModel,
   SavedItemModel,
   DistributorModel,
-  ProductModel
+  ProductModel,
+  GoodsReceiptModel,
+  InboundDeliveryModel,
 } = require("./Models");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { isAdmin } = require("./authentication");
 const { authenticateToken } = require("./authentication");
 
-const posetraProducts = require("./data/posetraProducts")
+const posetraProducts = require("./data/posetraProducts");
+const RequisitionModel = require("./Models/RequisitionSchema");
+const MaterialModel = require("./Models/MaterialsModel");
+const PurchaseOrderModel = require("./Models/PurchaseOrderSchema");
 const app = express();
 app.use(express.json());
 app.use(
@@ -36,33 +41,26 @@ app.use(
 
 // const JWT_SECRET = "Account_Test";
 
-const MONGO_URI = process.env.MONGO_URI
-const Stripe_Key = process.env.Stripe_Key
+const MONGO_URI = process.env.MONGO_URI;
+const Stripe_Key = process.env.Stripe_Key;
 const JWT_SECRET = process.env.JWT_SECRET;
-const PORT = process.env.PORT
+const PORT = process.env.PORT;
 
 // const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com"
 const checkoutURLs = "https://distributed-e-commerce-portal-frontend.onrender.com"
 // const checkoutURLs = "http://localhost:5173"
 
 const connectDB = async () => {
-  
-try {
-  await mongoose.connect(
-    MONGO_URI
-  );
-  console.log(`Connected to Database Successfully!`);
-} catch (error) {
-  console.log("Error While connecting to MongoDB", error.message)
-}
-}
+  try {
+    await mongoose.connect(MONGO_URI);
+    console.log(`Connected to Database Successfully!`);
+  } catch (error) {
+    console.log("Error While connecting to MongoDB", error.message);
+  }
+};
 connectDB();
 
-
-
-const stripe = Stripe(
-  Stripe_Key
-);
+const stripe = Stripe(Stripe_Key);
 
 app.get("/", (req, res) => {
   res.send(`
@@ -97,115 +95,197 @@ app.get("/", (req, res) => {
       `);
 });
 
-
 const getSapDataDetails = async () => {
-  const url = "http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/Material_data1Set?$format=json";
+  const url =
+    "http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/Material_data1Set?$format=json";
   const username = "NikhilA";
   const password = "Nikhil@12345";
   // Encode the credentials in base64 for Basic Authentication
   const headers = new Headers();
-  headers.set('Authorization', 'Basic ' + btoa(username + ":" + password));
+  headers.set("Authorization", "Basic " + btoa(username + ":" + password));
   const response = await fetch(url, {
-    method: 'GET',
-    headers: headers
-});
-let updatedData;
-// Check if the response is okay
-let dataFieldsForSAP = []
-if (response.ok) {
+    method: "GET",
+    headers: headers,
+  });
+  let updatedData;
+  // Check if the response is okay
+  let dataFieldsForSAP = [];
+  if (response.ok) {
     const data = await response.json();
-    
+
     // # 3) Destructuring the fields, adding them into an Array and consoling them
 
     data.d.results.map((eachRecord) => {
-        let newObject = {
-         productId:eachRecord.Product_ID,
-          productName:eachRecord.Product,
-          category :eachRecord.Material_Category,
-          brand :"",
-          description:eachRecord.Material_Description,
-          price:eachRecord.Price_Of_Product, 
-          weight:eachRecord.Allowed_Packaging_Weight,
-          stock:eachRecord.Storage_percentage,
-          expirationDate:eachRecord.Expiration_Date,
-          image : "",
-        }
-        dataFieldsForSAP.push(newObject)
-      })
+      let newObject = {
+        productId: eachRecord.Product_ID,
+        productName: eachRecord.Product,
+        category: eachRecord.Material_Category,
+        brand: "",
+        description: eachRecord.Material_Description,
+        price: eachRecord.Price_Of_Product,
+        weight: eachRecord.Allowed_Packaging_Weight,
+        stock: eachRecord.Storage_percentage,
+        expirationDate: eachRecord.Expiration_Date,
+        image: "",
+      };
+      dataFieldsForSAP.push(newObject);
+    });
     // console.log(dataFieldsForSAP)
 
     const getProductId = (product) => {
-        return product.productId.slice(0,1).toUpperCase() + product.productId.slice(1, product.productId.length)
-    }
+      return (
+        product.productId.slice(0, 1).toUpperCase() +
+        product.productId.slice(1, product.productId.length)
+      );
+    };
     const updatedData1 = dataFieldsForSAP.map((product) => {
-      if (product.productName === "AGRPUMP"){
-        return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206530/41jM54U8FgL._AC_UF1000_1000_QL80__pyongi.jpg" }
+      if (product.productName === "AGRPUMP") {
+        return {
+          ...product,
+          productId: getProductId(product),
+          category: "Materials",
+          brand: "Materials",
+          weight: product.weight + " lb",
+          image:
+            "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206530/41jM54U8FgL._AC_UF1000_1000_QL80__pyongi.jpg",
+        };
+      } else if (product.productName === "BENALIUM") {
+        return {
+          ...product,
+          productId: getProductId(product),
+          category: "Materials",
+          brand: "Materials",
+          weight: product.weight + " lb",
+          image:
+            "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206617/images_hqeypc.jpg",
+        };
+      } else if (product.productName === "BRASS") {
+        return {
+          ...product,
+          productId: getProductId(product),
+          category: "Materials",
+          brand: "Materials",
+          weight: product.weight + " lb",
+          image:
+            "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206705/brass-metal-components_bxwkyf.jpg",
+        };
+      } else if (product.productName === "LED") {
+        return {
+          ...product,
+          productId: getProductId(product),
+          category: "Materials",
+          brand: "Materials",
+          weight: product.weight + " lb",
+          image:
+            "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206775/led-bulb-raw-material-500x500_otjrgh.webp",
+        };
+      } else if (product.productName === "MNIPICKAXES") {
+        return {
+          ...product,
+          productId: getProductId(product),
+          category: "Materials",
+          brand: "Materials",
+          weight: product.weight + " lb",
+          image:
+            "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206885/ImageForArticle_1446_17219052982689037_kgkxpu.webp",
+        };
+      } else if (product.productName === "SITTAPER") {
+        return {
+          ...product,
+          productId: getProductId(product),
+          category: "Materials",
+          brand: "Materials",
+          weight: product.weight + " lb",
+          image:
+            "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738207536/images_1_a6hh4a.jpg",
+        };
+      } else if (product.productName === "SULPHUR") {
+        return {
+          ...product,
+          productId: getProductId(product),
+          category: "Materials",
+          brand: "Materials",
+          weight: product.weight + " lb",
+          image:
+            "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208651/360_F_85756492_i638LcwoFrymrBj96ZMHP4nL4BOolKfK_ai3zwv.jpg",
+        };
+      } else if (product.productName === "THORIUM") {
+        return {
+          ...product,
+          productId: getProductId(product),
+          category: "Materials",
+          brand: "Materials",
+          weight: product.weight + " lb",
+          image:
+            "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208805/b90b79a0-fcb7-40ea-955d-729b1a85e92b_484973f3_wrdyaa.webp",
+        };
+      } else if (product.productName === "TIE") {
+        return {
+          ...product,
+          productId: getProductId(product),
+          category: "Materials",
+          brand: "Materials",
+          weight: product.weight + " lb",
+          productName: "URANIUM",
+          category: "fashion accessories",
+          description: "This is Radioactive element & generates Nuclear Energy",
+          image:
+            "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208888/uranium-chemical-element_gojtdh.webp",
+        };
+      } else if (product.productName === "TILE") {
+        return {
+          ...product,
+          productId: getProductId(product),
+          category: "Materials",
+          brand: "Materials",
+          weight: product.weight + " lb",
+          image:
+            "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208950/1711451520993_ylgnow.jpg",
+        };
       }
-      else if (product.productName === "BENALIUM"){
-        return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206617/images_hqeypc.jpg" }
-      }
-      else if (product.productName === "BRASS"){
-        return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206705/brass-metal-components_bxwkyf.jpg" }
-      }
-      else if (product.productName === "LED"){
-        return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206775/led-bulb-raw-material-500x500_otjrgh.webp" }
-      }
-      else if (product.productName === "MNIPICKAXES"){
-        return {...product, productId: getProductId(product), category: "Materials", brand: "Materials", weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206885/ImageForArticle_1446_17219052982689037_kgkxpu.webp" }
-      }
-      else if (product.productName === "SITTAPER"){
-        return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738207536/images_1_a6hh4a.jpg" }
-      }
-      else if (product.productName === "SULPHUR"){
-        return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208651/360_F_85756492_i638LcwoFrymrBj96ZMHP4nL4BOolKfK_ai3zwv.jpg" }
-      }
-      else if (product.productName === "THORIUM"){
-        return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208805/b90b79a0-fcb7-40ea-955d-729b1a85e92b_484973f3_wrdyaa.webp" }
-      }
-      else if (product.productName === "TIE"){
-        return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", productName: "URANIUM", category: 'fashion accessories', description: "This is Radioactive element & generates Nuclear Energy", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208888/uranium-chemical-element_gojtdh.webp" }
-      }
-      else if (product.productName === "TILE"){
-        return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208950/1711451520993_ylgnow.jpg" }
-      }
-    })
-    updatedData = updatedData1
+    });
+    updatedData = updatedData1;
   }
   // console.log("U",updatedData)
-  return updatedData
-}
+  return updatedData;
+};
 
 // const SAP = getSapDataDetails()
 
 // Get dashboard stats
 // /api/v1/admin/dashboard API
-app.get("/api/v1/admin/dashboard", authenticateToken, isAdmin, async (req, res) => {
-  try {
-    const [totalUsers, totalOrders, recentOrders, userStats] =
-      await Promise.all([
-        EmployeeModel.countDocuments(),
-        OrderModel.countDocuments(),
-        OrderModel.find().sort({ createdAt: -1 }).limit(5),
-        EmployeeModel.aggregate([
-          {
-            $group: {
-              _id: "$role",
-              count: { $sum: 1 },
+app.get(
+  "/api/v1/admin/dashboard",
+  authenticateToken,
+  isAdmin,
+  async (req, res) => {
+    try {
+      const [totalUsers, totalOrders, recentOrders, userStats] =
+        await Promise.all([
+          EmployeeModel.countDocuments(),
+          OrderModel.countDocuments(),
+          OrderModel.find().sort({ createdAt: -1 }).limit(5),
+          EmployeeModel.aggregate([
+            {
+              $group: {
+                _id: "$role",
+                count: { $sum: 1 },
+              },
             },
-          },
-        ]),
-      ]);
+          ]),
+        ]);
 
-    res.json({
-      totalUsers,
-      totalOrders,
-      recentOrders,
-      userStats,
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching dashboard data" });
+      res.json({
+        totalUsers,
+        totalOrders,
+        recentOrders,
+        userStats,
+      });
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching dashboard data" });
+    }
   }
-});
+);
 
 app.post("/api/v1/create-checkout-session", async (req, res) => {
   try {
@@ -226,10 +306,10 @@ app.post("/api/v1/create-checkout-session", async (req, res) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: checkoutURLs + `/success?session_id={CHECKOUT_SESSION_ID}`, 
+      success_url: checkoutURLs + `/success?session_id={CHECKOUT_SESSION_ID}`,
       // // Pass session ID to success URL
       cancel_url: checkoutURLs + `/cancel`,
-      // success_url: `http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}`, 
+      // success_url: `http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}`,
       // // // Pass session ID to success URL
       // cancel_url: `http://localhost:5173/cancel`,
       metadata: {
@@ -265,23 +345,20 @@ app.post("/api/v1/create-checkout-session", async (req, res) => {
   }
 });
 
-
 app.get("/api/v1/getDataFromSap", async (req, res) => {
   try {
-      const updatedData = await getSapDataDetails()
-      res.status(200).json({success: true, data:updatedData})
-    
+    const updatedData = await getSapDataDetails();
+    res.status(200).json({ success: true, data: updatedData });
   } catch (error) {
-      console.error('Error:', error);
-    
+    console.error("Error:", error);
   }
-})
+});
 
 app.get("/api/v1/distributors/products", async (req, res) => {
   try {
     let allProductsData;
     const distributors = await DistributorModel.find();
-    
+
     // Consolidate product quantities from all distributors using reduce
     const productQuantities = distributors.reduce((acc, distributor) => {
       distributor.warehouses.forEach((warehouse) => {
@@ -291,104 +368,188 @@ app.get("/api/v1/distributors/products", async (req, res) => {
       });
       return acc;
     }, {});
-    console.log(distributors)
+    console.log(distributors);
     // Fetch all products
     const products = await ProductModel.find();
-    console.log(products)
-    
+    console.log(products);
+
     // Map product data and merge quantity from productQuantities
-    const finalProductList = products.map((product) => productQuantities[product.productId] > 0? {
-      ...product.toObject(),
-      quantity: productQuantities[product.productId] || 0,  // Ensure default is 0
-    }: {}).filter((product)=> product.productId);
+    const finalProductList = products
+      .map((product) =>
+        productQuantities[product.productId] > 0
+          ? {
+              ...product.toObject(),
+              quantity: productQuantities[product.productId] || 0, // Ensure default is 0
+            }
+          : {}
+      )
+      .filter((product) => product.productId);
 
     // Log to verify the final list of products
     // console.log(finalProductList);
 
-    const url = "http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/Material_data1Set?$format=json";
-  const username = "NikhilA";
-  const password = "Nikhil@12345";
-  // Encode the credentials in base64 for Basic Authentication
-  const headers = new Headers();
-  headers.set('Authorization', 'Basic ' + btoa(username + ":" + password));
-      // Make the request to the OData service
-      const response = await fetch(url, {
-          method: 'GET',
-          headers: headers
+    const url =
+      "http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/Material_data1Set?$format=json";
+    const username = "NikhilA";
+    const password = "Nikhil@12345";
+    // Encode the credentials in base64 for Basic Authentication
+    const headers = new Headers();
+    headers.set("Authorization", "Basic " + btoa(username + ":" + password));
+    // Make the request to the OData service
+    const response = await fetch(url, {
+      method: "GET",
+      headers: headers,
+    });
+
+    // Check if the response is okay
+    let dataFieldsForSAP = [];
+    if (response.ok) {
+      const data = await response.json();
+
+      // # 3) Destructuring the fields, adding them into an Array and consoling them
+
+      data.d.results.map((eachRecord) => {
+        let newObject = {
+          productId: eachRecord.Product_ID,
+          productName: eachRecord.Product,
+          category: eachRecord.Material_Category,
+          brand: "",
+          description: eachRecord.Material_Description,
+          price: eachRecord.Price_Of_Product,
+          weight: eachRecord.Allowed_Packaging_Weight,
+          stock: eachRecord.Storage_percentage,
+          expirationDate: eachRecord.Expiration_Date,
+          image: "",
+        };
+        dataFieldsForSAP.push(newObject);
+      });
+      // console.log(dataFieldsForSAP)
+
+      const getProductId = (product) => {
+        return (
+          product.productId.slice(0, 1).toUpperCase() +
+          product.productId.slice(1, product.productId.length)
+        );
+      };
+      const updatedData = dataFieldsForSAP.map((product) => {
+        if (product.productName === "AGRPUMP") {
+          return {
+            ...product,
+            productId: getProductId(product),
+            category: "Materials",
+            brand: "Materials",
+            weight: product.weight + " lb",
+            image:
+              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206530/41jM54U8FgL._AC_UF1000_1000_QL80__pyongi.jpg",
+          };
+        } else if (product.productName === "BENALIUM") {
+          return {
+            ...product,
+            productId: getProductId(product),
+            category: "Materials",
+            brand: "Materials",
+            weight: product.weight + " lb",
+            image:
+              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206617/images_hqeypc.jpg",
+          };
+        } else if (product.productName === "BRASS") {
+          return {
+            ...product,
+            productId: getProductId(product),
+            category: "Materials",
+            brand: "Materials",
+            weight: product.weight + " lb",
+            image:
+              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206705/brass-metal-components_bxwkyf.jpg",
+          };
+        } else if (product.productName === "LED") {
+          return {
+            ...product,
+            productId: getProductId(product),
+            category: "Materials",
+            brand: "Materials",
+            weight: product.weight + " lb",
+            image:
+              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206775/led-bulb-raw-material-500x500_otjrgh.webp",
+          };
+        } else if (product.productName === "MNIPICKAXES") {
+          return {
+            ...product,
+            productId: getProductId(product),
+            category: "Materials",
+            brand: "Materials",
+            weight: product.weight + " lb",
+            image:
+              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206885/ImageForArticle_1446_17219052982689037_kgkxpu.webp",
+          };
+        } else if (product.productName === "SITTAPER") {
+          return {
+            ...product,
+            productId: getProductId(product),
+            category: "Materials",
+            brand: "Materials",
+            weight: product.weight + " lb",
+            image:
+              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738207536/images_1_a6hh4a.jpg",
+          };
+        } else if (product.productName === "SULPHUR") {
+          return {
+            ...product,
+            productId: getProductId(product),
+            category: "Materials",
+            brand: "Materials",
+            weight: product.weight + " lb",
+            image:
+              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208651/360_F_85756492_i638LcwoFrymrBj96ZMHP4nL4BOolKfK_ai3zwv.jpg",
+          };
+        } else if (product.productName === "THORIUM") {
+          return {
+            ...product,
+            productId: getProductId(product),
+            category: "Materials",
+            brand: "Materials",
+            weight: product.weight + " lb",
+            image:
+              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208805/b90b79a0-fcb7-40ea-955d-729b1a85e92b_484973f3_wrdyaa.webp",
+          };
+        } else if (product.productName === "TIE") {
+          return {
+            ...product,
+            productId: getProductId(product),
+            category: "Materials",
+            brand: "Materials",
+            weight: product.weight + " lb",
+            productName: "URANIUM",
+            category: "fashion accessories",
+            description:
+              "This is Radioactive element & generates Nuclear Energy",
+            image:
+              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208888/uranium-chemical-element_gojtdh.webp",
+          };
+        } else if (product.productName === "TILE") {
+          return {
+            ...product,
+            productId: getProductId(product),
+            category: "Materials",
+            brand: "Materials",
+            weight: product.weight + " lb",
+            image:
+              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208950/1711451520993_ylgnow.jpg",
+          };
+        }
       });
 
-      // Check if the response is okay
-      let dataFieldsForSAP = []
-      if (response.ok) {
-          const data = await response.json();
-          
-          // # 3) Destructuring the fields, adding them into an Array and consoling them
-
-          data.d.results.map((eachRecord) => {
-              let newObject = {
-               productId:eachRecord.Product_ID,
-                productName:eachRecord.Product,
-                category :eachRecord.Material_Category,
-                brand :"",
-                description:eachRecord.Material_Description,
-                price:eachRecord.Price_Of_Product, 
-                weight:eachRecord.Allowed_Packaging_Weight,
-                stock:eachRecord.Storage_percentage,
-                expirationDate:eachRecord.Expiration_Date,
-                image : "",
-              }
-              dataFieldsForSAP.push(newObject)
-            })
-          // console.log(dataFieldsForSAP)
-
-          const getProductId = (product) => {
-              return product.productId.slice(0,1).toUpperCase() + product.productId.slice(1, product.productId.length)
-          }
-          const updatedData = dataFieldsForSAP.map((product) => {
-            if (product.productName === "AGRPUMP"){
-              return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206530/41jM54U8FgL._AC_UF1000_1000_QL80__pyongi.jpg" }
-            }
-            else if (product.productName === "BENALIUM"){
-              return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206617/images_hqeypc.jpg" }
-            }
-            else if (product.productName === "BRASS"){
-              return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206705/brass-metal-components_bxwkyf.jpg" }
-            }
-            else if (product.productName === "LED"){
-              return {...product, productId: getProductId(product), category: "Materials", brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206775/led-bulb-raw-material-500x500_otjrgh.webp" }
-            }
-            else if (product.productName === "MNIPICKAXES"){
-              return {...product, productId: getProductId(product), category: "Materials", brand: "Materials", weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206885/ImageForArticle_1446_17219052982689037_kgkxpu.webp" }
-            }
-            else if (product.productName === "SITTAPER"){
-              return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738207536/images_1_a6hh4a.jpg" }
-            }
-            else if (product.productName === "SULPHUR"){
-              return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208651/360_F_85756492_i638LcwoFrymrBj96ZMHP4nL4BOolKfK_ai3zwv.jpg" }
-            }
-            else if (product.productName === "THORIUM"){
-              return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208805/b90b79a0-fcb7-40ea-955d-729b1a85e92b_484973f3_wrdyaa.webp" }
-            }
-            else if (product.productName === "TIE"){
-              return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", productName: "URANIUM", category: 'fashion accessories', description: "This is Radioactive element & generates Nuclear Energy", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208888/uranium-chemical-element_gojtdh.webp" }
-            }
-            else if (product.productName === "TILE"){
-              return {...product, productId: getProductId(product), category: "Materials",brand: "Materials",  weight: product.weight + " lb", image : "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208950/1711451520993_ylgnow.jpg" }
-            }
-          })
-
-          allProductsData = await getSapDataDetails()
-          // console.log("updatedDataForDetails",updatedData)
-          // res.status(200).json({success: true, data:updatedData})
-          // res.status(200).json({success: true, data:dataFieldsForSAP})
-
-        } else {
-          console.error('Failed to fetch data', response.status);
-      }
-      // console.log("AllProductsData",allProductsData)
-      // console.log("AllProductsData1",finalProductList)
-      const allProductsDetails = [ ...finalProductList, ...allProductsData]
-      // console.log("AllProductsDetails",allProductsDetails, "Successfull!!!")
+      allProductsData = await getSapDataDetails();
+      // console.log("updatedDataForDetails",updatedData)
+      // res.status(200).json({success: true, data:updatedData})
+      // res.status(200).json({success: true, data:dataFieldsForSAP})
+    } else {
+      console.error("Failed to fetch data", response.status);
+    }
+    // console.log("AllProductsData",allProductsData)
+    // console.log("AllProductsData1",finalProductList)
+    const allProductsDetails = [...finalProductList, ...allProductsData];
+    // console.log("AllProductsDetails",allProductsDetails, "Successfull!!!")
     // res.status(200).json(finalProductList);
     res.status(200).json(allProductsDetails);
   } catch (error) {
@@ -578,8 +739,6 @@ app.put(
   }
 );
 
-
-
 // Get all orders (admin view)
 app.get("/admin/orders", authenticateToken, isAdmin, async (req, res) => {
   // try {
@@ -593,21 +752,22 @@ app.get("/admin/orders", authenticateToken, isAdmin, async (req, res) => {
   try {
     const userId = req.user.id; // Corrected to use req.user.id
     const orders = await OrderModel.find({}); // Fetch orders by user ID
-    
+
     res.json(orders);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Error fetching orders" });
   }
 });
-app.get("/api/v1/allorders",authenticateToken, async (req, res) => {
-  
+app.get("/api/v1/allorders", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id; // Corrected to use req.user.id
     const orders = await OrderModel.find({}); // Fetch orders by user ID
     // let usersOrders = []
-    const usersOrders = orders.filter((order) => userId !== order.userId.toString())
-    
+    const usersOrders = orders.filter(
+      (order) => userId !== order.userId.toString()
+    );
+
     res.json(usersOrders);
     // res.json(orders);
   } catch (error) {
@@ -664,7 +824,9 @@ app.get("/distributors/products", async (req, res) => {
 
     const finalProductList = Object.values(productDataMap)
       .map((productInfo) => {
-        const product = products.find((p) => p.productId === productInfo.productId);
+        const product = products.find(
+          (p) => p.productId === productInfo.productId
+        );
         return product
           ? {
               ...product.toObject(),
@@ -683,15 +845,11 @@ app.get("/distributors/products", async (req, res) => {
   }
 });
 
-
-
-
-
 app.post("/api/v1/login", async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await EmployeeModel.findOne({ email: email });
-    console.log({user})
+    console.log({ user });
     if (!user) {
       return res
         .status(404)
@@ -763,7 +921,7 @@ app.put("/api/v1/user", authenticateToken, (req, res) => {
 app.get("/api/v1/user/markup", authenticateToken, async (req, res) => {
   try {
     const user = await EmployeeModel.findById(req.user.id);
-    console.log({user})
+    console.log({ user });
     if (!user) return res.status(404).json({ message: "User not found" });
 
     res.json({ markUpValue: user.markUpValue });
@@ -790,7 +948,10 @@ app.put("/api/v1/user/markup", authenticateToken, async (req, res) => {
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    res.json({ message: "Markup value updated successfully", markUpValue: user.markUpValue });
+    res.json({
+      message: "Markup value updated successfully",
+      markUpValue: user.markUpValue,
+    });
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Internal server error" });
@@ -830,31 +991,35 @@ app.post("/api/v1/addresses", authenticateToken, async (req, res) => {
   }
 });
 
-app.put("/api/v1/addresses/:id/primary", authenticateToken, async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const addressId = req.params.id;
+app.put(
+  "/api/v1/addresses/:id/primary",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const addressId = req.params.id;
 
-    // Unset all other primary addresses
-    await AddressModel.updateMany({ userId }, { isPrimary: false });
+      // Unset all other primary addresses
+      await AddressModel.updateMany({ userId }, { isPrimary: false });
 
-    // Set the selected address as primary
-    const updatedAddress = await AddressModel.findByIdAndUpdate(
-      addressId,
-      { isPrimary: true },
-      { new: true }
-    );
+      // Set the selected address as primary
+      const updatedAddress = await AddressModel.findByIdAndUpdate(
+        addressId,
+        { isPrimary: true },
+        { new: true }
+      );
 
-    if (!updatedAddress) {
-      return res.status(404).json({ message: "Address not found" });
+      if (!updatedAddress) {
+        return res.status(404).json({ message: "Address not found" });
+      }
+
+      res.json(updatedAddress);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Internal server error" });
     }
-
-    res.json(updatedAddress);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Internal server error" });
   }
-});
+);
 
 app.put("/api/v1/addresses/:id", authenticateToken, async (req, res) => {
   try {
@@ -986,91 +1151,93 @@ app.get("/api/v1/orders", authenticateToken, async (req, res) => {
   }
 });
 
-app.get("/api/v1/ordersForInvoice/:orderId", authenticateToken, async (req, res) => {
-  const {orderId} = req.params
-  // console.log(orderId)
-  try {
-    const userId = req.user.id; // Corrected to use req.user.id
+app.get(
+  "/api/v1/ordersForInvoice/:orderId",
+  authenticateToken,
+  async (req, res) => {
+    const { orderId } = req.params;
+    // console.log(orderId)
+    try {
+      const userId = req.user.id; // Corrected to use req.user.id
 
-    // Convert the orderId string to ObjectId
-    const objectId = new mongoose.Types.ObjectId(orderId);
+      // Convert the orderId string to ObjectId
+      const objectId = new mongoose.Types.ObjectId(orderId);
 
-    // Find the order in the database
-    const order = await OrderModel.findOne({ _id: objectId });
-    // order.push(order.deliveryType)
-    // console.log("ORDER", order.items)
-    
-    const orders = await OrderModel.find({ userId }); // Fetch orders by user ID
+      // Find the order in the database
+      const order = await OrderModel.findOne({ _id: objectId });
+      // order.push(order.deliveryType)
+      // console.log("ORDER", order.items)
 
-    
-    // console.log("orderData",orderData)
-    res.json({orders: orders, orderDetails: order});
-    // res.json(orders);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Error fetching orders" });
+      const orders = await OrderModel.find({ userId }); // Fetch orders by user ID
+
+      // console.log("orderData",orderData)
+      res.json({ orders: orders, orderDetails: order });
+      // res.json(orders);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: "Error fetching orders" });
+    }
   }
-});
-
-
+);
 
 app.get("/api/v1/orders/:orderId/invoice", async (req, res) => {
   try {
-      const orderId = req.params.orderId;
-      const order = await OrderModel.findById(orderId); // Your Order Model
+    const orderId = req.params.orderId;
+    const order = await OrderModel.findById(orderId); // Your Order Model
 
-      if (!order) {
-          return res.status(404).json({ message: "Order not found" });
-      }
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
 
-      const invoicesDir = path.join(__dirname, 'invoices');
-      if (!fs.existsSync(invoicesDir)) {
-          fs.mkdirSync(invoicesDir, { recursive: true });
-      }
+    const invoicesDir = path.join(__dirname, "invoices");
+    if (!fs.existsSync(invoicesDir)) {
+      fs.mkdirSync(invoicesDir, { recursive: true });
+    }
 
-      const template = fs.readFileSync(path.join(__dirname, 'templates/invoice.mustache'), 'utf8');
+    const template = fs.readFileSync(
+      path.join(__dirname, "templates/invoice.mustache"),
+      "utf8"
+    );
 
-      const data = {
-          orderId: order._id,
-          date: new Date(order.createdAt).toDateString(), // Format the date
-          items: order.items.map(item => ({
-              name: item.name,
-              quantity: item.quantity,
-              price: item.price,
-          })),
-          total: order.total,
-          paymentMethod: order.paymentMethod,
-          address: order.address, // Include address information
-      };
+    const data = {
+      orderId: order._id,
+      date: new Date(order.createdAt).toDateString(), // Format the date
+      items: order.items.map((item) => ({
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      total: order.total,
+      paymentMethod: order.paymentMethod,
+      address: order.address, // Include address information
+    };
 
-      // Generate HTML content using Mustache
-      const htmlContent = mustache.render(template, data);
-      const htmlFilePath = path.join(invoicesDir, `order-${orderId}.html`);
+    // Generate HTML content using Mustache
+    const htmlContent = mustache.render(template, data);
+    const htmlFilePath = path.join(invoicesDir, `order-${orderId}.html`);
 
-      // Save the HTML file
-      fs.writeFileSync(htmlFilePath, htmlContent);
+    // Save the HTML file
+    fs.writeFileSync(htmlFilePath, htmlContent);
 
-      // Convert the HTML file to PDF using Puppeteer
-      const browser = await puppeteer.launch();
-      const page = await browser.newPage();
-      await page.setContent(htmlContent);
-      const pdfFilePath = path.join(invoicesDir, `order-${orderId}.pdf`);
-      await page.pdf({ path: pdfFilePath, format: 'A4' });
+    // Convert the HTML file to PDF using Puppeteer
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(htmlContent);
+    const pdfFilePath = path.join(invoicesDir, `order-${orderId}.pdf`);
+    await page.pdf({ path: pdfFilePath, format: "A4" });
 
-      await browser.close();
+    await browser.close();
 
-      res.download(pdfFilePath, `invoice-${orderId}.pdf`, () => {
-          // Optional: Delete files after sending
-          fs.unlinkSync(htmlFilePath);
-          fs.unlinkSync(pdfFilePath); 
-      });
-
+    res.download(pdfFilePath, `invoice-${orderId}.pdf`, () => {
+      // Optional: Delete files after sending
+      fs.unlinkSync(htmlFilePath);
+      fs.unlinkSync(pdfFilePath);
+    });
   } catch (error) {
-      console.error("Error generating invoice:", error);
-      res.status(500).json({ message: "Error generating invoice" });
+    console.error("Error generating invoice:", error);
+    res.status(500).json({ message: "Error generating invoice" });
   }
 });
-
 
 app.patch("/api/v1/orders/:orderId/status", async (req, res) => {
   const { orderId } = req.params;
@@ -1089,15 +1256,20 @@ app.patch("/api/v1/orders/:orderId/status", async (req, res) => {
 });
 
 app.put("/api/v1/order/:id/status", async (req, res) => {
-  const {id} = req.params
-  const updateOrderData = await OrderModel.findById(id)
+  const { id } = req.params;
+  const updateOrderData = await OrderModel.findById(id);
   // console.log("updatedORDERDATA",updateOrderData)
 
-  updateOrderData.status = "Shipped on"
-  updateOrderData.createdAt = new Date()
-  updateOrderData.save()
-  res.status(200).json({status: updateOrderData.status, orderedItems: updateOrderData.items, id : updateOrderData._id, createdAt: updateOrderData.createdAt})
-})
+  updateOrderData.status = "Shipped on";
+  updateOrderData.createdAt = new Date();
+  updateOrderData.save();
+  res.status(200).json({
+    status: updateOrderData.status,
+    orderedItems: updateOrderData.items,
+    id: updateOrderData._id,
+    createdAt: updateOrderData.createdAt,
+  });
+});
 
 app.post("/api/v1/register", async (req, res) => {
   // console.log(req.body);
@@ -1135,50 +1307,54 @@ app.get("/api/v1/savedItems", authenticateToken, async (req, res) => {
   }
 });
 
-app.post("/api/v1/moveToCart/:productId", authenticateToken, async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const productId = req.params.productId;
+app.post(
+  "/api/v1/moveToCart/:productId",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const productId = req.params.productId;
 
-    // Get the saved item
-    const savedItem = await SavedItemModel.findOne({ userId, productId });
-    if (!savedItem) {
-      return res.status(404).json({ message: "Saved item not found" });
+      // Get the saved item
+      const savedItem = await SavedItemModel.findOne({ userId, productId });
+      if (!savedItem) {
+        return res.status(404).json({ message: "Saved item not found" });
+      }
+
+      let cartItem = await CartModel.findOne({ userId, productId });
+
+      if (cartItem) {
+        // If item already exists in cart, update the quantity
+        cartItem.quantity += savedItem.quantity;
+        await cartItem.save();
+      } else {
+        // Create new cart item with the quantity from saved items
+        cartItem = new CartModel({
+          userId,
+          productId,
+          quantity: savedItem.quantity, // Preserve the saved quantity
+          productName: savedItem.productName,
+          category: savedItem.category,
+          brand: savedItem.brand,
+          price: savedItem.price,
+          description: savedItem.description,
+          weight: savedItem.weight,
+          expirationDate: savedItem.expirationDate,
+          image: savedItem.image,
+        });
+        await cartItem.save();
+      }
+
+      // Remove from saved items
+      await SavedItemModel.findOneAndDelete({ userId, productId });
+
+      res.json({ message: "Item moved to cart", cartItem });
+    } catch (error) {
+      console.error("Error moving item to cart:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
-
-    let cartItem = await CartModel.findOne({ userId, productId });
-
-    if (cartItem) {
-      // If item already exists in cart, update the quantity
-      cartItem.quantity += savedItem.quantity;
-      await cartItem.save();
-    } else {
-      // Create new cart item with the quantity from saved items
-      cartItem = new CartModel({
-        userId,
-        productId,
-        quantity: savedItem.quantity, // Preserve the saved quantity
-        productName: savedItem.productName,
-        category: savedItem.category,
-        brand: savedItem.brand,
-        price: savedItem.price,
-        description: savedItem.description,
-        weight: savedItem.weight,
-        expirationDate: savedItem.expirationDate,
-        image: savedItem.image,
-      });
-      await cartItem.save();
-    }
-
-    // Remove from saved items
-    await SavedItemModel.findOneAndDelete({ userId, productId });
-
-    res.json({ message: "Item moved to cart", cartItem });
-  } catch (error) {
-    console.error("Error moving item to cart:", error);
-    res.status(500).json({ error: "Internal server error" });
   }
-});
+);
 
 app.delete("/savedItems/:productId", authenticateToken, async (req, res) => {
   try {
@@ -1200,54 +1376,58 @@ app.delete("/savedItems/:productId", authenticateToken, async (req, res) => {
   }
 });
 
-app.post("/api/v1/saveForLater/:productId", authenticateToken, async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const productId = req.params.productId;
-    const { quantity } = req.body;
+app.post(
+  "/api/v1/saveForLater/:productId",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const userId = req.user.id;
+      const productId = req.params.productId;
+      const { quantity } = req.body;
 
-    // First, get the item from cart
-    const cartItem = await CartModel.findOne({ userId, productId });
-    if (!cartItem) {
-      return res.status(404).json({ message: "Cart item not found" });
+      // First, get the item from cart
+      const cartItem = await CartModel.findOne({ userId, productId });
+      if (!cartItem) {
+        return res.status(404).json({ message: "Cart item not found" });
+      }
+
+      // Check if item is already saved
+      const existingSavedItem = await SavedItemModel.findOne({
+        userId,
+        productId,
+      });
+      if (existingSavedItem) {
+        return res.status(400).json({ message: "Item already saved" });
+      }
+
+      // Create new saved item
+      const savedItem = await new SavedItemModel({
+        userId,
+        productId,
+        productName: cartItem.productName,
+        category: cartItem.category,
+        brand: cartItem.brand,
+        price: cartItem.price,
+        description: cartItem.description,
+        weight: cartItem.weight,
+        expirationDate: cartItem.expirationDate,
+        image: cartItem.image,
+        quantity: quantity || cartItem.quantity,
+      });
+
+      // Save the item
+      await savedItem.save();
+
+      // Remove from cart
+      await CartModel.findOneAndDelete({ userId, productId });
+
+      res.status(201).json({ message: "Item saved for later", savedItem });
+    } catch (error) {
+      console.error("Error saving item for later:", error);
+      res.status(500).json({ error: "Internal server error" });
     }
-
-    // Check if item is already saved
-    const existingSavedItem = await SavedItemModel.findOne({
-      userId,
-      productId,
-    });
-    if (existingSavedItem) {
-      return res.status(400).json({ message: "Item already saved" });
-    }
-
-    // Create new saved item
-    const savedItem = await new SavedItemModel({
-      userId,
-      productId,
-      productName: cartItem.productName,
-      category: cartItem.category,
-      brand: cartItem.brand,
-      price: cartItem.price,
-      description: cartItem.description,
-      weight: cartItem.weight,
-      expirationDate: cartItem.expirationDate,
-      image: cartItem.image,
-      quantity: quantity || cartItem.quantity,
-    });
-
-    // Save the item
-    await savedItem.save();
-
-    // Remove from cart
-    await CartModel.findOneAndDelete({ userId, productId });
-
-    res.status(201).json({ message: "Item saved for later", savedItem });
-  } catch (error) {
-    console.error("Error saving item for later:", error);
-    res.status(500).json({ error: "Internal server error" });
   }
-});
+);
 
 app.post("/api/v1/addToCart", authenticateToken, async (req, res) => {
   try {
@@ -1408,65 +1588,81 @@ app.get("/api/v1/cart", authenticateToken, async (req, res) => {
 });
 
 // Create new distributor profile
-app.post("/api/v1/distributor/register", authenticateToken, async (req, res) => {
-  try {
-    const { companyName, contactPerson, warehouse } = req.body;
+app.post(
+  "/api/v1/distributor/register",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { companyName, contactPerson, warehouse } = req.body;
 
-    // Check if user is a distributor
-    if (req.user.role !== "distributor") {
-      return res
-        .status(403)
-        .json({ message: "Access denied. Distributor role required." });
+      // Check if user is a distributor
+      if (req.user.role !== "distributor") {
+        return res
+          .status(403)
+          .json({ message: "Access denied. Distributor role required." });
+      }
+
+      // Generate unique distributor ID
+      const distributorId = await DistributorModel.generateDistributorId();
+
+      // Create new distributor
+      const distributor = new DistributorModel({
+        userId: req.user.id,
+        distributorId,
+        companyName,
+        contactPerson,
+        warehouses: [{ ...warehouse, isPrimary: true }],
+      });
+
+      await distributor.save();
+      res.status(201).json(distributor);
+    } catch (error) {
+      console.error("Error creating distributor:", error);
+      res.status(500).json({ message: "Failed to create distributor profile" });
     }
-
-    // Generate unique distributor ID
-    const distributorId = await DistributorModel.generateDistributorId();
-
-    // Create new distributor
-    const distributor = new DistributorModel({
-      userId: req.user.id,
-      distributorId,
-      companyName,
-      contactPerson,
-      warehouses: [{ ...warehouse, isPrimary: true }],
-    });
-
-    await distributor.save();
-    res.status(201).json(distributor);
-  } catch (error) {
-    console.error("Error creating distributor:", error);
-    res.status(500).json({ message: "Failed to create distributor profile" });
   }
-});
+);
 
 //Get Warehouses
-app.get("/api/v1/distributor/warehouses", authenticateToken, async (req, res) => {
-  try {
-    const distributor = await DistributorModel.findOne({ userId: req.user.id });
-    if (!distributor) {
-      return res.status(404).json({ message: "Distributor not found" });
+app.get(
+  "/api/v1/distributor/warehouses",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const distributor = await DistributorModel.findOne({
+        userId: req.user.id,
+      });
+      if (!distributor) {
+        return res.status(404).json({ message: "Distributor not found" });
+      }
+      res.json(distributor.warehouses);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch warehouses" });
     }
-    res.json(distributor.warehouses);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch warehouses" });
   }
-});
+);
 
 // Add warehouse
-app.post("/api/v1/distributor/warehouses", authenticateToken, async (req, res) => {
-  try {
-    const distributor = await DistributorModel.findOne({ userId: req.user.id });
-    if (!distributor) {
-      return res.status(404).json({ message: "Distributor not found" });
-    }
+app.post(
+  "/api/v1/distributor/warehouses",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const distributor = await DistributorModel.findOne({
+        userId: req.user.id,
+      });
+      if (!distributor) {
+        return res.status(404).json({ message: "Distributor not found" });
+      }
 
-    distributor.warehouses.push(req.body);
-    await distributor.save();
-    res.json(distributor.warehouses);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to add warehouse" });
+      distributor.warehouses.push(req.body);
+      await distributor.save();
+      res.json(distributor.warehouses);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to add warehouse" });
+    }
   }
-});
+);
 
 app.delete(
   "/api/v1/distributor/warehouses/:warehouseId",
@@ -1610,239 +1806,895 @@ app.get("/api/v1/distributor/details", authenticateToken, async (req, res) => {
   }
 });
 
-app.get('/products', async (req, res) => {
+app.get("/products", async (req, res) => {
   try {
-      const productCategory = req.query.productCategory;
-      // console.log({ productCategory });
+    const productCategory = req.query.productCategory;
+    // console.log({ productCategory });
 
-      let products = await ProductModel.find({});
+    let products = await ProductModel.find({});
 
-      if (productCategory !== 'undefined') {
-          products = products.filter(product => 
-              product.category.toLowerCase() === productCategory.toLowerCase()
-          );
-      }
-      return res.status(200).json(products);
+    if (productCategory !== "undefined") {
+      products = products.filter(
+        (product) =>
+          product.category.toLowerCase() === productCategory.toLowerCase()
+      );
+    }
+    return res.status(200).json(products);
   } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Internal Server Error' });
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 });
 
-app.get("/api/v1/distributor/inventory", authenticateToken, async (req, res) => {
+// Get all material IDs
+app.get("/api/v1/getMaterialIds", async (req, res) => {
   try {
-    // Find the distributor associated with the logged-in user
-    const distributor = await DistributorModel.findOne({ userId: req.user.id });
+    console.log("Fetching material IDs...");
+    const materials = await MaterialModel.find(
+      {},
+      "sNo itemNo materialId materialName shortText materialGroup unit"
+    );
+    res.json(materials);
+  } catch (error) {
+    console.error("Error fetching materials:", error.message);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
 
-    if (!distributor) {
-      return res.status(404).json({ message: "Distributor not found" });
+// Create a new purchase requisition
+app.post("/api/v1/requisition", authenticateToken, async (req, res) => {
+  try {
+    console.log("Creating requisition for user:", req.user.id);
+    const { materials } = req.body;
+
+    const materialIds = materials.map((m) => m.materialId);
+    const existingMaterials = await MaterialModel.find({
+      materialId: { $in: materialIds },
+    });
+
+    if (existingMaterials.length !== materials.length) {
+      return res
+        .status(400)
+        .json({ message: "Some materials are invalid or do not exist." });
     }
 
-    // Create a map of productId to price (consider updatedPrice first, then fallback to price)
-    const productPriceMap = distributor.products.reduce((map, product) => {
-      map[product.productId.toString()] = product.updatedPrice || product.price; // Prefer updatedPrice, fallback to price
-      return map;
-    }, {});
+    const enrichedMaterials = materials.map((m, index) => {
+      const foundMaterial = existingMaterials.find(
+        (mat) => mat.materialId === m.materialId
+      );
+      return {
+        sNo: index + 1,
+        itemNo: foundMaterial
+          ? foundMaterial.itemNo
+          : `ITM${String(index + 1).padStart(3, "0")}`,
+        materialId: m.materialId,
+        materialName: foundMaterial ? foundMaterial.materialName : "",
+        shortText: foundMaterial ? foundMaterial.shortText : "",
+        materialGroup: foundMaterial ? foundMaterial.materialGroup : "",
+        unit: foundMaterial ? foundMaterial.unit : "",
+        quantity: m.quantity,
+        deliveryDate: m.deliveryDate,
+        plant: m.plant || "",
+        storageLocation: m.storageLocation || "",
+        purchasingGroup: m.purchasingGroup || "",
+        requisitioner: m.requisitioner || "",
+        trackingNo: m.trackingNo || "",
+        supplier: m.supplier || "",
+        fixedVendorIS: m.fixedVendorIS || "",
+        status: "Open", // Default status
+        readVendorSPG: m.readVendorSPG || "",
+        splitIndicator: m.splitIndicator || "",
+        purchasingOrg: m.purchasingOrg || "",
+        agreement: m.agreement || "",
+        itemInfoRecord: m.itemInfoRecord || "",
+        mpnMaterial: m.mpnMaterial || "",
+      };
+    });
 
-    // Flatten the inventory data for all warehouses and map prices from productPriceMap
-    const inventoryPromises = distributor.warehouses.flatMap((warehouse) =>
-      warehouse.inventory.map(async (item) => {
-        // Get the price from the productPriceMap (updatedPrice or price)
-        let price = item.newPrice || productPriceMap[item.productId];
+    const newRequisition = new RequisitionModel({
+      userId: req.user.id,
+      materials: enrichedMaterials,
+    });
 
-        // If price is not found in the distributor model, fetch from ProductModel
-        if (!price) {
-          const product = await ProductModel.findOne({ productId: item.productId });
-          price = product?.price || 0; // Fallback to 0 if no price found in ProductModel
-        }
+    await newRequisition.save();
+    res.status(201).json({
+      message: "Requisition created successfully",
+      requisition: newRequisition,
+    });
+  } catch (error) {
+    console.error("Error saving requisition:", error.message);
+    res.status(500).json({ message: "Error saving requisition" });
+  }
+});
 
-        return {
-          _id: item._id,
-          productId: item.productId,
-          productName: item.productId, // Use the productName from distributor's inventory
-          warehouseId: warehouse._id,
-          warehouseName: warehouse.city,
-          warehouseLocation: warehouse.addressLine1,
-          quantity: item.quantity,
-          price: price, // Use the price from the map or ProductModel
-          minimumStock: item.minimumStock || 0, // Default to 0 if not set
-          reorderPoint: item.reorderPoint || 0, // Default to 0 if not set
-        };
-      })
+// Get all requisitions for the logged-in user
+app.get("/api/v1/requisition", authenticateToken, async (req, res) => {
+  try {
+    console.log("Fetching requisitions for user:", req.user.id);
+    const requisitions = await RequisitionModel.find({ userId: req.user.id });
+    res.json(requisitions);
+  } catch (error) {
+    console.error("Error fetching requisitions:", error.message);
+    res.status(500).json({ message: "Server Error" });
+  }
+});
+
+// Get a single requisition by ID
+app.get("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
+  try {
+    console.log("Fetching requisition ID:", req.params.id);
+    const requisition = await RequisitionModel.findOne({
+      _id: req.params.id,
+      userId: req.user.id,
+    });
+
+    if (!requisition)
+      return res.status(404).json({ message: "Requisition not found" });
+
+    res.json(requisition);
+  } catch (error) {
+    console.error("Error fetching requisition:", error.message);
+    res.status(500).json({ message: "Error fetching requisition" });
+  }
+});
+
+// Update a requisition
+app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
+  try {
+    console.log("Updating requisition ID:", req.params.id);
+    const { materials } = req.body;
+
+    const materialIds = materials.map((m) => m.materialId);
+    const existingMaterials = await MaterialModel.find({
+      materialId: { $in: materialIds },
+    });
+
+    if (existingMaterials.length !== materials.length) {
+      return res
+        .status(400)
+        .json({ message: "Some materials are invalid or do not exist." });
+    }
+
+    const enrichedMaterials = materials.map((m, index) => {
+      const foundMaterial = existingMaterials.find(
+        (mat) => mat.materialId === m.materialId
+      );
+      return {
+        sNo: index + 1,
+        itemNo: foundMaterial
+          ? foundMaterial.itemNo
+          : `ITM${String(index + 1).padStart(3, "0")}`,
+        materialId: m.materialId,
+        materialName: foundMaterial ? foundMaterial.materialName : "",
+        shortText: foundMaterial ? foundMaterial.shortText : "",
+        materialGroup: foundMaterial ? foundMaterial.materialGroup : "",
+        unit: foundMaterial ? foundMaterial.unit : "",
+        quantity: m.quantity,
+        deliveryDate: m.deliveryDate,
+        plant: m.plant || "",
+        storageLocation: m.storageLocation || "",
+        purchasingGroup: m.purchasingGroup || "",
+        requisitioner: m.requisitioner || "",
+        trackingNo: m.trackingNo || "",
+        supplier: m.supplier || "",
+        fixedVendorIS: m.fixedVendorIS || "",
+        status: m.status || "Open",
+        readVendorSPG: m.readVendorSPG || "",
+        splitIndicator: m.splitIndicator || "",
+        purchasingOrg: m.purchasingOrg || "",
+        agreement: m.agreement || "",
+        itemInfoRecord: m.itemInfoRecord || "",
+        mpnMaterial: m.mpnMaterial || "",
+      };
+    });
+
+    const updatedRequisition = await RequisitionModel.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      { materials: enrichedMaterials },
+      { new: true }
     );
 
-    // Wait for all promises to resolve before sending the response
-    const inventory = await Promise.all(inventoryPromises);
+    if (!updatedRequisition)
+      return res.status(404).json({ message: "Requisition not found" });
 
-    // Return the inventory data
-    res.status(200).json(inventory);
+    res.status(200).json({
+      message: "Requisition updated successfully",
+      requisition: updatedRequisition,
+    });
   } catch (error) {
-    console.error("Error fetching inventory:", error);
-    res.status(500).json({ message: "Failed to fetch inventory", error: error.message });
+    console.error("Error updating requisition:", error.message);
+    res.status(500).json({ message: "Error updating requisition" });
   }
 });
 
+// 📌 Create a new Purchase Order
+app.post("/api/v1/purchase-order", authenticateToken, async (req, res) => {
+  try {
+    const { supplierId, supplierName, documentDate, items } = req.body;
 
+    if (!supplierId || !supplierName || !documentDate || !items.length) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
 
+    const newPO = new PurchaseOrderModel({
+      userId: req.user.id,
+      supplierId,
+      supplierName,
+      documentDate,
+      items: items.map((item, index) => ({
+        sNo: index + 1,
+        itemNo: `ITM${String(index + 1).padStart(3, "0")}`,
+        materialId: item.materialId || "",
+        materialName: item.materialName || "",
+        shortText: item.shortText || "",
+        materialGroup: item.materialGroup || "",
+        quantity: item.quantity || 1,
+        unit: item.unit || "",
+        deliveryDate: item.deliveryDate || "",
+        startDate: item.startDate || "",
+        endDate: item.endDate || "",
+        plant: item.plant || "",
+        storageLocation: item.storageLocation || "",
+        batch: item.batch || "",
+        stockSegment: item.stockSegment || "",
+        requestSegment: item.requestSegment || "",
+        requirementNo: item.requirementNo || "",
+        requisitioner: item.requisitioner || "",
+        netPrice: item.netPrice || 0,
+        currency: item.currency || "INR",
+        taxCode: item.taxCode || "",
+        infoRecord: item.infoRecord || "",
+        outlineAgreement: item.outlineAgreement || "",
+        issuingStorageLocation: item.issuingStorageLocation || "",
+        servicePerformer: item.servicePerformer || "",
+        revisionLevel: item.revisionLevel || "",
+        supplierMatNo: item.supplierMatNo || "",
+        supplierSubrange: item.supplierSubrange || "",
+        supplierBatch: item.supplierBatch || "",
+        commodityCode: item.commodityCode || "",
+      })),
+    });
+
+    await newPO.save();
+    res.status(201).json({
+      message: "Purchase Order created successfully",
+      purchaseOrder: newPO,
+    });
+  } catch (error) {
+    console.error("Error creating Purchase Order:", error.message);
+    res.status(500).json({ message: "Error creating Purchase Order" });
+  }
+});
+
+// 📌 Get all Purchase Orders
+app.get("/api/v1/purchase-orders", authenticateToken, async (req, res) => {
+  try {
+    const purchaseOrders = await PurchaseOrderModel.find({
+      userId: req.user.id,
+    });
+    res.json(purchaseOrders);
+  } catch (error) {
+    console.error("Error fetching Purchase Orders:", error.message);
+    res.status(500).json({ message: "Error fetching Purchase Orders" });
+  }
+});
+
+// 📌 Get a single Purchase Order by ID
+app.get("/api/v1/purchase-order/:id", authenticateToken, async (req, res) => {
+  try {
+    const purchaseOrder = await PurchaseOrderModel.findOne({
+      _id: req.params.id,
+      userId: req.user.id,
+    });
+    if (!purchaseOrder)
+      return res.status(404).json({ message: "Purchase Order not found" });
+
+    res.json(purchaseOrder);
+  } catch (error) {
+    console.error("Error fetching Purchase Order:", error.message);
+    res.status(500).json({ message: "Error fetching Purchase Order" });
+  }
+});
+
+// 📌 Update a Purchase Order
+app.put("/api/v1/purchase-order/:id", authenticateToken, async (req, res) => {
+  try {
+    const { supplierId, supplierName, documentDate, items } = req.body;
+
+    if (!supplierId || !supplierName || !documentDate || !items.length) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const updatedPO = await PurchaseOrderModel.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      {
+        supplierId,
+        supplierName,
+        documentDate,
+        items: items.map((item, index) => ({
+          sNo: index + 1,
+          itemNo: `ITM${String(index + 1).padStart(3, "0")}`,
+          materialId: item.materialId || "",
+          materialName: item.materialName || "",
+          shortText: item.shortText || "",
+          materialGroup: item.materialGroup || "",
+          quantity: item.quantity || 1,
+          unit: item.unit || "",
+          deliveryDate: item.deliveryDate || "",
+          startDate: item.startDate || "",
+          endDate: item.endDate || "",
+          plant: item.plant || "",
+          storageLocation: item.storageLocation || "",
+          batch: item.batch || "",
+          stockSegment: item.stockSegment || "",
+          requestSegment: item.requestSegment || "",
+          requirementNo: item.requirementNo || "",
+          requisitioner: item.requisitioner || "",
+          netPrice: item.netPrice || 0,
+          currency: item.currency || "INR",
+          taxCode: item.taxCode || "",
+          infoRecord: item.infoRecord || "",
+          outlineAgreement: item.outlineAgreement || "",
+          issuingStorageLocation: item.issuingStorageLocation || "",
+          servicePerformer: item.servicePerformer || "",
+          revisionLevel: item.revisionLevel || "",
+          supplierMatNo: item.supplierMatNo || "",
+          supplierSubrange: item.supplierSubrange || "",
+          supplierBatch: item.supplierBatch || "",
+          commodityCode: item.commodityCode || "",
+        })),
+      },
+      { new: true }
+    );
+
+    if (!updatedPO)
+      return res.status(404).json({ message: "Purchase Order not found" });
+
+    res.status(200).json({
+      message: "Purchase Order updated successfully",
+      purchaseOrder: updatedPO,
+    });
+  } catch (error) {
+    console.error("Error updating Purchase Order:", error.message);
+    res.status(500).json({ message: "Error updating Purchase Order" });
+  }
+});
+
+// 📌 Create a new Goods Receipt Purchase Order
+app.post("/api/v1/goods-receipt", authenticateToken, async (req, res) => {
+  try {
+    const {
+      purchaseOrderId,
+      supplierId,
+      supplierName,
+      documentDate,
+      deliveryNote,
+      items,
+    } = req.body;
+
+    if (
+      !purchaseOrderId ||
+      !supplierId ||
+      !supplierName ||
+      !documentDate ||
+      !items.length
+    ) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const newGR = new GoodsReceiptModel({
+      userId: req.user.id,
+      purchaseOrderId,
+      supplierId,
+      supplierName,
+      documentDate,
+      deliveryNote: deliveryNote || "",
+      items: items.map((item, index) => ({
+        sNo: index + 1,
+        materialId: item.materialId || "",
+        materialName: item.materialName || "",
+        quantityOrdered: item.quantityOrdered || 1,
+        quantityReceived: item.quantityReceived || 0,
+        unit: item.unit || "",
+        storageLocation: item.storageLocation || "",
+        batch: item.batch || "",
+        movementType: item.movementType || "101",
+        stockType: item.stockType || "Unrestricted",
+        goodsRecipient: item.goodsRecipient || "",
+        extendedAmount: item.extendedAmount || 0,
+        taxCode: item.taxCode || "",
+        currency: item.currency || "INR",
+      })),
+    });
+
+    await newGR.save();
+    res.status(201).json({
+      message: "Goods Receipt created successfully",
+      goodsReceipt: newGR,
+    });
+  } catch (error) {
+    console.error("Error creating Goods Receipt:", error.message);
+    res.status(500).json({ message: "Error creating Goods Receipt" });
+  }
+});
+
+// 📌 Get all Goods Receipt Purchase Orders
+app.get("/api/v1/goods-receipts", authenticateToken, async (req, res) => {
+  try {
+    const goodsReceipts = await GoodsReceiptModel.find({ userId: req.user.id });
+    res.json(goodsReceipts);
+  } catch (error) {
+    console.error("Error fetching Goods Receipts:", error.message);
+    res.status(500).json({ message: "Error fetching Goods Receipts" });
+  }
+});
+
+// 📌 Get a single Goods Receipt by ID
+app.get("/api/v1/goods-receipt/:id", authenticateToken, async (req, res) => {
+  try {
+    const goodsReceipt = await GoodsReceiptModel.findOne({
+      _id: req.params.id,
+      userId: req.user.id,
+    });
+
+    if (!goodsReceipt)
+      return res.status(404).json({ message: "Goods Receipt not found" });
+
+    res.json(goodsReceipt);
+  } catch (error) {
+    console.error("Error fetching Goods Receipt:", error.message);
+    res.status(500).json({ message: "Error fetching Goods Receipt" });
+  }
+});
+
+// 📌 Update a Goods Receipt Purchase Order
+app.put("/api/v1/goods-receipt/:id", authenticateToken, async (req, res) => {
+  try {
+    const {
+      purchaseOrderId,
+      supplierId,
+      supplierName,
+      documentDate,
+      deliveryNote,
+      items,
+    } = req.body;
+
+    // Validate required fields
+    if (
+      !purchaseOrderId ||
+      !supplierId ||
+      !supplierName ||
+      !documentDate ||
+      !Array.isArray(items) ||
+      items.length === 0
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Missing or invalid required fields" });
+    }
+
+    // Validate items array structure
+    const formattedItems = items.map((item, index) => ({
+      sNo: index + 1,
+      materialId: item.materialId?.trim() || "",
+      materialName: item.materialName?.trim() || "",
+      shortText: item.shortText?.trim() || "",
+      quantityOrdered: item.quantityOrdered > 0 ? item.quantityOrdered : 1,
+      quantityReceived: item.quantityReceived >= 0 ? item.quantityReceived : 0,
+      unit: item.unit?.trim() || "",
+      plant: item.plant?.trim() || "",
+      storageLocation: item.storageLocation?.trim() || "",
+      batch: item.batch?.trim() || "",
+      stockSegment: item.stockSegment?.trim() || "",
+      movementType: item.movementType?.trim() || "101",
+      stockType: item.stockType?.trim() || "Unrestricted",
+      goodsRecipient: item.goodsRecipient?.trim() || "",
+      unloadingPoint: item.unloadingPoint?.trim() || "",
+      valuationType: item.valuationType?.trim() || "",
+      extendedAmount: item.extendedAmount >= 0 ? item.extendedAmount : 0,
+      taxCode: item.taxCode?.trim() || "",
+      currency: item.currency?.trim() || "INR",
+      itemOK: item.itemOK !== undefined ? item.itemOK : true,
+    }));
+
+    // Update the Goods Receipt
+    const updatedGR = await GoodsReceiptModel.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      {
+        $set: {
+          purchaseOrderId,
+          supplierId,
+          supplierName,
+          documentDate,
+          deliveryNote: deliveryNote?.trim() || "",
+          items: formattedItems,
+        },
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedGR) {
+      return res.status(404).json({ message: "Goods Receipt not found" });
+    }
+
+    res.status(200).json({
+      message: "Goods Receipt updated successfully",
+      goodsReceipt: updatedGR,
+    });
+  } catch (error) {
+    console.error("Error updating Goods Receipt:", error);
+    res
+      .status(500)
+      .json({ message: "Server error while updating Goods Receipt" });
+  }
+});
+
+app.post("/api/v1/inbound-deliveries", authenticateToken, async (req, res) => {
+  try {
+    const { supplierId, supplierName, documentDate, items } = req.body;
+
+    if (!supplierId || !supplierName || !documentDate || !items.length) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const newInboundDelivery = new InboundDeliveryModel({
+      userId: req.user.id,
+      supplierId,
+      supplierName,
+      documentDate,
+      items: items.map((item, index) => ({
+        sNo: index + 1,
+        materialId: item.materialId || "",
+        materialName: item.materialName || "",
+        deliveryQuantity: item.deliveryQuantity || 1,
+        unit: item.unit || "",
+        storageLocation: item.storageLocation || "",
+        supplierBatch: item.supplierBatch || "",
+        grossWeight: item.grossWeight || "",
+        volume: item.volume || "",
+        warehouseNo: item.warehouseNo || "",
+        referenceDocument: item.referenceDocument || "",
+        putawayQty: item.putawayQty || 0,
+      })),
+    });
+
+    await newInboundDelivery.save();
+    res.status(201).json({
+      message: "Inbound Delivery created successfully",
+      inboundDelivery: newInboundDelivery,
+    });
+  } catch (error) {
+    console.error("Error creating Inbound Delivery:", error.message);
+    res.status(500).json({ message: "Error creating Inbound Delivery" });
+  }
+});
+
+app.get("/api/v1/inbound-deliveries", authenticateToken, async (req, res) => {
+  try {
+    const inboundDeliveries = await InboundDeliveryModel.find({
+      userId: req.user.id,
+    });
+    res.json(inboundDeliveries);
+  } catch (error) {
+    console.error("Error fetching Inbound Deliveries:", error.message);
+    res.status(500).json({ message: "Error fetching Inbound Deliveries" });
+  }
+});
+
+app.get(
+  "/api/v1/inbound-deliveries/:id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const inboundDelivery = await InboundDeliveryModel.findOne({
+        _id: req.params.id,
+        userId: req.user.id,
+      });
+
+      if (!inboundDelivery)
+        return res.status(404).json({ message: "Inbound Delivery not found" });
+
+      res.json(inboundDelivery);
+    } catch (error) {
+      console.error("Error fetching Inbound Delivery:", error.message);
+      res.status(500).json({ message: "Error fetching Inbound Delivery" });
+    }
+  }
+);
+
+app.put(
+  "/api/v1/inbound-deliveries/:id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { supplierId, supplierName, documentDate, items } = req.body;
+
+      if (!supplierId || !supplierName || !documentDate || !items.length) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      const updatedInboundDelivery =
+        await InboundDeliveryModel.findOneAndUpdate(
+          { _id: req.params.id, userId: req.user.id },
+          {
+            supplierId,
+            supplierName,
+            documentDate,
+            items: items.map((item, index) => ({
+              sNo: index + 1,
+              materialId: item.materialId || "",
+              materialName: item.materialName || "",
+              deliveryQuantity: item.deliveryQuantity || 1,
+              unit: item.unit || "",
+              storageLocation: item.storageLocation || "",
+              supplierBatch: item.supplierBatch || "",
+              grossWeight: item.grossWeight || "",
+              volume: item.volume || "",
+              warehouseNo: item.warehouseNo || "",
+              referenceDocument: item.referenceDocument || "",
+              putawayQty: item.putawayQty || 0,
+            })),
+          },
+          { new: true }
+        );
+
+      if (!updatedInboundDelivery)
+        return res.status(404).json({ message: "Inbound Delivery not found" });
+
+      res.status(200).json({
+        message: "Inbound Delivery updated successfully",
+        inboundDelivery: updatedInboundDelivery,
+      });
+    } catch (error) {
+      console.error("Error updating Inbound Delivery:", error.message);
+      res.status(500).json({ message: "Error updating Inbound Delivery" });
+    }
+  }
+);
+
+app.get(
+  "/api/v1/distributor/inventory",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      // Find the distributor associated with the logged-in user
+      const distributor = await DistributorModel.findOne({
+        userId: req.user.id,
+      });
+
+      if (!distributor) {
+        return res.status(404).json({ message: "Distributor not found" });
+      }
+
+      // Create a map of productId to price (consider updatedPrice first, then fallback to price)
+      const productPriceMap = distributor.products.reduce((map, product) => {
+        map[product.productId.toString()] =
+          product.updatedPrice || product.price; // Prefer updatedPrice, fallback to price
+        return map;
+      }, {});
+
+      // Flatten the inventory data for all warehouses and map prices from productPriceMap
+      const inventoryPromises = distributor.warehouses.flatMap((warehouse) =>
+        warehouse.inventory.map(async (item) => {
+          // Get the price from the productPriceMap (updatedPrice or price)
+          let price = item.newPrice || productPriceMap[item.productId];
+
+          // If price is not found in the distributor model, fetch from ProductModel
+          if (!price) {
+            const product = await ProductModel.findOne({
+              productId: item.productId,
+            });
+            price = product?.price || 0; // Fallback to 0 if no price found in ProductModel
+          }
+
+          return {
+            _id: item._id,
+            productId: item.productId,
+            productName: item.productId, // Use the productName from distributor's inventory
+            warehouseId: warehouse._id,
+            warehouseName: warehouse.city,
+            warehouseLocation: warehouse.addressLine1,
+            quantity: item.quantity,
+            price: price, // Use the price from the map or ProductModel
+            minimumStock: item.minimumStock || 0, // Default to 0 if not set
+            reorderPoint: item.reorderPoint || 0, // Default to 0 if not set
+          };
+        })
+      );
+
+      // Wait for all promises to resolve before sending the response
+      const inventory = await Promise.all(inventoryPromises);
+
+      // Return the inventory data
+      res.status(200).json(inventory);
+    } catch (error) {
+      console.error("Error fetching inventory:", error);
+      res
+        .status(500)
+        .json({ message: "Failed to fetch inventory", error: error.message });
+    }
+  }
+);
 
 // Update Price for Product in Distributor
-app.post("/api/v1/distributor/update-price", authenticateToken, async (req, res) => {
-  const { productId, warehouseId, newPrice } = req.body;
+app.post(
+  "/api/v1/distributor/update-price",
+  authenticateToken,
+  async (req, res) => {
+    const { productId, warehouseId, newPrice } = req.body;
 
-  try {
-    // Find the distributor associated with the logged-in user
-    const distributor = await DistributorModel.findOne({ userId: req.user.id });
+    try {
+      // Find the distributor associated with the logged-in user
+      const distributor = await DistributorModel.findOne({
+        userId: req.user.id,
+      });
 
-    if (!distributor) {
-      return res.status(404).json({ message: "Distributor not found" });
+      if (!distributor) {
+        return res.status(404).json({ message: "Distributor not found" });
+      }
+
+      // Find the warehouse containing the inventory
+      const warehouse = distributor.warehouses.id(warehouseId);
+      if (!warehouse) {
+        return res.status(404).json({ message: "Warehouse not found" });
+      }
+
+      // Find the product in the warehouse's inventory
+      const inventoryItem = warehouse.inventory.find(
+        (item) => item.productId === productId
+      );
+      if (!inventoryItem) {
+        return res
+          .status(404)
+          .json({ message: "Product not found in warehouse" });
+      }
+
+      // Update the newPrice in the inventory item if it differs from the existing one
+      if (inventoryItem.newPrice !== newPrice) {
+        inventoryItem.newPrice = newPrice;
+      }
+
+      // Save the distributor with the updated price in the warehouse inventory
+      await distributor.save();
+
+      // Respond with the updated inventory
+      res
+        .status(200)
+        .json({ message: "Price updated successfully", distributor });
+    } catch (error) {
+      console.error("Error updating price:", error);
+      res
+        .status(500)
+        .json({ message: "Failed to update price", error: error.message });
     }
-
-    // Find the warehouse containing the inventory
-    const warehouse = distributor.warehouses.id(warehouseId);
-    if (!warehouse) {
-      return res.status(404).json({ message: "Warehouse not found" });
-    }
-
-    // Find the product in the warehouse's inventory
-    const inventoryItem = warehouse.inventory.find(item => item.productId === productId);
-    if (!inventoryItem) {
-      return res.status(404).json({ message: "Product not found in warehouse" });
-    }
-
-    // Update the newPrice in the inventory item if it differs from the existing one
-    if (inventoryItem.newPrice !== newPrice) {
-      inventoryItem.newPrice = newPrice;
-    }
-
-    // Save the distributor with the updated price in the warehouse inventory
-    await distributor.save();
-
-    // Respond with the updated inventory
-    res.status(200).json({ message: "Price updated successfully", distributor });
-  } catch (error) {
-    console.error("Error updating price:", error);
-    res.status(500).json({ message: "Failed to update price", error: error.message });
   }
-});
-
-
-
+);
 
 app.get("/api/v1/inventories", authenticateToken, async (req, res) => {
   try {
     const distributor = await DistributorModel.findOne({ userId: req.user.id });
-    res.status(200).json(distributor)
+    res.status(200).json(distributor);
   } catch (error) {
     console.error("Error fetching inventory:", error);
     res
       .status(500)
       .json({ message: "Failed to fetch inventory", error: error.message });
   }
-})
+});
 
 app.post("/api/v1/inventories", authenticateToken, async (req, res) => {
-  const {inventoryOrders, orderedItems, disWarehouses} = req.body
+  const { inventoryOrders, orderedItems, disWarehouses } = req.body;
   // console.log("INVENTORIES", inventoryOrders)
   // console.log("CONSUMERS", orderedItems)
 
-try {
-  if (!orderedItems || orderedItems.length === 0 || disWarehouses.length === 0 || !disWarehouses) {
-      return res.status(400).json({ message: "Consumer Order and Warehouse details are required!" });
-  }
+  try {
+    if (
+      !orderedItems ||
+      orderedItems.length === 0 ||
+      disWarehouses.length === 0 ||
+      !disWarehouses
+    ) {
+      return res.status(400).json({
+        message: "Consumer Order and Warehouse details are required!",
+      });
+    }
 
-  let { warehouses } = disWarehouses;
-  warehouses.sort((a, b) => b.isPrimary - a.isPrimary);
+    let { warehouses } = disWarehouses;
+    warehouses.sort((a, b) => b.isPrimary - a.isPrimary);
 
-  let deductedProducts = []; // Stores deducted products and their warehouse info
-  let insufficientStockProducts = []; // Stores products with insufficient stock
+    let deductedProducts = []; // Stores deducted products and their warehouse info
+    let insufficientStockProducts = []; // Stores products with insufficient stock
 
-  for (let orderItem of orderedItems) {
-      const { product, name, quantity } = orderItem;  // Extract productName
+    for (let orderItem of orderedItems) {
+      const { product, name, quantity } = orderItem; // Extract productName
       let remainingQuantity = quantity;
       let deductedFromWarehouses = [];
       let insufficientWarehouses = []; // Track which warehouses had insufficient stock
 
       for (let warehouse of warehouses) {
-          if (remainingQuantity === 0) break;
+        if (remainingQuantity === 0) break;
 
-          let productIndex = warehouse.inventory.findIndex(p => p.productId === product);
+        let productIndex = warehouse.inventory.findIndex(
+          (p) => p.productId === product
+        );
 
-          if (productIndex !== -1) {
-              let availableQuantity = warehouse.inventory[productIndex].quantity;
-              let deductedQuantity = Math.min(availableQuantity, remainingQuantity);
+        if (productIndex !== -1) {
+          let availableQuantity = warehouse.inventory[productIndex].quantity;
+          let deductedQuantity = Math.min(availableQuantity, remainingQuantity);
 
-              if (deductedQuantity > 0) {
-                  warehouse.inventory[productIndex].quantity -= deductedQuantity;
-                  remainingQuantity -= deductedQuantity;
+          if (deductedQuantity > 0) {
+            warehouse.inventory[productIndex].quantity -= deductedQuantity;
+            remainingQuantity -= deductedQuantity;
 
-                  // Track the warehouse from which stock was deducted
-                  deductedFromWarehouses.push({
-                      warehouseId: warehouse._id,
-                      warehouseLocation: `${warehouse.addressLine1}, ${warehouse.city}`,
-                      deductedQuantity
-                  });
-              }
-
-              // If the product is still needed but the warehouse has 0 stock, mark it as insufficient
-              if (remainingQuantity > 0 && availableQuantity === 0) {
-                  insufficientWarehouses.push({
-                      warehouseId: warehouse._id,
-                      warehouseLocation: `${warehouse.addressLine1}, ${warehouse.city}`
-                  });
-              }
+            // Track the warehouse from which stock was deducted
+            deductedFromWarehouses.push({
+              warehouseId: warehouse._id,
+              warehouseLocation: `${warehouse.addressLine1}, ${warehouse.city}`,
+              deductedQuantity,
+            });
           }
+
+          // If the product is still needed but the warehouse has 0 stock, mark it as insufficient
+          if (remainingQuantity > 0 && availableQuantity === 0) {
+            insufficientWarehouses.push({
+              warehouseId: warehouse._id,
+              warehouseLocation: `${warehouse.addressLine1}, ${warehouse.city}`,
+            });
+          }
+        }
       }
 
       // If stock was deducted, add to deductedProducts array
       if (deductedFromWarehouses.length > 0) {
-          deductedProducts.push({
-              productId: product,
-              productName: name,  // Include product name
-              orderedQuantity: quantity,
-              deductedFrom: deductedFromWarehouses
-          });
+        deductedProducts.push({
+          productId: product,
+          productName: name, // Include product name
+          orderedQuantity: quantity,
+          deductedFrom: deductedFromWarehouses,
+        });
       }
 
       // If order couldn't be fully fulfilled, add to insufficientStockProducts array
       if (remainingQuantity > 0) {
-          insufficientStockProducts.push({
-              productId: product,
-              productName: name,  // Include product name
-              orderedQuantity: quantity,
-              availableQuantity: quantity - remainingQuantity, // Amount that could be fulfilled
-              insufficientFrom: insufficientWarehouses // Track where stock was insufficient
-          });
+        insufficientStockProducts.push({
+          productId: product,
+          productName: name, // Include product name
+          orderedQuantity: quantity,
+          availableQuantity: quantity - remainingQuantity, // Amount that could be fulfilled
+          insufficientFrom: insufficientWarehouses, // Track where stock was insufficient
+        });
       }
-  }
+    }
 
-  // Add insufficient products to disWarehouses
-  disWarehouses.insufficientStockProducts = insufficientStockProducts;
+    // Add insufficient products to disWarehouses
+    disWarehouses.insufficientStockProducts = insufficientStockProducts;
 
-  // Update the warehouse data in MongoDB
-  await DistributorModel.findByIdAndUpdate(disWarehouses._id, { warehouses, insufficientStockProducts });
+    // Update the warehouse data in MongoDB
+    await DistributorModel.findByIdAndUpdate(disWarehouses._id, {
+      warehouses,
+      insufficientStockProducts,
+    });
 
-  console.log("Deducted Products:", deductedProducts);
-  console.log("Insufficient Stock Products:", insufficientStockProducts);
+    console.log("Deducted Products:", deductedProducts);
+    console.log("Insufficient Stock Products:", insufficientStockProducts);
 
-  res.json({
-      message: insufficientStockProducts.length > 0 
-          ? "Order partially fulfilled, some products have insufficient stock" 
+    res.json({
+      message:
+        insufficientStockProducts.length > 0
+          ? "Order partially fulfilled, some products have insufficient stock"
           : "Order fulfilled successfully",
       deductedProducts,
       insufficientStockProducts,
       updatedWarehouses: warehouses,
-      success:true
-  });
-
-} catch (error) {
-  console.error("Error updating inventory:", error);
-  res.status(500).json({ message: "Failed to update inventory", error: error.message });
-}
-
-
-})
-
-
+      success: true,
+    });
+  } catch (error) {
+    console.error("Error updating inventory:", error);
+    res
+      .status(500)
+      .json({ message: "Failed to update inventory", error: error.message });
+  }
+});
 
 app.post(
   "/warehouses/:warehouseId/products",

@@ -58,25 +58,68 @@ const InventoryManagement = React.lazy(() =>
   import('../components/Distributor/InventoryManagement.jsx')
 );
 
-const posetraAllProducts = React.lazy(() => 
+const posetraAllProducts = React.lazy(() =>
   import('../components/ReusedComponents/AllProducts/AllProducts.jsx')
-)
+);
 
-const inventoryOrders = React.lazy(() => 
-import('../components/InventoryAndOrders/InventoryOrders.jsx')
-)
-const TrackShipping = React.lazy(() => 
-import('../components/TrackShipping/TrackShipping.jsx')
-)
-const FullFilledOrderDetails = React.lazy(() => 
+const inventoryOrders = React.lazy(() =>
+  import('../components/InventoryAndOrders/InventoryOrders.jsx')
+);
+const TrackShipping = React.lazy(() =>
+  import('../components/TrackShipping/TrackShipping.jsx')
+);
+const FullFilledOrderDetails = React.lazy(() =>
   import('../components/FulfilledOrders/FilfilledOrderDetails.jsx')
-)
-const SAPDataDetails = React.lazy(() => 
-import ('../components/ReusedComponents/SAPDataDetails/SAPDataDetails.jsx'))
+);
+const SAPDataDetails = React.lazy(() =>
+  import('../components/ReusedComponents/SAPDataDetails/SAPDataDetails.jsx')
+);
+
+const CreatePurchaseRequisition = React.lazy(() =>
+  import('../components/PurchaseRequisition/CreatePurchaseRequisition.jsx')
+);
+const PurchaseRequisition = React.lazy(() =>
+  import('../components/PurchaseRequisition/index.jsx')
+);
+
+const EditPurchaseRequisition = React.lazy(() =>
+  import('../components/PurchaseRequisition/EditPurchaseRequisition.jsx')
+);
+
+const PurchaseOrderList = React.lazy(() =>
+  import('../components/PurchaseOrder/index.jsx')
+);
+const CreatePurchaseOrder = React.lazy(() =>
+  import('../components/PurchaseOrder/CreatePurchaseOrder.jsx')
+);
+const EditPurchaseOrder = React.lazy(() =>
+  import('../components/PurchaseOrder/EditPurchaseOrder.jsx')
+);
+
+const GoodsReceiptOrder = React.lazy(() =>
+  import('../components/GoodsRecieptOrder/index.jsx')
+);
+const CreateGoodsReceiptOrder = React.lazy(() =>
+  import('../components/GoodsRecieptOrder/CreateGoodsRecieptOrder.jsx')
+);
+const EditGoodsReceiptOrder = React.lazy(() =>
+  import('../components/GoodsRecieptOrder/EditGoodsRecieptOrder.jsx')
+);
+
+const InboundDelivery = React.lazy(() =>
+  import('../components/InboundDelivery/index.jsx')
+);
+const CreateInboundDelivery = React.lazy(() =>
+  import('../components/InboundDelivery/CreateInboundDelivery.jsx')
+);
+const EditInboundDelivery = React.lazy(() =>
+  import('../components/InboundDelivery/EditInboundDelivery.jsx')
+);
 
 import {
   productsData,
   solutionsData,
+  SourcingData,
   pricingData,
   InventoryData,
   QuotationData,
@@ -148,7 +191,7 @@ export const privateRoutes = [
   },
   {
     path: '/distributors/products',
-    element: UserProducts
+    element: UserProducts,
   },
   {
     path: '/cart',
@@ -163,7 +206,7 @@ export const privateRoutes = [
     element: PlaceOrder,
   },
   {
-    path: "/settings",
+    path: '/settings',
     element: Settings,
   },
   {
@@ -176,24 +219,72 @@ export const privateRoutes = [
   },
   {
     path: '/viewProducts',
-    element: posetraAllProducts
+    element: posetraAllProducts,
   },
   {
     path: '/inventoryOrders',
-    element: inventoryOrders
+    element: inventoryOrders,
   },
   {
     path: '/trackShipping',
-    element: TrackShipping
+    element: TrackShipping,
   },
   {
-    path: "/consumerOrderFullfilled",
-    element: FullFilledOrderDetails
+    path: '/consumerOrderFullfilled',
+    element: FullFilledOrderDetails,
   },
   {
-    path: "/product/materials",
-    element: SAPDataDetails
-  }
+    path: '/product/materials',
+    element: SAPDataDetails,
+  },
+  {
+    path: '/sourcing/purchase-requisitions',
+    element: PurchaseRequisition,
+  },
+  {
+    path: '/sourcing/create-requisition',
+    element: CreatePurchaseRequisition,
+  },
+  {
+    path: '/sourcing/edit-requisition/:id',
+    element: EditPurchaseRequisition,
+  },
+  {
+    path: '/sourcing/purchase-orders',
+    element: PurchaseOrderList,
+  },
+  {
+    path: '/sourcing/purchase-orders/create',
+    element: CreatePurchaseOrder,
+  },
+  {
+    path: '/sourcing/purchase-orders/edit/:id',
+    element: EditPurchaseOrder,
+  },
+  {
+    path: '/sourcing/goods-receipt-orders',
+    element: GoodsReceiptOrder,
+  },
+  {
+    path: '/sourcing/goods-receipt-orders/create',
+    element: CreateGoodsReceiptOrder,
+  },
+  {
+    path: '/sourcing/goods-receipt-orders/edit/:id',
+    element: EditGoodsReceiptOrder,
+  },
+  {
+    path: '/sourcing/inbound-deliveries',
+    element: InboundDelivery,
+  },
+  {
+    path: '/sourcing/inbound-deliveries/create',
+    element: CreateInboundDelivery,
+  },
+  {
+    path: '/sourcing/inbound-deliveries/edit/:id',
+    element: EditInboundDelivery,
+  },
 ];
 
 export const adminRoutes = [

@@ -5,6 +5,8 @@ const CartModel = require("./CartSchema");
 const SavedItemModel = require("./SavedItemSChema");
 const DistributorModel = require("./Distributor.model");
 const ProductModel = require("./ProductModel");
+const GoodsReceiptModel = require("./GoodsRecieptSchema");
+const InboundDeliveryModel = require("./InboundDeliverySchema");
 module.exports = {
   EmployeeModel,
   AddressModel,
@@ -13,4 +15,6 @@ module.exports = {
   SavedItemModel,
   ProductModel,
   DistributorModel,
+  GoodsReceiptModel,
+  InboundDeliveryModel,
 };
