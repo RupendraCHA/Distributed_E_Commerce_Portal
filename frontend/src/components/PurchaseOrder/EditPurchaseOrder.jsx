@@ -56,7 +56,7 @@ const EditPurchaseOrder = () => {
         updatedItems[index].shortText = selectedMaterial.shortText || '-';
         updatedItems[index].materialGroup =
           selectedMaterial.materialGroup || '-';
-        updatedItems[index].unit = selectedMaterial.unit || '-';
+        updatedItems[index].unit = selectedMaterial1;
         updatedItems[index].itemNo = selectedMaterial.itemNo || '-';
       }
     }

@@ -14,64 +14,55 @@ import { Edit } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const GoodsReceiptList = () => {
+const InboundDeliveryList = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
-  const [goodsReceipts, setGoodsReceipts] = useState([]);
+  const [inboundDeliveries, setInboundDeliveries] = useState([]);
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get(
-          `${server_Url}/api/v1/goods-receipts`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        setGoodsReceipts(response.data);
-      } catch (error) {
-        console.error('Error fetching Goods Receipts:', error);
-      }
-    };
-
-    fetchData();
-  }, [server_Url, token]);
+    axios
+      .get(`${server_Url}/api/v1/inbound-deliveries`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setInboundDeliveries(res.data))
+      .catch((err) => console.error('Error fetching inbound deliveries:', err));
+  }, []);
 
   return (
     <Container>
-      <h2>Goods Receipt Orders</h2>
+      <h2>Inbound Deliveries</h2>
 
+      {/* Create New Inbound Delivery Button */}
       <Button
         variant="contained"
         color="primary"
         style={{ float: 'right', marginBottom: '10px' }}
-        onClick={() => navigate('/sourcing/goods-receipt-orders/create')}
+        onClick={() => navigate('/sourcing/inbound-deliveries/create')}
       >
         Create
       </Button>
 
+      {/* Inbound Deliveries Table */}
       <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
-        <Table style={{ minWidth: '1800px' }}>
+        <Table style={{ minWidth: '2200px' }}>
           <TableHead>
             <TableRow>
               {[
                 'S.No',
-                'Purchase Order ID',
                 'Supplier',
                 'Document Date',
                 'Material ID',
                 'Material Name',
-                'Ordered Qty',
-                'Received Qty',
+                'Delivery Quantity',
                 'Unit',
-                'Batch',
                 'Storage Location',
-                'Movement Type',
-                'Stock Type',
-                'Goods Recipient',
-                'Extended Amount',
-                'Currency',
+                'Supplier Batch',
+                'Gross Weight',
+                'Volume',
+                'Warehouse No',
+                'Reference Document',
+                'Putaway Quantity',
                 'Actions',
               ].map((header) => (
                 <TableCell
@@ -84,45 +75,41 @@ const GoodsReceiptList = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {goodsReceipts.map((gr, index) =>
-              gr.items.map((item, itemIndex) => (
-                <TableRow key={`${gr._id}-${itemIndex}`}>
+            {inboundDeliveries.map((delivery, index) =>
+              delivery.items.map((item, itemIndex) => (
+                <TableRow key={`${index}-${itemIndex}`}>
                   {itemIndex === 0 && (
                     <>
-                      <TableCell rowSpan={gr.items.length}>
+                      <TableCell rowSpan={delivery.items.length}>
                         {index + 1}
                       </TableCell>
-                      <TableCell rowSpan={gr.items.length}>
-                        {gr.purchaseOrderId}
+                      <TableCell rowSpan={delivery.items.length}>
+                        {delivery.supplierName} ({delivery.supplierId})
                       </TableCell>
-                      <TableCell rowSpan={gr.items.length}>
-                        {gr.supplierName} ({gr.supplierId})
-                      </TableCell>
-                      <TableCell rowSpan={gr.items.length}>
-                        {gr.documentDate}
+                      <TableCell rowSpan={delivery.items.length}>
+                        {delivery.documentDate}
                       </TableCell>
                     </>
                   )}
                   <TableCell>{item.materialId}</TableCell>
                   <TableCell>{item.materialName}</TableCell>
-                  <TableCell>{item.quantityOrdered}</TableCell>
-                  <TableCell>{item.quantityReceived}</TableCell>
+                  <TableCell>{item.deliveryQuantity}</TableCell>
                   <TableCell>{item.unit}</TableCell>
-                  <TableCell>{item.batch || '-'}</TableCell>
                   <TableCell>{item.storageLocation || '-'}</TableCell>
-                  <TableCell>{item.movementType}</TableCell>
-                  <TableCell>{item.stockType}</TableCell>
-                  <TableCell>{item.goodsRecipient || '-'}</TableCell>
-                  <TableCell>{item.extendedAmount || '-'}</TableCell>
-                  <TableCell>{item.currency}</TableCell>
+                  <TableCell>{item.supplierBatch || '-'}</TableCell>
+                  <TableCell>{item.grossWeight || '-'}</TableCell>
+                  <TableCell>{item.volume || '-'}</TableCell>
+                  <TableCell>{item.warehouseNo || '-'}</TableCell>
+                  <TableCell>{item.referenceDocument || '-'}</TableCell>
+                  <TableCell>{item.putawayQty || '-'}</TableCell>
                   {itemIndex === 0 && (
-                    <TableCell rowSpan={gr.items.length}>
+                    <TableCell rowSpan={delivery.items.length}>
                       <Tooltip title="Edit">
                         <IconButton
                           color="primary"
                           onClick={() =>
                             navigate(
-                              `/sourcing/goods-receipt-orders/edit/${gr._id}`
+                              `/sourcing/inbound-deliveries/edit/${delivery._id}`
                             )
                           }
                         >
@@ -141,4 +128,4 @@ const GoodsReceiptList = () => {
   );
 };
 
-export default GoodsReceiptList;
+export default InboundDeliveryList;

@@ -26,7 +26,7 @@ export const SourcingData = [
   },
   {
     title: 'Inbound Delivery',
-    path: '/sourcing/inbound-delivery',
+    path: '/sourcing/inbound-deliveries',
   },
   {
     title: 'Goods receipt',

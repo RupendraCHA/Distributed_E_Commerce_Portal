@@ -18,6 +18,7 @@ const {
   DistributorModel,
   ProductModel,
   GoodsReceiptModel,
+  InboundDeliveryModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -2162,30 +2163,47 @@ app.put("/api/v1/purchase-order/:id", authenticateToken, async (req, res) => {
 // 📌 Create a new Goods Receipt Purchase Order
 app.post("/api/v1/goods-receipt", authenticateToken, async (req, res) => {
   try {
-    const { supplierId, supplierName, documentDate, items } = req.body;
+    const {
+      purchaseOrderId,
+      supplierId,
+      supplierName,
+      documentDate,
+      deliveryNote,
+      items,
+    } = req.body;
 
-    if (!supplierId || !supplierName || !documentDate || !items.length) {
+    if (
+      !purchaseOrderId ||
+      !supplierId ||
+      !supplierName ||
+      !documentDate ||
+      !items.length
+    ) {
       return res.status(400).json({ message: "Missing required fields" });
     }
 
     const newGR = new GoodsReceiptModel({
       userId: req.user.id,
+      purchaseOrderId,
       supplierId,
       supplierName,
       documentDate,
+      deliveryNote: deliveryNote || "",
       items: items.map((item, index) => ({
         sNo: index + 1,
         materialId: item.materialId || "",
         materialName: item.materialName || "",
-        shortText: item.shortText || "",
-        quantity: item.quantity || 1,
+        quantityOrdered: item.quantityOrdered || 1,
+        quantityReceived: item.quantityReceived || 0,
         unit: item.unit || "",
-        plant: item.plant || "",
         storageLocation: item.storageLocation || "",
+        batch: item.batch || "",
         movementType: item.movementType || "101",
         stockType: item.stockType || "Unrestricted",
         goodsRecipient: item.goodsRecipient || "",
-        itemOK: item.itemOK || true,
+        extendedAmount: item.extendedAmount || 0,
+        taxCode: item.taxCode || "",
+        currency: item.currency || "INR",
       })),
     });
 
@@ -2218,8 +2236,10 @@ app.get("/api/v1/goods-receipt/:id", authenticateToken, async (req, res) => {
       _id: req.params.id,
       userId: req.user.id,
     });
+
     if (!goodsReceipt)
       return res.status(404).json({ message: "Goods Receipt not found" });
+
     res.json(goodsReceipt);
   } catch (error) {
     console.error("Error fetching Goods Receipt:", error.message);
@@ -2230,48 +2250,207 @@ app.get("/api/v1/goods-receipt/:id", authenticateToken, async (req, res) => {
 // 📌 Update a Goods Receipt Purchase Order
 app.put("/api/v1/goods-receipt/:id", authenticateToken, async (req, res) => {
   try {
-    const { supplierId, supplierName, documentDate, items } = req.body;
+    const {
+      purchaseOrderId,
+      supplierId,
+      supplierName,
+      documentDate,
+      deliveryNote,
+      items,
+    } = req.body;
 
-    if (!supplierId || !supplierName || !documentDate || !items.length) {
-      return res.status(400).json({ message: "Missing required fields" });
+    // Validate required fields
+    if (
+      !purchaseOrderId ||
+      !supplierId ||
+      !supplierName ||
+      !documentDate ||
+      !Array.isArray(items) ||
+      items.length === 0
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Missing or invalid required fields" });
     }
 
+    // Validate items array structure
+    const formattedItems = items.map((item, index) => ({
+      sNo: index + 1,
+      materialId: item.materialId?.trim() || "",
+      materialName: item.materialName?.trim() || "",
+      shortText: item.shortText?.trim() || "",
+      quantityOrdered: item.quantityOrdered > 0 ? item.quantityOrdered : 1,
+      quantityReceived: item.quantityReceived >= 0 ? item.quantityReceived : 0,
+      unit: item.unit?.trim() || "",
+      plant: item.plant?.trim() || "",
+      storageLocation: item.storageLocation?.trim() || "",
+      batch: item.batch?.trim() || "",
+      stockSegment: item.stockSegment?.trim() || "",
+      movementType: item.movementType?.trim() || "101",
+      stockType: item.stockType?.trim() || "Unrestricted",
+      goodsRecipient: item.goodsRecipient?.trim() || "",
+      unloadingPoint: item.unloadingPoint?.trim() || "",
+      valuationType: item.valuationType?.trim() || "",
+      extendedAmount: item.extendedAmount >= 0 ? item.extendedAmount : 0,
+      taxCode: item.taxCode?.trim() || "",
+      currency: item.currency?.trim() || "INR",
+      itemOK: item.itemOK !== undefined ? item.itemOK : true,
+    }));
+
+    // Update the Goods Receipt
     const updatedGR = await GoodsReceiptModel.findOneAndUpdate(
       { _id: req.params.id, userId: req.user.id },
       {
-        supplierId,
-        supplierName,
-        documentDate,
-        items: items.map((item, index) => ({
-          sNo: index + 1,
-          materialId: item.materialId || "",
-          materialName: item.materialName || "",
-          shortText: item.shortText || "",
-          quantity: item.quantity || 1,
-          unit: item.unit || "",
-          plant: item.plant || "",
-          storageLocation: item.storageLocation || "",
-          movementType: item.movementType || "101",
-          stockType: item.stockType || "Unrestricted",
-          goodsRecipient: item.goodsRecipient || "",
-          itemOK: item.itemOK || true,
-        })),
+        $set: {
+          purchaseOrderId,
+          supplierId,
+          supplierName,
+          documentDate,
+          deliveryNote: deliveryNote?.trim() || "",
+          items: formattedItems,
+        },
       },
-      { new: true }
+      { new: true, runValidators: true }
     );
 
-    if (!updatedGR)
+    if (!updatedGR) {
       return res.status(404).json({ message: "Goods Receipt not found" });
+    }
 
     res.status(200).json({
       message: "Goods Receipt updated successfully",
       goodsReceipt: updatedGR,
     });
   } catch (error) {
-    console.error("Error updating Goods Receipt:", error.message);
-    res.status(500).json({ message: "Error updating Goods Receipt" });
+    console.error("Error updating Goods Receipt:", error);
+    res
+      .status(500)
+      .json({ message: "Server error while updating Goods Receipt" });
   }
 });
+
+app.post("/api/v1/inbound-deliveries", authenticateToken, async (req, res) => {
+  try {
+    const { supplierId, supplierName, documentDate, items } = req.body;
+
+    if (!supplierId || !supplierName || !documentDate || !items.length) {
+      return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    const newInboundDelivery = new InboundDeliveryModel({
+      userId: req.user.id,
+      supplierId,
+      supplierName,
+      documentDate,
+      items: items.map((item, index) => ({
+        sNo: index + 1,
+        materialId: item.materialId || "",
+        materialName: item.materialName || "",
+        deliveryQuantity: item.deliveryQuantity || 1,
+        unit: item.unit || "",
+        storageLocation: item.storageLocation || "",
+        supplierBatch: item.supplierBatch || "",
+        grossWeight: item.grossWeight || "",
+        volume: item.volume || "",
+        warehouseNo: item.warehouseNo || "",
+        referenceDocument: item.referenceDocument || "",
+        putawayQty: item.putawayQty || 0,
+      })),
+    });
+
+    await newInboundDelivery.save();
+    res.status(201).json({
+      message: "Inbound Delivery created successfully",
+      inboundDelivery: newInboundDelivery,
+    });
+  } catch (error) {
+    console.error("Error creating Inbound Delivery:", error.message);
+    res.status(500).json({ message: "Error creating Inbound Delivery" });
+  }
+});
+
+app.get("/api/v1/inbound-deliveries", authenticateToken, async (req, res) => {
+  try {
+    const inboundDeliveries = await InboundDeliveryModel.find({
+      userId: req.user.id,
+    });
+    res.json(inboundDeliveries);
+  } catch (error) {
+    console.error("Error fetching Inbound Deliveries:", error.message);
+    res.status(500).json({ message: "Error fetching Inbound Deliveries" });
+  }
+});
+
+app.get(
+  "/api/v1/inbound-deliveries/:id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const inboundDelivery = await InboundDeliveryModel.findOne({
+        _id: req.params.id,
+        userId: req.user.id,
+      });
+
+      if (!inboundDelivery)
+        return res.status(404).json({ message: "Inbound Delivery not found" });
+
+      res.json(inboundDelivery);
+    } catch (error) {
+      console.error("Error fetching Inbound Delivery:", error.message);
+      res.status(500).json({ message: "Error fetching Inbound Delivery" });
+    }
+  }
+);
+
+app.put(
+  "/api/v1/inbound-deliveries/:id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { supplierId, supplierName, documentDate, items } = req.body;
+
+      if (!supplierId || !supplierName || !documentDate || !items.length) {
+        return res.status(400).json({ message: "Missing required fields" });
+      }
+
+      const updatedInboundDelivery =
+        await InboundDeliveryModel.findOneAndUpdate(
+          { _id: req.params.id, userId: req.user.id },
+          {
+            supplierId,
+            supplierName,
+            documentDate,
+            items: items.map((item, index) => ({
+              sNo: index + 1,
+              materialId: item.materialId || "",
+              materialName: item.materialName || "",
+              deliveryQuantity: item.deliveryQuantity || 1,
+              unit: item.unit || "",
+              storageLocation: item.storageLocation || "",
+              supplierBatch: item.supplierBatch || "",
+              grossWeight: item.grossWeight || "",
+              volume: item.volume || "",
+              warehouseNo: item.warehouseNo || "",
+              referenceDocument: item.referenceDocument || "",
+              putawayQty: item.putawayQty || 0,
+            })),
+          },
+          { new: true }
+        );
+
+      if (!updatedInboundDelivery)
+        return res.status(404).json({ message: "Inbound Delivery not found" });
+
+      res.status(200).json({
+        message: "Inbound Delivery updated successfully",
+        inboundDelivery: updatedInboundDelivery,
+      });
+    } catch (error) {
+      console.error("Error updating Inbound Delivery:", error.message);
+      res.status(500).json({ message: "Error updating Inbound Delivery" });
+    }
+  }
+);
 
 app.get(
   "/api/v1/distributor/inventory",

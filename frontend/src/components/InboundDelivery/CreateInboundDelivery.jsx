@@ -15,41 +15,23 @@ import { Add, Delete } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const CreatePurchaseOrder = () => {
+const CreateInboundDelivery = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
   const [materials, setMaterials] = useState([]);
   const [rows, setRows] = useState([
     {
       sNo: 1,
-      itemNo: '-',
       materialId: '',
       materialName: '',
-      shortText: '',
-      materialGroup: '',
-      quantity: 1,
+      deliveryQuantity: 1,
       unit: '',
-      deliveryDate: '',
-      startDate: '',
-      endDate: '',
-      plant: '',
       storageLocation: '',
-      batch: '',
-      stockSegment: '',
-      requestSegment: '',
-      requirementNo: '',
-      requisitioner: '',
-      netPrice: '',
-      currency: 'INR',
-      taxCode: '',
-      infoRecord: '',
-      outlineAgreement: '',
-      issuingStorageLocation: '',
-      servicePerformer: '',
-      revisionLevel: '',
-      supplierMatNo: '',
-      supplierSubrange: '',
       supplierBatch: '',
-      commodityCode: '',
+      grossWeight: '',
+      volume: '',
+      warehouseNo: '',
+      referenceDocument: '',
+      putawayQty: '',
     },
   ]);
   const [supplierId, setSupplierId] = useState('');
@@ -58,10 +40,13 @@ const CreatePurchaseOrder = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(server_Url + '/api/v1/getMaterialIds').then((res) => {
-      const sortedMaterials = res.data.sort((a, b) => a.sNo - b.sNo);
-      setMaterials(sortedMaterials);
-    });
+    axios
+      .get(server_Url + '/api/v1/getMaterialIds')
+      .then((res) => {
+        const sortedMaterials = res.data.sort((a, b) => a.sNo - b.sNo);
+        setMaterials(sortedMaterials);
+      })
+      .catch((err) => console.error('Error fetching materials:', err));
   }, []);
 
   const handleChange = (index, field, value) => {
@@ -70,14 +55,9 @@ const CreatePurchaseOrder = () => {
 
     if (field === 'materialId') {
       const selectedMaterial = materials.find((p) => p.materialId === value);
-      console.log({ selectedMaterial });
       if (selectedMaterial) {
         updatedRows[index].materialName = selectedMaterial.materialName;
-        updatedRows[index].shortText = selectedMaterial.shortText || '-';
-        updatedRows[index].materialGroup =
-          selectedMaterial.materialGroup || '-';
         updatedRows[index].unit = selectedMaterial.unit || 1;
-        updatedRows[index].itemNo = selectedMaterial.itemNo || '-';
       }
     }
 
@@ -89,66 +69,43 @@ const CreatePurchaseOrder = () => {
       ...rows,
       {
         sNo: rows.length + 1,
-        itemNo: `-`,
         materialId: '',
         materialName: '',
-        shortText: '',
-        materialGroup: '',
-        quantity: 1,
+        deliveryQuantity: 1,
         unit: '',
-        deliveryDate: '',
-        startDate: '',
-        endDate: '',
-        plant: '',
         storageLocation: '',
-        batch: '',
-        stockSegment: '',
-        requestSegment: '',
-        requirementNo: '',
-        requisitioner: '',
-        netPrice: '',
-        currency: 'INR',
-        taxCode: '',
-        infoRecord: '',
-        outlineAgreement: '',
-        issuingStorageLocation: '',
-        servicePerformer: '',
-        revisionLevel: '',
-        supplierMatNo: '',
-        supplierSubrange: '',
         supplierBatch: '',
-        commodityCode: '',
+        grossWeight: '',
+        volume: '',
+        warehouseNo: '',
+        referenceDocument: '',
+        putawayQty: '',
       },
     ]);
   };
 
   const removeRow = (index) => {
     const updatedRows = rows.filter((_, i) => i !== index);
-    setRows(
-      updatedRows.map((row, i) => ({
-        ...row,
-        sNo: i + 1,
-        itemNo: `ITM${String(i + 1).padStart(3, '0')}`,
-      }))
-    ); // Re-number sNo
+    setRows(updatedRows.map((row, i) => ({ ...row, sNo: i + 1 })));
   };
 
   const handleSave = () => {
     const token = localStorage.getItem('token');
     axios
       .post(
-        server_Url + '/api/v1/purchase-order',
+        `${server_Url}/api/v1/inbound-deliveries`,
         { supplierId, supplierName, documentDate, items: rows },
         { headers: { Authorization: `Bearer ${token}` } }
       )
       .then(() => {
-        navigate('/sourcing/purchase-orders');
-      });
+        navigate('/sourcing/inbound-deliveries');
+      })
+      .catch((err) => console.error('Error saving inbound delivery:', err));
   };
-  console.log({ materials });
+
   return (
     <Container>
-      <h2>Create Purchase Order</h2>
+      <h2>Create Inbound Delivery</h2>
 
       {/* Supplier and Document Date Inputs */}
       <TextField
@@ -177,40 +134,22 @@ const CreatePurchaseOrder = () => {
 
       {/* Scrollable Table */}
       <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
-        <Table style={{ minWidth: '2200px' }}>
+        <Table style={{ minWidth: '1800px' }}>
           <TableHead>
             <TableRow>
               {[
                 'S.No',
-                'Item No',
                 'Material ID',
                 'Material Name',
-                'Short Text',
-                'Material Group',
-                'Quantity',
+                'Delivery Quantity',
                 'Unit',
-                'Delivery Date',
-                'Start Date',
-                'End Date',
-                'Plant',
                 'Storage Location',
-                'Batch',
-                'Stock Segment',
-                'Request Segment',
-                'Requirement No',
-                'Requisitioner',
-                'Net Price',
-                'Currency',
-                'Tax Code',
-                'Info Record',
-                'Outline Agreement',
-                'Issuing Storage Location',
-                'Service Performer',
-                'Revision Level',
-                'Supplier Mat. No',
-                'Supplier Subrange',
                 'Supplier Batch',
-                'Commodity Code',
+                'Gross Weight',
+                'Volume',
+                'Warehouse No',
+                'Reference Document',
+                'Putaway Quantity',
                 'Action',
               ].map((header) => (
                 <TableCell
@@ -226,7 +165,6 @@ const CreatePurchaseOrder = () => {
             {rows.map((item, index) => (
               <TableRow key={index}>
                 <TableCell>{item.sNo}</TableCell>
-                <TableCell>{item.itemNo}</TableCell>
                 <TableCell>
                   <Autocomplete
                     options={materials.map((p) => p.materialId)}
@@ -246,82 +184,95 @@ const CreatePurchaseOrder = () => {
                 </TableCell>
                 <TableCell>
                   <TextField
-                    type={'text'}
+                    type="text"
                     value={item.materialName}
-                    onChange={(e) =>
-                      handleChange(index, 'materialName', e.target.value)
-                    }
                     fullWidth
                     disabled
                   />
                 </TableCell>
                 <TableCell>
                   <TextField
-                    type={'text'}
-                    value={item.shortText}
+                    type="number"
+                    value={item.deliveryQuantity}
                     onChange={(e) =>
-                      handleChange(index, 'shortText', e.target.value)
+                      handleChange(index, 'deliveryQuantity', e.target.value)
                     }
                     fullWidth
-                    disabled
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField type="text" value={item.unit} fullWidth disabled />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.storageLocation}
+                    onChange={(e) =>
+                      handleChange(index, 'storageLocation', e.target.value)
+                    }
+                    fullWidth
                   />
                 </TableCell>
                 <TableCell>
                   <TextField
-                    type={'text'}
-                    value={item.materialGroup}
+                    type="text"
+                    value={item.supplierBatch}
                     onChange={(e) =>
-                      handleChange(index, 'materialGroup', e.target.value)
+                      handleChange(index, 'supplierBatch', e.target.value)
                     }
                     fullWidth
-                    disabled
                   />
                 </TableCell>
-                {[
-                  'quantity',
-                  'unit',
-                  'deliveryDate',
-                  'startDate',
-                  'endDate',
-                  'plant',
-                  'storageLocation',
-                  'batch',
-                  'stockSegment',
-                  'requestSegment',
-                  'requirementNo',
-                  'requisitioner',
-                  'netPrice',
-                  'currency',
-                  'taxCode',
-                  'infoRecord',
-                  'outlineAgreement',
-                  'issuingStorageLocation',
-                  'servicePerformer',
-                  'revisionLevel',
-                  'supplierMatNo',
-                  'supplierSubrange',
-                  'supplierBatch',
-                  'commodityCode',
-                ].map((field) => (
-                  <TableCell key={field}>
-                    <TextField
-                      type={
-                        field.includes('Date')
-                          ? 'date'
-                          : field.includes('quantity') ||
-                            field.includes('netPrice')
-                          ? 'number'
-                          : 'text'
-                      }
-                      value={item[field]}
-                      onChange={(e) =>
-                        handleChange(index, field, e.target.value)
-                      }
-                      fullWidth
-                      disabled={field === 'currency'}
-                    />
-                  </TableCell>
-                ))}
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.grossWeight}
+                    onChange={(e) =>
+                      handleChange(index, 'grossWeight', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.volume}
+                    onChange={(e) =>
+                      handleChange(index, 'volume', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.warehouseNo}
+                    onChange={(e) =>
+                      handleChange(index, 'warehouseNo', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.referenceDocument}
+                    onChange={(e) =>
+                      handleChange(index, 'referenceDocument', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="number"
+                    value={item.putawayQty}
+                    onChange={(e) =>
+                      handleChange(index, 'putawayQty', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
                 <TableCell>
                   <IconButton
                     color="secondary"
@@ -352,10 +303,10 @@ const CreatePurchaseOrder = () => {
         color="primary"
         style={{ marginTop: '10px', marginLeft: '10px' }}
       >
-        Save Purchase Order
+        Save Inbound Delivery
       </Button>
     </Container>
   );
 };
 
-export default CreatePurchaseOrder;
+export default CreateInboundDelivery;

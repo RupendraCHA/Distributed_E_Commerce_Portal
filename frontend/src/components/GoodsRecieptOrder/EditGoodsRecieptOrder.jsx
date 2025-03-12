@@ -3,239 +3,300 @@ import {
   Container,
   TextField,
   Button,
-  Autocomplete,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
   IconButton,
+  CircularProgress,
+  Alert,
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const EditGoodsReceiptPO = () => {
+const EditGoodsReceipt = () => {
   const { id } = useParams();
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
   const navigate = useNavigate();
-  const [materials, setMaterials] = useState([]);
-  const [goodsReceipt, setGoodsReceipt] = useState({
-    supplierId: '',
-    supplierName: '',
-    documentDate: '',
-    items: [],
-  });
+  const [goodsReceipt, setGoodsReceipt] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    axios
-      .get(server_Url + '/api/v1/getMaterialIds', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setMaterials(res.data));
+    let isMounted = true;
 
-    axios
-      .get(`${server_Url}/api/v1/goods-receipt/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setGoodsReceipt(res.data));
+    const fetchGoodsReceipt = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get(
+          `${server_Url}/api/v1/goods-receipt/${id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (isMounted) setGoodsReceipt(response.data);
+      } catch (err) {
+        if (isMounted)
+          setError('Failed to fetch Goods Receipt. Please try again.');
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+
+    fetchGoodsReceipt();
+    return () => {
+      isMounted = false;
+    }; // Cleanup function
   }, [id]);
 
   const handleChange = (index, field, value) => {
-    const updatedItems = [...goodsReceipt.items];
-    updatedItems[index][field] = value;
-
-    if (field === 'materialId') {
-      const selectedMaterial = materials.find((p) => p.materialId === value);
-      if (selectedMaterial) {
-        updatedItems[index].materialName = selectedMaterial.materialName;
-        updatedItems[index].shortText = selectedMaterial.shortText || '-';
-        updatedItems[index].unit = selectedMaterial.unit || '-';
-      }
-    }
-
-    setGoodsReceipt({ ...goodsReceipt, items: updatedItems });
+    setGoodsReceipt((prevState) => ({
+      ...prevState,
+      items: prevState.items.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+      ),
+    }));
   };
 
   const addRow = () => {
-    setGoodsReceipt({
-      ...goodsReceipt,
+    setGoodsReceipt((prevState) => ({
+      ...prevState,
       items: [
-        ...goodsReceipt.items,
+        ...prevState.items,
         {
-          sNo: goodsReceipt.items.length + 1,
+          sNo: prevState.items.length + 1,
           materialId: '',
           materialName: '',
-          shortText: '',
-          quantity: 1,
+          quantityOrdered: '',
+          quantityReceived: '',
           unit: '',
-          plant: '',
+          batch: '',
+          stockSegment: '',
           storageLocation: '',
+          plant: '',
+          deliveryNote: '',
           movementType: '101',
-          stockType: 'Unrestricted',
+          stockType: 'Unrestricted-Use',
           goodsRecipient: '',
-          itemOK: true,
+          unloadingPoint: '',
+          valuationType: '',
+          extendedAmount: '',
+          taxCode: '',
+          currency: 'INR',
         },
       ],
-    });
+    }));
   };
 
   const removeRow = (index) => {
-    const updatedItems = goodsReceipt.items.filter((_, i) => i !== index);
-    setGoodsReceipt({
-      ...goodsReceipt,
-      items: updatedItems.map((item, i) => ({
-        ...item,
-        sNo: i + 1,
-      })),
-    });
+    setGoodsReceipt((prevState) => ({
+      ...prevState,
+      items: prevState.items
+        .filter((_, i) => i !== index)
+        .map((item, i) => ({ ...item, sNo: i + 1 })),
+    }));
   };
 
-  const handleEditSave = () => {
-    axios
-      .put(`${server_Url}/api/v1/goods-receipt/${id}`, goodsReceipt, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => {
-        navigate('/sourcing/goods-receipt-orders');
-      });
+  const handleEditSave = async () => {
+    setSaving(true);
+    setError('');
+
+    try {
+      await axios.put(
+        `${server_Url}/api/v1/goods-receipt/${id}`,
+        goodsReceipt,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      navigate('/sourcing/goods-receipt-orders');
+    } catch (err) {
+      setError('Failed to update Goods Receipt. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <Container>
+        <CircularProgress />
+        <p>Loading Goods Receipt...</p>
+      </Container>
+    );
+  }
+
+  if (!goodsReceipt) {
+    return (
+      <Container>
+        <Alert severity="error">{error || 'No Goods Receipt found.'}</Alert>
+      </Container>
+    );
+  }
 
   return (
     <Container>
-      <h2>Edit Goods Receipt Purchase Order</h2>
+      <h2>Edit Goods Receipt</h2>
 
+      {error && <Alert severity="error">{error}</Alert>}
+
+      {/* Document Date */}
       <TextField
         label="Supplier ID"
         value={goodsReceipt.supplierId}
-        onChange={(e) =>
-          setGoodsReceipt({ ...goodsReceipt, supplierId: e.target.value })
-        }
         fullWidth
         margin="normal"
+        disabled
       />
+
       <TextField
         label="Supplier Name"
         value={goodsReceipt.supplierName}
-        onChange={(e) =>
-          setGoodsReceipt({ ...goodsReceipt, supplierName: e.target.value })
-        }
         fullWidth
         margin="normal"
+        disabled
       />
+
       <TextField
         label="Document Date"
         type="date"
         value={goodsReceipt.documentDate}
         onChange={(e) =>
-          setGoodsReceipt({ ...goodsReceipt, documentDate: e.target.value })
+          setGoodsReceipt((prevState) => ({
+            ...prevState,
+            documentDate: e.target.value,
+          }))
         }
         fullWidth
         margin="normal"
         InputLabelProps={{ shrink: true }}
       />
 
-      {goodsReceipt.items.map((item, index) => (
-        <div
-          key={index}
-          style={{
-            display: 'flex',
-            gap: '10px',
-            alignItems: 'center',
-            marginBottom: '10px',
-          }}
-        >
-          <Autocomplete
-            options={materials.map((p) => p.materialId)}
-            value={item.materialId}
-            onChange={(event, newValue) =>
-              handleChange(index, 'materialId', newValue)
-            }
-            renderInput={(params) => (
-              <TextField {...params} label="Material ID" fullWidth />
-            )}
-          />
-          <TextField
-            label="Material Name"
-            value={item.materialName}
-            fullWidth
-            disabled
-          />
-          <TextField
-            label="Short Text"
-            value={item.shortText}
-            fullWidth
-            disabled
-          />
-          <TextField
-            label="Quantity"
-            type="number"
-            value={item.quantity}
-            onChange={(e) => handleChange(index, 'quantity', e.target.value)}
-            fullWidth
-          />
-          <TextField label="Unit" value={item.unit} fullWidth disabled />
-          <TextField
-            label="Plant"
-            value={item.plant}
-            onChange={(e) => handleChange(index, 'plant', e.target.value)}
-            fullWidth
-          />
-          <TextField
-            label="Storage Location"
-            value={item.storageLocation}
-            onChange={(e) =>
-              handleChange(index, 'storageLocation', e.target.value)
-            }
-            fullWidth
-          />
-          <TextField
-            label="Movement Type"
-            value={item.movementType}
-            fullWidth
-            disabled
-          />
-          <TextField
-            label="Stock Type"
-            value={item.stockType}
-            fullWidth
-            disabled
-          />
-          <TextField
-            label="Goods Recipient"
-            value={item.goodsRecipient}
-            onChange={(e) =>
-              handleChange(index, 'goodsRecipient', e.target.value)
-            }
-            fullWidth
-          />
-          <TextField
-            label="Item OK"
-            value={item.itemOK ? '✔' : '❌'}
-            fullWidth
-            disabled
-          />
-          <IconButton color="secondary" onClick={() => removeRow(index)}>
-            <Delete />
-          </IconButton>
-        </div>
-      ))}
+      {/* Scrollable Table */}
+      <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+        <Table style={{ minWidth: '1800px' }}>
+          <TableHead>
+            <TableRow>
+              {[
+                'S.No',
+                'Material ID',
+                'Material Name',
+                'Ordered Qty',
+                'Received Qty',
+                'Unit',
+                'Batch',
+                'Stock Segment',
+                'Storage Location',
+                'Plant',
+                'Delivery Note',
+                'Movement Type',
+                'Stock Type',
+                'Goods Recipient',
+                'Unloading Point',
+                'Valuation Type',
+                'Extended Amount',
+                'Tax Code',
+                'Currency',
+                'Action',
+              ].map((header) => (
+                <TableCell
+                  key={header}
+                  style={{ minWidth: '120px', fontWeight: 'bold' }}
+                >
+                  {header}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {goodsReceipt.items.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell>{item.sNo}</TableCell>
+                <TableCell>{item.materialId}</TableCell>
+                <TableCell>{item.materialName}</TableCell>
+                <TableCell>{item.quantityOrdered}</TableCell>
+                <TableCell>
+                  <TextField
+                    type="number"
+                    value={item.quantityReceived}
+                    onChange={(e) =>
+                      handleChange(index, 'quantityReceived', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>{item.unit}</TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.batch}
+                    onChange={(e) =>
+                      handleChange(index, 'batch', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.stockSegment}
+                    onChange={(e) =>
+                      handleChange(index, 'stockSegment', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>{item.storageLocation}</TableCell>
+                <TableCell>{item.plant}</TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.deliveryNote}
+                    onChange={(e) =>
+                      handleChange(index, 'deliveryNote', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>{item.movementType}</TableCell>
+                <TableCell>{item.stockType}</TableCell>
+                <TableCell>{item.extendedAmount}</TableCell>
+                <TableCell>{item.taxCode}</TableCell>
+                <TableCell>{item.currency}</TableCell>
+                <TableCell>
+                  <IconButton
+                    color="secondary"
+                    onClick={() => removeRow(index)}
+                    disabled={goodsReceipt.items.length === 1}
+                  >
+                    <Delete />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
-      <Button
-        startIcon={<Add />}
-        onClick={addRow}
-        variant="outlined"
-        color="primary"
-        style={{ marginTop: '10px' }}
-      >
+      <Button startIcon={<Add />} onClick={addRow} variant="outlined">
         Add Row
       </Button>
       <Button
         onClick={handleEditSave}
         variant="contained"
         color="primary"
-        style={{ marginTop: '10px', marginLeft: '10px' }}
+        disabled={saving}
       >
-        Save Changes
+        {saving ? <CircularProgress size={24} /> : 'Save Changes'}
       </Button>
     </Container>
   );
 };
 
-export default EditGoodsReceiptPO;
+export default EditGoodsReceipt;
