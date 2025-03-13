@@ -46,8 +46,8 @@ const Stripe_Key = process.env.Stripe_Key;
 const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = process.env.PORT;
 
-const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com" // Visionsoft
-// const checkoutURLs = "https://distributed-e-commerce-portal-frontend.onrender.com"
+// const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com" // Visionsoft
+const checkoutURLs = "https://distributed-e-commerce-portal-frontend.onrender.com"
 // const checkoutURLs = "http://localhost:5173"
 
 const connectDB = async () => {
