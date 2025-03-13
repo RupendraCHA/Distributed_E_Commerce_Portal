@@ -40,18 +40,21 @@ const GoodsReceiptList = () => {
 
   return (
     <Container>
-      <h2>Goods Receipt Orders</h2>
+      <h1 style={{ fontSize: '22px', fontWeight: 'bold', marginTop: '10px' }}>
+        Goods Receipt Orders
+      </h1>
 
+      {/* Create New Inbound Delivery Button */}
       <Button
         variant="contained"
         color="primary"
-        style={{ float: 'right', marginBottom: '10px' }}
+        style={{ float: 'right' }}
         onClick={() => navigate('/sourcing/goods-receipt-orders/create')}
       >
         Create
       </Button>
 
-      <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+      <div style={{ overflowX: 'auto', maxWidth: '100%', marginTop: '50px' }}>
         <Table style={{ minWidth: '1800px' }}>
           <TableHead>
             <TableRow>

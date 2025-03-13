@@ -30,20 +30,22 @@ const PurchaseOrderList = () => {
 
   return (
     <Container>
-      <h2>Purchase Orders</h2>
+      <h1 style={{ fontSize: '22px', fontWeight: 'bold', marginTop: '10px' }}>
+        Purchase Orders
+      </h1>
 
-      {/* Create New Purchase Order Button */}
+      {/* Create New Inbound Delivery Button */}
       <Button
         variant="contained"
         color="primary"
-        style={{ float: 'right', marginBottom: '10px' }}
+        style={{ float: 'right' }}
         onClick={() => navigate('/sourcing/purchase-orders/create')}
       >
         Create
       </Button>
 
       {/* Purchase Orders Table */}
-      <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+      <div style={{ overflowX: 'auto', maxWidth: '100%', marginTop: '50px' }}>
         <Table style={{ minWidth: '2200px' }}>
           <TableHead>
             <TableRow>
