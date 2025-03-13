@@ -66,10 +66,14 @@ const GoodsReceiptList = () => {
                 'Received Qty',
                 'Unit',
                 'Batch',
+                'Stock Segment',
                 'Storage Location',
+                'Plant',
                 'Movement Type',
                 'Stock Type',
                 'Goods Recipient',
+                'Unloading Point',
+                'Valuation Type',
                 'Extended Amount',
                 'Currency',
                 'Actions',
@@ -109,10 +113,14 @@ const GoodsReceiptList = () => {
                   <TableCell>{item.quantityReceived}</TableCell>
                   <TableCell>{item.unit}</TableCell>
                   <TableCell>{item.batch || '-'}</TableCell>
+                  <TableCell>{item.stockSegment || '-'}</TableCell>
                   <TableCell>{item.storageLocation || '-'}</TableCell>
+                  <TableCell>{item.plant || '-'}</TableCell>
                   <TableCell>{item.movementType}</TableCell>
                   <TableCell>{item.stockType}</TableCell>
                   <TableCell>{item.goodsRecipient || '-'}</TableCell>
+                  <TableCell>{item.unloadingPoint || '-'}</TableCell>
+                  <TableCell>{item.valuationType || '-'}</TableCell>
                   <TableCell>{item.extendedAmount || '-'}</TableCell>
                   <TableCell>{item.currency}</TableCell>
                   {itemIndex === 0 && (

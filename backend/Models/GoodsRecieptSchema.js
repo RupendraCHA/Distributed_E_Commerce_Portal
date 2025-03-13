@@ -31,12 +31,6 @@ const GoodsReceiptSchema = new mongoose.Schema(
       required: true,
     }, // Changed to Date type for better validation and sorting
 
-    deliveryNote: {
-      type: String,
-      trim: true,
-      default: "",
-    }, // Trimmed for unnecessary spaces
-
     items: [
       {
         sNo: {
@@ -151,6 +145,12 @@ const GoodsReceiptSchema = new mongoose.Schema(
           trim: true,
           default: "INR",
         }, // Default to INR
+
+        deliveryNote: {
+          type: String,
+          trim: true,
+          default: "",
+        }, // Trimmed for unnecessary spaces
 
         itemOK: {
           type: Boolean,
