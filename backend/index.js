@@ -19,6 +19,7 @@ const {
   ProductModel,
   GoodsReceiptModel,
   InboundDeliveryModel,
+  VendorBillModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -2160,17 +2161,67 @@ app.put("/api/v1/purchase-order/:id", authenticateToken, async (req, res) => {
   }
 });
 
+app.post("/api/v1/vendor-bill", authenticateToken, async (req, res) => {
+  console.log({ body: req.body });
+  const newBill = new VendorBillModel({
+    userId: req.user.id,
+    ...req.body,
+  });
+  await newBill.save();
+  res.status(201).json(newBill);
+});
+
+app.get("/api/v1/vendor-bills", authenticateToken, async (req, res) => {
+  const bills = await VendorBillModel.find({
+    userId: req.user.id,
+  });
+  res.json(bills);
+});
+
+app.get("/api/v1/vendor-bill/:id", authenticateToken, async (req, res) => {
+  try {
+    const bill = await VendorBillModel.findOne({
+      _id: req.params.id,
+      userId: req.user.id, // Ensure the bill belongs to the authenticated user
+    });
+
+    if (!bill) {
+      return res
+        .status(404)
+        .json({ message: "Bill not found or unauthorized" });
+    }
+
+    res.json(bill);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+app.put("/api/v1/vendor-bill/:id", authenticateToken, async (req, res) => {
+  try {
+    const updatedBill = await VendorBillModel.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id }, // Ensure update is only applied to user's own bills
+      req.body,
+      { new: true }
+    );
+
+    if (!updatedBill) {
+      return res
+        .status(404)
+        .json({ message: "Bill not found or unauthorized" });
+    }
+
+    res.json(updatedBill);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
 // 📌 Create a new Goods Receipt Purchase Order
 app.post("/api/v1/goods-receipt", authenticateToken, async (req, res) => {
   try {
-    const {
-      purchaseOrderId,
-      supplierId,
-      supplierName,
-      documentDate,
-      deliveryNote,
-      items,
-    } = req.body;
+    const { purchaseOrderId, supplierId, supplierName, documentDate, items } =
+      req.body;
 
     if (
       !purchaseOrderId ||
@@ -2188,11 +2239,11 @@ app.post("/api/v1/goods-receipt", authenticateToken, async (req, res) => {
       supplierId,
       supplierName,
       documentDate,
-      deliveryNote: deliveryNote || "",
       items: items.map((item, index) => ({
         sNo: index + 1,
         materialId: item.materialId || "",
         materialName: item.materialName || "",
+        movementType: item.movementType || "",
         quantityOrdered: item.quantityOrdered || 1,
         quantityReceived: item.quantityReceived || 0,
         unit: item.unit || "",
@@ -2204,6 +2255,11 @@ app.post("/api/v1/goods-receipt", authenticateToken, async (req, res) => {
         extendedAmount: item.extendedAmount || 0,
         taxCode: item.taxCode || "",
         currency: item.currency || "INR",
+        deliveryNote: item.deliveryNote || "",
+        plant: item.plant || "",
+        unloadingPoint: item.unloadingPoint || "",
+        stockSegment: item.stockSegment || "",
+        valuationType: item.valuationType?.trim() || "",
       })),
     });
 
@@ -2279,6 +2335,7 @@ app.put("/api/v1/goods-receipt/:id", authenticateToken, async (req, res) => {
       materialId: item.materialId?.trim() || "",
       materialName: item.materialName?.trim() || "",
       shortText: item.shortText?.trim() || "",
+      movementType: item.movementType || "",
       quantityOrdered: item.quantityOrdered > 0 ? item.quantityOrdered : 1,
       quantityReceived: item.quantityReceived >= 0 ? item.quantityReceived : 0,
       unit: item.unit?.trim() || "",
@@ -2293,6 +2350,7 @@ app.put("/api/v1/goods-receipt/:id", authenticateToken, async (req, res) => {
       valuationType: item.valuationType?.trim() || "",
       extendedAmount: item.extendedAmount >= 0 ? item.extendedAmount : 0,
       taxCode: item.taxCode?.trim() || "",
+      deliveryNote: item.deliveryNote || "",
       currency: item.currency?.trim() || "INR",
       itemOK: item.itemOK !== undefined ? item.itemOK : true,
     }));
@@ -2306,7 +2364,6 @@ app.put("/api/v1/goods-receipt/:id", authenticateToken, async (req, res) => {
           supplierId,
           supplierName,
           documentDate,
-          deliveryNote: deliveryNote?.trim() || "",
           items: formattedItems,
         },
       },

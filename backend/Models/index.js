@@ -7,6 +7,7 @@ const DistributorModel = require("./Distributor.model");
 const ProductModel = require("./ProductModel");
 const GoodsReceiptModel = require("./GoodsRecieptSchema");
 const InboundDeliveryModel = require("./InboundDeliverySchema");
+const VendorBillModel = require("./vendor_bill_schema");
 module.exports = {
   EmployeeModel,
   AddressModel,
@@ -17,4 +18,5 @@ module.exports = {
   DistributorModel,
   GoodsReceiptModel,
   InboundDeliveryModel,
+  VendorBillModel,
 };

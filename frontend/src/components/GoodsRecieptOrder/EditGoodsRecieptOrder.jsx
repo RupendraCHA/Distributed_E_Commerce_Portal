@@ -231,7 +231,16 @@ const EditGoodsReceipt = () => {
                     fullWidth
                   />
                 </TableCell>
-                <TableCell>{item.unit}</TableCell>
+                <TableCell>
+                  <TextField
+                    type="number"
+                    value={item.unit}
+                    onChange={(e) =>
+                      handleChange(index, 'unit', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
                 <TableCell>
                   <TextField
                     type="text"
@@ -252,8 +261,26 @@ const EditGoodsReceipt = () => {
                     fullWidth
                   />
                 </TableCell>
-                <TableCell>{item.storageLocation}</TableCell>
-                <TableCell>{item.plant}</TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.storageLocation}
+                    onChange={(e) =>
+                      handleChange(index, 'storageLocation', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.plant}
+                    onChange={(e) =>
+                      handleChange(index, 'plant', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
                 <TableCell>
                   <TextField
                     type="text"
@@ -264,11 +291,86 @@ const EditGoodsReceipt = () => {
                     fullWidth
                   />
                 </TableCell>
-                <TableCell>{item.movementType}</TableCell>
-                <TableCell>{item.stockType}</TableCell>
-                <TableCell>{item.extendedAmount}</TableCell>
-                <TableCell>{item.taxCode}</TableCell>
-                <TableCell>{item.currency}</TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.movementType}
+                    onChange={(e) =>
+                      handleChange(index, 'movementType', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.stockType}
+                    onChange={(e) =>
+                      handleChange(index, 'stockType', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.goodsRecipient}
+                    onChange={(e) =>
+                      handleChange(index, 'goodsRecipient', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.unloadingPoint}
+                    onChange={(e) =>
+                      handleChange(index, 'unloadingPoint', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.valuationType}
+                    onChange={(e) =>
+                      handleChange(index, 'valuationType', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="number"
+                    value={item.extendedAmount}
+                    onChange={(e) =>
+                      handleChange(index, 'extendedAmount', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.taxCode}
+                    onChange={(e) =>
+                      handleChange(index, 'taxCode', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.currency}
+                    onChange={(e) =>
+                      handleChange(index, 'currency', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
                 <TableCell>
                   <IconButton
                     color="secondary"

@@ -40,18 +40,21 @@ const GoodsReceiptList = () => {
 
   return (
     <Container>
-      <h2>Goods Receipt Orders</h2>
+      <h1 style={{ fontSize: '22px', fontWeight: 'bold', marginTop: '10px' }}>
+        Goods Receipt Orders
+      </h1>
 
+      {/* Create New Inbound Delivery Button */}
       <Button
         variant="contained"
         color="primary"
-        style={{ float: 'right', marginBottom: '10px' }}
+        style={{ float: 'right' }}
         onClick={() => navigate('/sourcing/goods-receipt-orders/create')}
       >
         Create
       </Button>
 
-      <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+      <div style={{ overflowX: 'auto', maxWidth: '100%', marginTop: '50px' }}>
         <Table style={{ minWidth: '1800px' }}>
           <TableHead>
             <TableRow>
@@ -66,10 +69,14 @@ const GoodsReceiptList = () => {
                 'Received Qty',
                 'Unit',
                 'Batch',
+                'Stock Segment',
                 'Storage Location',
+                'Plant',
                 'Movement Type',
                 'Stock Type',
                 'Goods Recipient',
+                'Unloading Point',
+                'Valuation Type',
                 'Extended Amount',
                 'Currency',
                 'Actions',
@@ -109,10 +116,14 @@ const GoodsReceiptList = () => {
                   <TableCell>{item.quantityReceived}</TableCell>
                   <TableCell>{item.unit}</TableCell>
                   <TableCell>{item.batch || '-'}</TableCell>
+                  <TableCell>{item.stockSegment || '-'}</TableCell>
                   <TableCell>{item.storageLocation || '-'}</TableCell>
+                  <TableCell>{item.plant || '-'}</TableCell>
                   <TableCell>{item.movementType}</TableCell>
                   <TableCell>{item.stockType}</TableCell>
                   <TableCell>{item.goodsRecipient || '-'}</TableCell>
+                  <TableCell>{item.unloadingPoint || '-'}</TableCell>
+                  <TableCell>{item.valuationType || '-'}</TableCell>
                   <TableCell>{item.extendedAmount || '-'}</TableCell>
                   <TableCell>{item.currency}</TableCell>
                   {itemIndex === 0 && (

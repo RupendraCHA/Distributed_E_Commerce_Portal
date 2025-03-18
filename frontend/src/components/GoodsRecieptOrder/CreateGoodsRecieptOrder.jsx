@@ -72,7 +72,7 @@ const CreateGoodsReceipt = () => {
           quantityOrdered: item.quantity,
           quantityReceived: item.quantity, // Default full receipt
           unit: item.unit,
-          batch: '',
+          batch: item.batch || '',
           stockSegment: item.stockSegment || '',
           storageLocation: item.storageLocation || '',
           plant: item.plant || '',
@@ -239,9 +239,9 @@ const CreateGoodsReceipt = () => {
                 'Stock Segment',
                 'Storage Location',
                 'Plant',
-                'Delivery Note',
                 'Movement Type',
                 'Stock Type',
+                'Delivery Note',
                 'Goods Recipient',
                 'Unloading Point',
                 'Valuation Type',
@@ -328,16 +328,7 @@ const CreateGoodsReceipt = () => {
                     fullWidth
                   />
                 </TableCell>
-                <TableCell>
-                  <TextField
-                    type="text"
-                    value={item.deliveryNote}
-                    onChange={(e) =>
-                      handleChange(index, 'deliveryNote', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
+
                 <TableCell>
                   <TextField
                     type="text"
@@ -354,6 +345,16 @@ const CreateGoodsReceipt = () => {
                     value={item.stockType}
                     onChange={(e) =>
                       handleChange(index, 'stockType', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="text"
+                    value={item.deliveryNote}
+                    onChange={(e) =>
+                      handleChange(index, 'deliveryNote', e.target.value)
                     }
                     fullWidth
                   />

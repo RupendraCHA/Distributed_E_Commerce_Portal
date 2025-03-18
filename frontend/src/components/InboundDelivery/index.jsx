@@ -31,20 +31,22 @@ const InboundDeliveryList = () => {
 
   return (
     <Container>
-      <h2>Inbound Deliveries</h2>
+      <h1 style={{ fontSize: '22px', fontWeight: 'bold', marginTop: '10px' }}>
+        Inbound Deliveries
+      </h1>
 
       {/* Create New Inbound Delivery Button */}
       <Button
         variant="contained"
         color="primary"
-        style={{ float: 'right', marginBottom: '10px' }}
+        style={{ float: 'right' }}
         onClick={() => navigate('/sourcing/inbound-deliveries/create')}
       >
         Create
       </Button>
 
       {/* Inbound Deliveries Table */}
-      <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+      <div style={{ overflowX: 'auto', maxWidth: '100%', marginTop: '50px' }}>
         <Table style={{ minWidth: '2200px' }}>
           <TableHead>
             <TableRow>

@@ -32,11 +32,15 @@ const PurchaseRequisitionList = () => {
 
   return (
     <Container>
-      <h2>Purchase Requisitions</h2>
+      <h1 style={{ fontSize: '22px', fontWeight: 'bold', marginTop: '10px' }}>
+        Purchase Requisitions
+      </h1>
+
+      {/* Create New Inbound Delivery Button */}
       <Button
         variant="contained"
         color="primary"
-        style={{ float: 'right', marginBottom: '10px' }}
+        style={{ float: 'right' }}
         onClick={() => navigate('/sourcing/create-requisition')}
       >
         Create
@@ -45,7 +49,7 @@ const PurchaseRequisitionList = () => {
       {/* Scrollable Table Container */}
       <TableContainer
         component={Paper}
-        style={{ maxHeight: '500px', overflowY: 'auto' }}
+        style={{ maxHeight: '500px', overflowY: 'auto', marginTop: '50px' }}
       >
         <Table>
           <TableHead>
