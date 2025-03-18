@@ -19,6 +19,7 @@ const {
   ProductModel,
   GoodsReceiptModel,
   InboundDeliveryModel,
+  VendorBillModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -2157,6 +2158,62 @@ app.put("/api/v1/purchase-order/:id", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error("Error updating Purchase Order:", error.message);
     res.status(500).json({ message: "Error updating Purchase Order" });
+  }
+});
+
+app.post("/api/v1/vendor-bill", authenticateToken, async (req, res) => {
+  console.log({ body: req.body });
+  const newBill = new VendorBillModel({
+    userId: req.user.id,
+    ...req.body,
+  });
+  await newBill.save();
+  res.status(201).json(newBill);
+});
+
+app.get("/api/v1/vendor-bills", authenticateToken, async (req, res) => {
+  const bills = await VendorBillModel.find({
+    userId: req.user.id,
+  });
+  res.json(bills);
+});
+
+app.get("/api/v1/vendor-bill/:id", authenticateToken, async (req, res) => {
+  try {
+    const bill = await VendorBillModel.findOne({
+      _id: req.params.id,
+      userId: req.user.id, // Ensure the bill belongs to the authenticated user
+    });
+
+    if (!bill) {
+      return res
+        .status(404)
+        .json({ message: "Bill not found or unauthorized" });
+    }
+
+    res.json(bill);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
+  }
+});
+
+app.put("/api/v1/vendor-bill/:id", authenticateToken, async (req, res) => {
+  try {
+    const updatedBill = await VendorBillModel.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id }, // Ensure update is only applied to user's own bills
+      req.body,
+      { new: true }
+    );
+
+    if (!updatedBill) {
+      return res
+        .status(404)
+        .json({ message: "Bill not found or unauthorized" });
+    }
+
+    res.json(updatedBill);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error });
   }
 });
 

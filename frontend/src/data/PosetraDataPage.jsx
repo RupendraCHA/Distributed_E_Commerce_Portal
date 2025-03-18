@@ -34,7 +34,7 @@ export const SourcingData = [
   },
   {
     title: 'Vendor bill',
-    path: '/sourcing/vendor-bill',
+    path: '/sourcing/vendor-bills',
   },
   {
     title: 'Vendor Master',

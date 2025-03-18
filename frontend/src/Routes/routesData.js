@@ -116,6 +116,17 @@ const EditInboundDelivery = React.lazy(() =>
   import('../components/InboundDelivery/EditInboundDelivery.jsx')
 );
 
+const VendorBill = React.lazy(() =>
+  import('../components/VendorBill/index.jsx')
+);
+
+const CreateVendorBill = React.lazy(() =>
+  import('../components/VendorBill/VendorBillCreate.jsx')
+);
+const EditVendorBill = React.lazy(() =>
+  import('../components/VendorBill/VendorBillEdit.jsx')
+);
+
 import {
   productsData,
   solutionsData,
@@ -284,6 +295,18 @@ export const privateRoutes = [
   {
     path: '/sourcing/inbound-deliveries/edit/:id',
     element: EditInboundDelivery,
+  },
+  {
+    path: '/sourcing/vendor-bills',
+    element: VendorBill,
+  },
+  {
+    path: '/sourcing/vendor-bills/create',
+    element: CreateVendorBill,
+  },
+  {
+    path: '/sourcing/vendor-bills/edit/:id',
+    element: EditVendorBill,
   },
 ];
 
