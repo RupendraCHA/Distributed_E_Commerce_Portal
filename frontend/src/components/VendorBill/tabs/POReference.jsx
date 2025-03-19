@@ -46,7 +46,7 @@ const POReference = ({ formData, setFormData, purchaseOrders, isEdit }) => {
         </Grid>
 
         {/* Supplier Name */}
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={6} md={4}>
           <TextField
             label="Supplier Name"
             value={formData.supplierName || ''}
@@ -56,7 +56,7 @@ const POReference = ({ formData, setFormData, purchaseOrders, isEdit }) => {
         </Grid>
 
         {/* Supplier ID */}
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={6} md={4}>
           <TextField
             label="Supplier ID"
             value={formData.supplierId || ''}
@@ -66,7 +66,7 @@ const POReference = ({ formData, setFormData, purchaseOrders, isEdit }) => {
         </Grid>
 
         {/* Document Date */}
-        <Grid item xs={6}>
+        <Grid item xs={12} sm={12} md={4}>
           <TextField
             label="Document Date"
             value={formData.documentDate || ''}

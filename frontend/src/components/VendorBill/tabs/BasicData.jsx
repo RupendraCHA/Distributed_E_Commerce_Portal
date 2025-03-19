@@ -5,7 +5,7 @@ const BasicData = ({ formData, setFormData }) => {
   return (
     <Grid container spacing={2} sx={{ marginTop: '20px' }}>
       {/* Invoice Date */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Invoice Date"
           type="date"
@@ -25,7 +25,7 @@ const BasicData = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Posting Date */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Posting Date"
           type="date"
@@ -45,7 +45,7 @@ const BasicData = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Amount */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Amount"
           type="number"
@@ -64,7 +64,7 @@ const BasicData = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Reference */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Reference"
           value={formData.basicData?.reference || ''}
@@ -82,7 +82,7 @@ const BasicData = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Tax Amount */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Tax Amount"
           type="number"
@@ -100,30 +100,8 @@ const BasicData = ({ formData, setFormData }) => {
         />
       </Grid>
 
-      {/* Tax Code Dropdown */}
-      <Grid item xs={12} sm={6}>
-        <TextField
-          select
-          label="Tax Code"
-          value={formData.basicData?.taxCode || ''}
-          onChange={(e) =>
-            setFormData({
-              ...formData,
-              basicData: {
-                ...formData.basicData,
-                taxCode: e.target.value,
-              },
-            })
-          }
-          fullWidth
-        >
-          <MenuItem value="E1">E1 (Out Put Tax)</MenuItem>
-          <MenuItem value="E2">E2 (Reduced Tax)</MenuItem>
-        </TextField>
-      </Grid>
-
       {/* Business Place / Section */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Business Place/Section"
           value={formData.basicData?.businessPlace || ''}
@@ -141,7 +119,7 @@ const BasicData = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Text Field */}
-      <Grid item xs={12}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Text"
           value={formData.basicData?.text || ''}
@@ -159,7 +137,7 @@ const BasicData = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Baseline Date */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Baseline Date"
           type="date"
@@ -179,7 +157,7 @@ const BasicData = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Company Code */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Company Code"
           value={formData.basicData?.companyCode || 'EC01 Eco store banglore'}
@@ -189,7 +167,7 @@ const BasicData = ({ formData, setFormData }) => {
       </Grid>
 
       {/* GST Partner */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="GST Partner"
           value={formData.basicData?.gstPartner || ''}
@@ -207,7 +185,7 @@ const BasicData = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Place of Supply */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Place of Supply"
           value={formData.basicData?.placeOfSupply || ''}
@@ -225,7 +203,7 @@ const BasicData = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Invoice Reference Number */}
-      <Grid item xs={12}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Invoice Reference Number"
           value={formData.basicData?.invoiceRefNumber || ''}

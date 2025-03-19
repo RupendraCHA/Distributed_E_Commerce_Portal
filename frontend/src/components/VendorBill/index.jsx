@@ -43,7 +43,7 @@ const VendorBillList = () => {
         variant="h4"
         style={{ fontSize: '22px', fontWeight: 'bold', marginTop: '10px' }}
       >
-        Vendor Bills
+        Vendor Bill
       </Typography>
 
       <Button
