@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Container, Tabs, Tab, Button } from '@mui/material';
+import { Container, Tabs, Tab, Button, Paper, Box } from '@mui/material';
 import BasicData from './tabs/BasicData';
 import Payment from './tabs/Payment';
 import Details from './tabs/Details';
@@ -21,10 +21,9 @@ const VendorBillCreate = () => {
     contacts: {},
     note: {},
   });
-  const [purchaseOrders, setPurchaseOrders] = useState([]); // Store PO data
+  const [purchaseOrders, setPurchaseOrders] = useState([]);
   const navigate = useNavigate();
 
-  // Fetch POs when the component mounts
   useEffect(() => {
     axios
       .get(server_Url + '/api/v1/purchase-orders', {
@@ -36,7 +35,6 @@ const VendorBillCreate = () => {
       .catch((err) => console.error('Error fetching POs:', err));
   }, []);
 
-  // Submit the vendor bill
   const handleSubmit = () => {
     axios
       .post(server_Url + '/api/v1/vendor-bill', formData, {
@@ -55,35 +53,54 @@ const VendorBillCreate = () => {
         Create Vendor Bill
       </h1>
 
-      {/* MUI Tabs */}
-      <Tabs
-        value={tabIndex}
-        onChange={(_, newIndex) => setTabIndex(newIndex)}
-        style={{ marginTop: '20px' }}
-      >
-        <Tab label="Basic Data" />
-        <Tab label="Payment" />
-        <Tab label="Details" />
-        <Tab label="Tax" />
-        <Tab label="Contacts" />
-        <Tab label="Note" />
-      </Tabs>
+      {/* Paper wraps tabs to keep them behind the content */}
+      <Paper elevation={3} sx={{ padding: 2, marginTop: 2, borderRadius: 2 }}>
+        <Tabs
+          value={tabIndex}
+          onChange={(_, newIndex) => setTabIndex(newIndex)}
+          variant="fullWidth"
+          textColor="inherit"
+          // TabIndicatorProps={{ style: { background: '#000' } }}
+          sx={{
+            '& .Mui-selected': {
+              borderRadius: '8px',
+              fontWeight: 'bold',
+            },
+            '& .MuiTabs-indicator': {
+              backgroundColor: '#1976d2',
+            },
+          }}
+        >
+          <Tab label="Basic Data" />
+          <Tab label="Payment" />
+          <Tab label="Details" />
+          <Tab label="Tax" />
+          <Tab label="Contacts" />
+          <Tab label="Note" />
+        </Tabs>
 
-      {/* Render tabs conditionally */}
-      {tabIndex === 0 && (
-        <BasicData formData={formData} setFormData={setFormData} />
-      )}
-      {tabIndex === 1 && (
-        <Payment formData={formData} setFormData={setFormData} />
-      )}
-      {tabIndex === 2 && (
-        <Details formData={formData} setFormData={setFormData} />
-      )}
-      {tabIndex === 3 && <Tax formData={formData} setFormData={setFormData} />}
-      {tabIndex === 4 && (
-        <Contacts formData={formData} setFormData={setFormData} />
-      )}
-      {tabIndex === 5 && <Note formData={formData} setFormData={setFormData} />}
+        {/* Content Box */}
+        <Box sx={{ marginTop: 2 }}>
+          {tabIndex === 0 && (
+            <BasicData formData={formData} setFormData={setFormData} />
+          )}
+          {tabIndex === 1 && (
+            <Payment formData={formData} setFormData={setFormData} />
+          )}
+          {tabIndex === 2 && (
+            <Details formData={formData} setFormData={setFormData} />
+          )}
+          {tabIndex === 3 && (
+            <Tax formData={formData} setFormData={setFormData} />
+          )}
+          {tabIndex === 4 && (
+            <Contacts formData={formData} setFormData={setFormData} />
+          )}
+          {tabIndex === 5 && (
+            <Note formData={formData} setFormData={setFormData} />
+          )}
+        </Box>
+      </Paper>
 
       {/* PO Reference Section */}
       <POReference
@@ -97,7 +114,7 @@ const VendorBillCreate = () => {
         variant="contained"
         color="primary"
         onClick={handleSubmit}
-        style={{ marginTop: '20px' }}
+        sx={{ marginTop: 2 }}
       >
         Save Vendor Bill
       </Button>

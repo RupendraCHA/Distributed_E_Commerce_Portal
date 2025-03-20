@@ -126,6 +126,16 @@ const CreateVendorBill = React.lazy(() =>
 const EditVendorBill = React.lazy(() =>
   import('../components/VendorBill/VendorBillEdit.jsx')
 );
+const VendorMaster = React.lazy(() =>
+  import('../components/VendorMaster/index.jsx')
+);
+
+const CreateVendorMaster = React.lazy(() =>
+  import('../components/VendorMaster/CreateVendorMaster.jsx')
+);
+const EditVendorMaster = React.lazy(() =>
+  import('../components/VendorMaster/EditVendorMaster.jsx')
+);
 
 import {
   productsData,
@@ -307,6 +317,18 @@ export const privateRoutes = [
   {
     path: '/sourcing/vendor-bills/edit/:id',
     element: EditVendorBill,
+  },
+  {
+    path: '/sourcing/vendor-master',
+    element: VendorMaster,
+  },
+  {
+    path: '/sourcing/vendor-master/create',
+    element: CreateVendorMaster,
+  },
+  {
+    path: '/sourcing/vendor-master/edit/:id',
+    element: EditVendorMaster,
   },
 ];
 

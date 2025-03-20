@@ -8,6 +8,7 @@ const ProductModel = require("./ProductModel");
 const GoodsReceiptModel = require("./GoodsRecieptSchema");
 const InboundDeliveryModel = require("./InboundDeliverySchema");
 const VendorBillModel = require("./vendor_bill_schema");
+const VendorMasterModel = require("./VendorMasterSchema");
 module.exports = {
   EmployeeModel,
   AddressModel,
@@ -19,4 +20,5 @@ module.exports = {
   GoodsReceiptModel,
   InboundDeliveryModel,
   VendorBillModel,
+  VendorMasterModel,
 };

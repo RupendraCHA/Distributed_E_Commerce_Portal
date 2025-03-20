@@ -20,6 +20,7 @@ const {
   GoodsReceiptModel,
   InboundDeliveryModel,
   VendorBillModel,
+  VendorMasterModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -2214,6 +2215,82 @@ app.put("/api/v1/vendor-bill/:id", authenticateToken, async (req, res) => {
     res.json(updatedBill);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
+  }
+});
+
+// Create Vendor
+app.post("/api/v1/vendor-master", authenticateToken, async (req, res) => {
+  try {
+    const newVendor = new VendorMasterModel({
+      userId: req.user.id,
+      ...req.body,
+    });
+    await newVendor.save();
+    res.status(201).json(newVendor);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Get all Vendors
+app.get("/api/v1/vendor-master", authenticateToken, async (req, res) => {
+  try {
+    const vendors = await VendorMasterModel.find({ userId: req.user.id });
+    res.json(vendors);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Get Vendor by ID
+app.get("/api/v1/vendor-master/:id", authenticateToken, async (req, res) => {
+  try {
+    const vendor = await VendorMasterModel.findOne({
+      _id: req.params.id,
+      userId: req.user.id,
+    });
+    if (!vendor)
+      return res
+        .status(404)
+        .json({ error: "Vendor not found or unauthorized" });
+    res.json(vendor);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Update Vendor
+app.put("/api/v1/vendor-master/:id", authenticateToken, async (req, res) => {
+  try {
+    const updatedVendor = await VendorMasterModel.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user.id },
+      req.body,
+      { new: true }
+    );
+    if (!updatedVendor)
+      return res
+        .status(404)
+        .json({ error: "Vendor not found or unauthorized" });
+    res.json(updatedVendor);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Delete Vendor
+app.delete("/api/v1/vendor-master/:id", authenticateToken, async (req, res) => {
+  try {
+    const vendor = await VendorMasterModel.findOneAndDelete({
+      _id: req.params.id,
+      userId: req.user.id,
+    });
+    if (!vendor)
+      return res
+        .status(404)
+        .json({ error: "Vendor not found or unauthorized" });
+    res.json({ message: "Vendor deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

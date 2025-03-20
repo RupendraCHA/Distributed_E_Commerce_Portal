@@ -5,7 +5,7 @@ const Payment = ({ formData, setFormData }) => {
   return (
     <Grid container spacing={2} sx={{ marginTop: '20px' }}>
       {/* Baseline Date */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Baseline Date"
           type="date"
@@ -25,7 +25,7 @@ const Payment = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Due On */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Due On"
           value={formData.payment?.dueOn || ''}
@@ -43,7 +43,7 @@ const Payment = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Cash Discount (CD) */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Cash Discount (CD)"
           value={formData.payment?.cashDiscount || ''}
@@ -61,7 +61,7 @@ const Payment = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Payment Terms */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Payment Terms"
           value={formData.payment?.paymentTerms || ''}
@@ -136,7 +136,7 @@ const Payment = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Fixed Payment */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Fixed Payment"
           value={formData.payment?.fixedPayment || ''}
@@ -154,7 +154,7 @@ const Payment = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Payment Block Dropdown */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           select
           label="Payment Block"
@@ -176,7 +176,7 @@ const Payment = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Payment Method */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Payment Method"
           value={formData.payment?.paymentMethod || ''}
@@ -194,7 +194,7 @@ const Payment = ({ formData, setFormData }) => {
       </Grid>
 
       {/* House Bank */}
-      <Grid item xs={12} sm={3}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="House Bank"
           value={formData.payment?.houseBank || ''}
@@ -212,7 +212,7 @@ const Payment = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Partner Bank */}
-      <Grid item xs={12} sm={3}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Partner Bank"
           value={formData.payment?.partnerBank || ''}

@@ -5,7 +5,7 @@ const Details = ({ formData, setFormData }) => {
   return (
     <Grid container spacing={2} sx={{ marginTop: '20px' }}>
       {/* Unplanned Delivery Costs */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Unplanned Delivery Costs"
           type="number"
@@ -24,7 +24,7 @@ const Details = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Currency */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Currency"
           value={formData.details?.currency || ''}
@@ -42,7 +42,7 @@ const Details = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Exchange Rate */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Exchange Rate"
           type="number"
@@ -61,7 +61,7 @@ const Details = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Document Type Dropdown */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           select
           label="Document Type"
@@ -83,7 +83,7 @@ const Details = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Invoice Party */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Invoice Party"
           value={formData.details?.invoiceParty || ''}
@@ -101,7 +101,7 @@ const Details = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Business Area */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Business Area"
           value={formData.details?.businessArea || ''}
@@ -119,7 +119,7 @@ const Details = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Assignment */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Assignment"
           value={formData.details?.assignment || ''}
@@ -137,7 +137,7 @@ const Details = ({ formData, setFormData }) => {
       </Grid>
 
       {/* G/L Account */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="G/L Account"
           value={formData.details?.glAccount || ''}
@@ -155,7 +155,7 @@ const Details = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Header Text */}
-      <Grid item xs={12}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Header Text"
           value={formData.details?.headerText || ''}
@@ -173,7 +173,7 @@ const Details = ({ formData, setFormData }) => {
       </Grid>
 
       {/* SCB Indicator */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="SCB Indicator"
           value={formData.details?.scbIndicator || ''}
@@ -191,7 +191,7 @@ const Details = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Supply C/R */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Supply C/R"
           value={formData.details?.supplyCR || ''}
@@ -209,7 +209,7 @@ const Details = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Service Indicator */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={6} md={4}>
         <TextField
           label="Service Indicator"
           value={formData.details?.serviceIndicator || ''}
@@ -227,7 +227,7 @@ const Details = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Collective Invoice */}
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12}>
         <TextField
           label="Collective Invoice"
           value={formData.details?.collectiveInvoice || ''}

@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Tabs, Tab, Button, Paper } from '@mui/material';
-import BasicData from './tabs/BasicData';
-import Payment from './tabs/Payment';
-import Details from './tabs/Details';
-import Tax from './tabs/Tax';
-import Contacts from './tabs/Contacts';
-import Note from './tabs/Note';
-import POReference from './tabs/POReference';
+import VendorAddress from './tabs/VendorAddress';
+import VendorControl from './tabs/VendorControl';
+import PaymentTransactions from './tabs/PaymentTransactions';
+import ContactPersons from './tabs/ContactPersons';
+import AccountingInformation from './tabs/AccountingInformation';
+import PaymentTransactionAccounting from './tabs/PaymentTransactionAccounting';
+import PurchaseData from './tabs/PurchaseData';
+import PartnerFunctions from './tabs/PartnerFunctions';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 
-const VendorBillEdit = () => {
+const EditVendor = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
-
   const { id } = useParams();
   const [tabIndex, setTabIndex] = useState(0);
   const [formData, setFormData] = useState({});
@@ -20,7 +20,7 @@ const VendorBillEdit = () => {
 
   useEffect(() => {
     axios
-      .get(server_Url + `/api/v1/vendor-bill/${id}`, {
+      .get(server_Url + `/api/v1/vendor-master/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -30,18 +30,18 @@ const VendorBillEdit = () => {
 
   const handleSubmit = () => {
     axios
-      .put(server_Url + `/api/v1/vendor-bill/${id}`, formData, {
+      .put(server_Url + `/api/v1/vendor-master/${id}`, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       })
-      .then(() => navigate('/sourcing/vendor-bills'));
+      .then(() => navigate('/sourcing/vendor-master'));
   };
 
   return (
     <Container>
       <h1 style={{ fontSize: '22px', fontWeight: 'bold', marginTop: '10px' }}>
-        Edit Vendor Bill
+        Edit Vendor
       </h1>
       <Paper elevation={3} sx={{ padding: 2, marginTop: 2, borderRadius: 2 }}>
         <Tabs
@@ -60,38 +60,47 @@ const VendorBillEdit = () => {
             },
           }}
         >
-          <Tab label="Basic Data" />
+          <Tab label="Address" />
+          <Tab label="Control" />
           <Tab label="Payment" />
-          <Tab label="Details" />
-          <Tab label="Tax" />
-          <Tab label="Contacts" />
-          <Tab label="Note" />
+          <Tab label="Contact" />
+          <Tab label="Accounting" />
+          <Tab label="Payment Transactions Accounting" />
+          <Tab label="Purchasing Data" />
+          <Tab label="Partner Functions" />
         </Tabs>
 
         {tabIndex === 0 && (
-          <BasicData formData={formData} setFormData={setFormData} />
+          <VendorAddress formData={formData} setFormData={setFormData} />
         )}
         {tabIndex === 1 && (
-          <Payment formData={formData} setFormData={setFormData} />
+          <VendorControl formData={formData} setFormData={setFormData} />
         )}
         {tabIndex === 2 && (
-          <Details formData={formData} setFormData={setFormData} />
+          <PaymentTransactions formData={formData} setFormData={setFormData} />
         )}
         {tabIndex === 3 && (
-          <Tax formData={formData} setFormData={setFormData} />
+          <ContactPersons formData={formData} setFormData={setFormData} />
         )}
         {tabIndex === 4 && (
-          <Contacts formData={formData} setFormData={setFormData} />
+          <AccountingInformation
+            formData={formData}
+            setFormData={setFormData}
+          />
         )}
         {tabIndex === 5 && (
-          <Note formData={formData} setFormData={setFormData} />
+          <PaymentTransactionAccounting
+            formData={formData}
+            setFormData={setFormData}
+          />
+        )}
+        {tabIndex === 6 && (
+          <PurchaseData formData={formData} setFormData={setFormData} />
+        )}
+        {tabIndex === 7 && (
+          <PartnerFunctions formData={formData} setFormData={setFormData} />
         )}
       </Paper>
-      <POReference
-        formData={formData}
-        setFormData={setFormData}
-        isEdit={true}
-      />
 
       <Button
         variant="contained"
@@ -99,10 +108,10 @@ const VendorBillEdit = () => {
         onClick={handleSubmit}
         style={{ marginTop: '20px' }}
       >
-        Update Vendor Bill
+        Update Vendor
       </Button>
     </Container>
   );
 };
 
-export default VendorBillEdit;
+export default EditVendor;
