@@ -1834,7 +1834,7 @@ app.get("/api/v1/getMaterialIds", async (req, res) => {
     console.log("Fetching material IDs...");
     const materials = await MaterialModel.find(
       {},
-      "sNo itemNo materialId materialName shortText materialGroup unit"
+      "sNo itemNo materialId materialName shortText materialGroup unit plant storageLocation purchasingGroup requisitioner trackingNo splitIndicator purchasingOrg agreement itemInfoRecord mpnMaterial"
     );
     res.json(materials);
   } catch (error) {
@@ -1882,6 +1882,7 @@ app.post("/api/v1/requisition", authenticateToken, async (req, res) => {
         requisitioner: m.requisitioner || "",
         trackingNo: m.trackingNo || "",
         supplier: m.supplier || "",
+        vendor: m.vendor || "",
         fixedVendorIS: m.fixedVendorIS || "",
         status: "Open", // Default status
         readVendorSPG: m.readVendorSPG || "",
@@ -1979,6 +1980,7 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
         requisitioner: m.requisitioner || "",
         trackingNo: m.trackingNo || "",
         supplier: m.supplier || "",
+        vendor: m.vendor || "",
         fixedVendorIS: m.fixedVendorIS || "",
         status: m.status || "Open",
         readVendorSPG: m.readVendorSPG || "",
@@ -2215,6 +2217,23 @@ app.put("/api/v1/vendor-bill/:id", authenticateToken, async (req, res) => {
     res.json(updatedBill);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
+  }
+});
+
+// New endpoint (optional optimization)
+app.get("/api/v1/vendors-list", authenticateToken, async (req, res) => {
+  try {
+    const vendors = await VendorMasterModel.find(
+      { userId: req.user.id },
+      { _id: 1, "vendorAddress.name": 1 }
+    );
+    const formatted = vendors.map((v) => ({
+      id: v._id,
+      name: v.vendorAddress?.name || "Unnamed Vendor",
+    }));
+    res.json(formatted);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 

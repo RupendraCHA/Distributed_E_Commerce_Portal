@@ -136,6 +136,9 @@ const CreateVendorMaster = React.lazy(() =>
 const EditVendorMaster = React.lazy(() =>
   import('../components/VendorMaster/EditVendorMaster.jsx')
 );
+const MaterialList = React.lazy(() =>
+  import('../components/MaterialList/index.jsx')
+);
 
 import {
   productsData,
@@ -329,6 +332,10 @@ export const privateRoutes = [
   {
     path: '/sourcing/vendor-master/edit/:id',
     element: EditVendorMaster,
+  },
+  {
+    path: '/sourcing/materials',
+    element: MaterialList,
   },
 ];
 

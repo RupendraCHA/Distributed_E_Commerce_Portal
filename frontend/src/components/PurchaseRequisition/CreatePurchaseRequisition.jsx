@@ -28,7 +28,7 @@ const CreatePurchaseRequisition = () => {
       shortText: '',
       materialGroup: '',
       quantity: 1,
-      unit: '',
+      unit: 1,
       deliveryDate: '',
       plant: '',
       storageLocation: '',
@@ -45,12 +45,23 @@ const CreatePurchaseRequisition = () => {
       mpnMaterial: '',
     },
   ]);
+  const [vendors, setVendors] = useState([]);
+
   const navigate = useNavigate();
 
   useEffect(() => {
     axios.get(server_Url + '/api/v1/getMaterialIds').then((res) => {
       setMaterials(res.data);
     });
+  }, []);
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    axios
+      .get(server_Url + '/api/v1/vendors-list', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setVendors(res.data))
+      .catch((err) => console.error('Error fetching vendors:', err));
   }, []);
 
   const handleChange = (index, field, value) => {
@@ -59,12 +70,28 @@ const CreatePurchaseRequisition = () => {
 
     if (field === 'materialId') {
       const selectedMaterial = materials.find((p) => p.materialId === value);
+      console.log({ selectedMaterial });
+
       if (selectedMaterial) {
-        updatedRows[index].materialName = selectedMaterial.materialName;
-        updatedRows[index].shortText = selectedMaterial.shortText || '-';
-        updatedRows[index].materialGroup =
-          selectedMaterial.materialGroup || '-';
-        updatedRows[index].itemNo = `ITM${String(index + 1).padStart(3, '0')}`;
+        updatedRows[index].itemNo =
+          selectedMaterial.itemNo || `ITM${String(index + 1).padStart(3, '0')}`;
+        updatedRows[index].materialName = selectedMaterial.materialName || '';
+        updatedRows[index].shortText = selectedMaterial.shortText || '';
+        updatedRows[index].materialGroup = selectedMaterial.materialGroup || '';
+        updatedRows[index].plant = selectedMaterial.plant || '';
+        updatedRows[index].storageLocation =
+          selectedMaterial.storageLocation || '';
+        updatedRows[index].purchasingGroup =
+          selectedMaterial.purchasingGroup || '';
+        updatedRows[index].requisitioner = selectedMaterial.requisitioner || '';
+        updatedRows[index].trackingNo = selectedMaterial.trackingNo || '';
+        updatedRows[index].splitIndicator =
+          selectedMaterial.splitIndicator || '';
+        updatedRows[index].purchasingOrg = selectedMaterial.purchasingOrg || '';
+        updatedRows[index].agreement = selectedMaterial.agreement || '';
+        updatedRows[index].itemInfoRecord =
+          selectedMaterial.itemInfoRecord || '';
+        updatedRows[index].mpnMaterial = selectedMaterial.mpnMaterial || '';
       }
     }
 
@@ -131,24 +158,24 @@ const CreatePurchaseRequisition = () => {
             <TableRow>
               {[
                 'S.No',
-                'Status',
                 'Item No',
                 'Material ID',
                 'Material Name',
-                'Short Text',
-                'Material Group',
+                'Vendor',
                 'Quantity',
                 'Unit',
+                'Status',
                 'Delivery Date',
+                'Fixed Vendor IS',
+                'Read Vendor SPG',
+                'Split Indicator',
+                'Short Text',
+                'Material Group',
                 'Plant',
                 'Storage Location',
                 'Purchasing Group',
                 'Requisitioner',
                 'Tracking No',
-                'Vendor',
-                'Fixed Vendor IS',
-                'Read Vendor SPG',
-                'Split Indicator',
                 'Purchasing Organization',
                 'Agreement',
                 'Item Info Record',
@@ -169,15 +196,6 @@ const CreatePurchaseRequisition = () => {
               <TableRow key={index}>
                 <TableCell>{row.sNo}</TableCell>
                 <TableCell>
-                  <TextField
-                    value={row.status}
-                    onChange={(e) =>
-                      handleChange(index, 'status', e.target.value)
-                    }
-                    fullWidth
-                  />
-                </TableCell>
-                <TableCell>
                   <TextField value={row.itemNo} disabled fullWidth />
                 </TableCell>
                 <TableCell>
@@ -195,36 +213,50 @@ const CreatePurchaseRequisition = () => {
                 <TableCell>
                   <TextField value={row.materialName} disabled fullWidth />
                 </TableCell>
-                <TableCell>
-                  <TextField value={row.shortText} disabled fullWidth />
+                <TableCell key="vendor">
+                  <Autocomplete
+                    options={vendors}
+                    getOptionLabel={(option) => option.name}
+                    value={vendors.find((v) => v.id === row.vendor) || null}
+                    onChange={(event, newValue) =>
+                      handleChange(index, 'vendor', newValue ? newValue.id : '')
+                    }
+                    renderInput={(params) => (
+                      <TextField {...params} label="Vendor" fullWidth />
+                    )}
+                    isOptionEqualToValue={(option, value) =>
+                      option.id === value.id
+                    }
+                  />
                 </TableCell>
-                <TableCell>
-                  <TextField value={row.materialGroup} disabled fullWidth />
-                </TableCell>
+
                 {[
                   { key: 'quantity', type: 'number' },
                   { key: 'unit' },
+                  { key: 'status' },
                   { key: 'deliveryDate', type: 'date' },
-                  { key: 'plant' },
-                  { key: 'storageLocation' },
-                  { key: 'purchasingGroup' },
-                  { key: 'requisitioner' },
-                  { key: 'trackingNo' },
-                  { key: 'vendor' },
                   { key: 'fixedVendorIS' },
                   { key: 'readVendorSPG' },
                   { key: 'splitIndicator' },
-                  { key: 'purchasingOrg' },
-                  { key: 'agreement' },
-                  { key: 'itemInfoRecord' },
-                  { key: 'mpnMaterial' },
-                ].map(({ key, type }) => (
+                  { key: 'shortText', disabled: true },
+                  { key: 'materialGroup', disabled: true },
+                  { key: 'plant', disabled: true },
+                  { key: 'storageLocation', disabled: true },
+                  { key: 'purchasingGroup', disabled: true },
+                  { key: 'requisitioner', disabled: true },
+                  { key: 'trackingNo', disabled: true },
+                  { key: 'purchasingOrg', disabled: true },
+                  { key: 'agreement', disabled: true },
+                  { key: 'itemInfoRecord', disabled: true },
+                  { key: 'mpnMaterial', disabled: true },
+                ].map(({ key, type, disabled }) => (
                   <TableCell key={key}>
                     <TextField
                       type={type || 'text'}
                       value={row[key]}
                       onChange={(e) => handleChange(index, key, e.target.value)}
                       fullWidth
+                      disabled={disabled}
                     />
                   </TableCell>
                 ))}
