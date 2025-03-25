@@ -30,13 +30,11 @@ const MaterialList = () => {
     'Material Name',
     'Short Text',
     'Material Group',
-    'Unit',
     'Plant',
     'Storage Location',
     'Purchasing Group',
     'Requisitioner',
     'Tracking No',
-    'Split Indicator',
     'Purchasing Org',
     'Agreement',
     'Item Info Record',
@@ -69,13 +67,11 @@ const MaterialList = () => {
                 <TableCell>{mat.materialName || '-'}</TableCell>
                 <TableCell>{mat.shortText || '-'}</TableCell>
                 <TableCell>{mat.materialGroup || '-'}</TableCell>
-                <TableCell>{mat.unit || '-'}</TableCell>
                 <TableCell>{mat.plant || '-'}</TableCell>
                 <TableCell>{mat.storageLocation || '-'}</TableCell>
                 <TableCell>{mat.purchasingGroup || '-'}</TableCell>
                 <TableCell>{mat.requisitioner || '-'}</TableCell>
                 <TableCell>{mat.trackingNo || '-'}</TableCell>
-                <TableCell>{mat.splitIndicator || '-'}</TableCell>
                 <TableCell>{mat.purchasingOrg || '-'}</TableCell>
                 <TableCell>{mat.agreement || '-'}</TableCell>
                 <TableCell>{mat.itemInfoRecord || '-'}</TableCell>

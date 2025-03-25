@@ -334,7 +334,7 @@ export const privateRoutes = [
     element: EditVendorMaster,
   },
   {
-    path: '/sourcing/materials',
+    path: '/sourcing/basicData',
     element: MaterialList,
   },
 ];

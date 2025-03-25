@@ -41,8 +41,8 @@ export const SourcingData = [
     path: '/sourcing/vendor-master',
   },
   {
-    title: 'Materials',
-    path: '/sourcing/materials',
+    title: 'Basic Data',
+    path: '/sourcing/basicData',
   },
 ];
 export const pricingData = [
