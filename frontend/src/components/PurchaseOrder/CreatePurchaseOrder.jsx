@@ -9,108 +9,69 @@ import {
   TableCell,
   TableBody,
   Autocomplete,
-  IconButton,
 } from '@mui/material';
-import { Add, Delete } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const CreatePurchaseOrder = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
   const [materials, setMaterials] = useState([]);
-  const [rows, setRows] = useState([
-    {
-      sNo: 1,
-      itemNo: '-',
-      materialId: '',
-      materialName: '',
-      shortText: '',
-      materialGroup: '',
-      quantity: 1,
-      unit: '',
-      deliveryDate: '',
-      startDate: '',
-      endDate: '',
-      plant: '',
-      storageLocation: '',
-      batch: '',
-      stockSegment: '',
-      requestSegment: '',
-      requirementNo: '',
-      requisitioner: '',
-      netPrice: '',
-      currency: 'INR',
-      taxCode: '',
-      infoRecord: '',
-      outlineAgreement: '',
-      issuingStorageLocation: '',
-      servicePerformer: '',
-      revisionLevel: '',
-      supplierMatNo: '',
-      supplierSubrange: '',
-      supplierBatch: '',
-      commodityCode: '',
-    },
-  ]);
+  const [requisitions, setRequisitions] = useState([]);
+  const [selectedRequisition, setSelectedRequisition] = useState(null);
+  const [rows, setRows] = useState([]);
   const [supplierId, setSupplierId] = useState('');
   const [supplierName, setSupplierName] = useState('');
   const [documentDate, setDocumentDate] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(server_Url + '/api/v1/getMaterialIds').then((res) => {
-      const sortedMaterials = res.data.sort((a, b) => a.sNo - b.sNo);
-      setMaterials(sortedMaterials);
-    });
+    const token = localStorage.getItem('token');
+    axios
+      .get(server_Url + '/api/v1/getMaterialIds', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        const sortedMaterials = res.data.sort((a, b) => a.sNo - b.sNo);
+        setMaterials(sortedMaterials);
+      });
+
+    axios
+      .get(server_Url + '/api/v1/requisition', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setRequisitions(res.data);
+      })
+      .catch((err) => console.error('Failed to fetch requisitions', err));
   }, []);
 
-  const handleChange = (index, field, value) => {
-    const updatedRows = [...rows];
-    updatedRows[index][field] = value;
-
-    if (field === 'materialId') {
-      const selectedMaterial = materials.find((p) => p.materialId === value);
-      console.log({ selectedMaterial });
-      if (selectedMaterial) {
-        updatedRows[index].materialName = selectedMaterial.materialName;
-        updatedRows[index].shortText = selectedMaterial.shortText || '-';
-        updatedRows[index].materialGroup =
-          selectedMaterial.materialGroup || '-';
-        updatedRows[index].unit = selectedMaterial.unit || 1;
-        updatedRows[index].itemNo = selectedMaterial.itemNo || '-';
-      }
-    }
-
-    setRows(updatedRows);
-  };
-
-  const addRow = () => {
-    setRows([
-      ...rows,
-      {
-        sNo: rows.length + 1,
-        itemNo: `-`,
-        materialId: '',
-        materialName: '',
-        shortText: '',
-        materialGroup: '',
-        quantity: 1,
-        unit: '',
-        deliveryDate: '',
-        startDate: '',
-        endDate: '',
-        plant: '',
-        storageLocation: '',
-        batch: '',
-        stockSegment: '',
-        requestSegment: '',
-        requirementNo: '',
-        requisitioner: '',
+  useEffect(() => {
+    if (selectedRequisition) {
+      const materialsFromReq = selectedRequisition.materials || [];
+      const formattedRows = materialsFromReq.map((item, index) => ({
+        sNo: index + 1,
+        itemNo: item.itemNo || `ITM${String(index + 1).padStart(3, '0')}`,
+        materialId: item.materialId || '',
+        materialName: item.materialName || '',
+        shortText: item.shortText || '',
+        materialGroup: item.materialGroup || '',
+        quantity: item.quantity || 1,
+        unit: item.unit || '',
+        deliveryDate: item.deliveryDate || '',
+        startDate: item.startDate || '',
+        endDate: item.endDate || '',
+        plant: item.plant || '',
+        storageLocation: item.storageLocation || '',
+        batch: item.batch || '',
+        stockSegment: item.stockSegment || '',
+        requestSegment: item.requestSegment || '',
+        requirementNo: item.trackingNo || '',
+        requisitioner: item.requisitioner || '',
         netPrice: '',
         currency: 'INR',
         taxCode: '',
-        infoRecord: '',
-        outlineAgreement: '',
+        infoRecord: item.itemInfoRecord || '',
+        outlineAgreement: item.agreement || '',
         issuingStorageLocation: '',
         servicePerformer: '',
         revisionLevel: '',
@@ -118,20 +79,10 @@ const CreatePurchaseOrder = () => {
         supplierSubrange: '',
         supplierBatch: '',
         commodityCode: '',
-      },
-    ]);
-  };
-
-  const removeRow = (index) => {
-    const updatedRows = rows.filter((_, i) => i !== index);
-    setRows(
-      updatedRows.map((row, i) => ({
-        ...row,
-        sNo: i + 1,
-        itemNo: `ITM${String(i + 1).padStart(3, '0')}`,
-      }))
-    ); // Re-number sNo
-  };
+      }));
+      setRows(formattedRows);
+    }
+  }, [selectedRequisition]);
 
   const handleSave = () => {
     const token = localStorage.getItem('token');
@@ -145,12 +96,27 @@ const CreatePurchaseOrder = () => {
         navigate('/sourcing/purchase-orders');
       });
   };
-  console.log({ materials });
+
   return (
     <Container>
-      <h2>Create Purchase Order</h2>
+      <h1 style={{ fontSize: '22px', fontWeight: 'bold', marginTop: '10px' }}>
+        Create Purchase Order
+      </h1>
 
-      {/* Supplier and Document Date Inputs */}
+      <Autocomplete
+        options={requisitions}
+        getOptionLabel={(option) => `REQ-${option._id}`}
+        onChange={(event, newValue) => setSelectedRequisition(newValue)}
+        renderInput={(params) => (
+          <TextField
+            {...params}
+            label="Select Purchase Requisition"
+            margin="normal"
+            fullWidth
+          />
+        )}
+      />
+
       <TextField
         label="Supplier ID"
         value={supplierId}
@@ -175,7 +141,6 @@ const CreatePurchaseOrder = () => {
         InputLabelProps={{ shrink: true }}
       />
 
-      {/* Scrollable Table */}
       <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
         <Table style={{ minWidth: '2200px' }}>
           <TableHead>
@@ -211,7 +176,6 @@ const CreatePurchaseOrder = () => {
                 'Supplier Subrange',
                 'Supplier Batch',
                 'Commodity Code',
-                'Action',
               ].map((header) => (
                 <TableCell
                   key={header}
@@ -229,11 +193,9 @@ const CreatePurchaseOrder = () => {
                 <TableCell>{item.itemNo}</TableCell>
                 <TableCell>
                   <Autocomplete
+                    disabled
                     options={materials.map((p) => p.materialId)}
                     value={item.materialId}
-                    onChange={(event, newValue) =>
-                      handleChange(index, 'materialId', newValue)
-                    }
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -244,40 +206,10 @@ const CreatePurchaseOrder = () => {
                     )}
                   />
                 </TableCell>
-                <TableCell>
-                  <TextField
-                    type={'text'}
-                    value={item.materialName}
-                    onChange={(e) =>
-                      handleChange(index, 'materialName', e.target.value)
-                    }
-                    fullWidth
-                    disabled
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type={'text'}
-                    value={item.shortText}
-                    onChange={(e) =>
-                      handleChange(index, 'shortText', e.target.value)
-                    }
-                    fullWidth
-                    disabled
-                  />
-                </TableCell>
-                <TableCell>
-                  <TextField
-                    type={'text'}
-                    value={item.materialGroup}
-                    onChange={(e) =>
-                      handleChange(index, 'materialGroup', e.target.value)
-                    }
-                    fullWidth
-                    disabled
-                  />
-                </TableCell>
                 {[
+                  'materialName',
+                  'shortText',
+                  'materialGroup',
                   'quantity',
                   'unit',
                   'deliveryDate',
@@ -314,23 +246,16 @@ const CreatePurchaseOrder = () => {
                           : 'text'
                       }
                       value={item[field]}
-                      onChange={(e) =>
-                        handleChange(index, field, e.target.value)
-                      }
+                      onChange={(e) => {
+                        const updatedRows = [...rows];
+                        updatedRows[index][field] = e.target.value;
+                        setRows(updatedRows);
+                      }}
                       fullWidth
-                      disabled={field === 'currency'}
+                      disabled={item[field] !== undefined && item[field] !== ''}
                     />
                   </TableCell>
                 ))}
-                <TableCell>
-                  <IconButton
-                    color="secondary"
-                    onClick={() => removeRow(index)}
-                    disabled={rows.length === 1}
-                  >
-                    <Delete />
-                  </IconButton>
-                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -338,19 +263,11 @@ const CreatePurchaseOrder = () => {
       </div>
 
       <Button
-        startIcon={<Add />}
-        onClick={addRow}
-        variant="outlined"
-        color="primary"
-        style={{ marginTop: '10px' }}
-      >
-        Add Row
-      </Button>
-      <Button
         onClick={handleSave}
         variant="contained"
         color="primary"
-        style={{ marginTop: '10px', marginLeft: '10px' }}
+        style={{ marginTop: '10px' }}
+        disabled={!selectedRequisition}
       >
         Save Purchase Order
       </Button>

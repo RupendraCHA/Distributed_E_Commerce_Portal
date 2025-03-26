@@ -138,6 +138,8 @@ const EditPurchaseRequisition = () => {
       });
   };
 
+  console.log('Requisition:', JSON.stringify(requisition, null, 2));
+
   return (
     <Container>
       <h2>Edit Purchase Requisition</h2>
@@ -222,7 +224,6 @@ const EditPurchaseRequisition = () => {
                 </TableCell>
 
                 {[
-                  { key: 'vendor' },
                   { key: 'quantity', type: 'number' },
                   { key: 'unit' },
                   { key: 'status' },

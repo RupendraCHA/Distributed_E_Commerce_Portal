@@ -3,12 +3,12 @@ const mongoose = require("mongoose");
 const MaterialSchema = new mongoose.Schema(
   {
     userId: { type: String, required: true }, // Associate requisition with a user
-    sNo: { type: Number, required: true }, // Auto-incremented Serial Number
+    sNo: { type: Number, required: true, unique: true }, // Auto-incremented Serial Number
     itemNo: { type: String, required: true, unique: true }, // Unique Item Number
     materialId: { type: String, required: true, unique: true },
     materialName: { type: String, required: true },
-    shortText: { type: String, default: "" }, // Brief description of material
-    materialGroup: { type: String, default: "" }, // Category/Group
+    shortText: { type: String, default: "" },
+    materialGroup: { type: String, default: "" },
     category: { type: String, default: "" },
     brand: { type: String, default: "" },
     price: { type: String, default: "" },
@@ -16,8 +16,21 @@ const MaterialSchema = new mongoose.Schema(
     weight: { type: String, default: "" },
     stock: { type: Number, default: 0 },
     expirationDate: { type: String, default: "" },
-    unit: { type: String, default: "" }, // Measurement unit (kg, lb, pcs, etc.)
+    unit: { type: String, default: "" },
     image: { type: String, default: "" },
+
+    // New fields based on the provided object
+    status: { type: String, default: "" },
+    plant: { type: String, default: "" },
+    storageLocation: { type: String, default: "" },
+    purchasingGroup: { type: String, default: "" },
+    requisitioner: { type: String, default: "" },
+    trackingNo: { type: String, default: "" },
+    splitIndicator: { type: String, default: "" },
+    purchasingOrg: { type: String, default: "" },
+    agreement: { type: String, default: "" },
+    itemInfoRecord: { type: String, default: "" },
+    mpnMaterial: { type: String, default: "" },
   },
   { timestamps: true }
 );

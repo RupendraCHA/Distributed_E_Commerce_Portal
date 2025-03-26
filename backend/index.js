@@ -1829,7 +1829,7 @@ app.get("/products", async (req, res) => {
 });
 
 // Get all material IDs
-app.get("/api/v1/getMaterialIds", async (req, res) => {
+app.get("/api/v1/getMaterialIds", authenticateToken, async (req, res) => {
   try {
     console.log("Fetching material IDs...");
     const materials = await MaterialModel.find(
@@ -1840,6 +1840,85 @@ app.get("/api/v1/getMaterialIds", async (req, res) => {
   } catch (error) {
     console.error("Error fetching materials:", error.message);
     res.status(500).json({ message: "Server Error" });
+  }
+});
+
+app.post("/api/v1/materials", authenticateToken, async (req, res) => {
+  try {
+    const material = new MaterialModel({ ...req.body, userId: req.user.id });
+    await material.save();
+    res.status(201).json(material);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Get All Materials
+app.get("/api/v1/materials", authenticateToken, async (req, res) => {
+  const materials = await MaterialModel.find({ userId: req.user.id });
+  res.json(materials);
+});
+
+// Update Material
+app.put("/api/v1/materials/:id", authenticateToken, async (req, res) => {
+  try {
+    const updated = await MaterialModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updated);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.get("/api/v1/materials/last", authenticateToken, async (req, res) => {
+  try {
+    const last = ((await MaterialModel.find({})
+      .sort({ itemNo: -1 })
+      .limit(1)) || [])[0];
+    console.log({ last });
+
+    const lastSNo = (last?.itemNo).split("ITM")[1] || 0;
+    console.log({ lastSNo: Number(lastSNo) });
+
+    res.status(200).json({ lastSNo: Number(lastSNo) });
+  } catch (error) {
+    console.error("Error fetching last material:", error);
+    res.status(500).json({ message: "Failed to fetch last serial number" });
+  }
+});
+
+// Get Material by ID
+app.get("/api/v1/materials/:id", authenticateToken, async (req, res) => {
+  const material = await MaterialModel.findById(req.params.id);
+  if (!material) return res.status(404).json({ error: "Material not found" });
+  res.json(material);
+});
+
+// POST /api/v1/materials/bulk
+app.post("/api/v1/materials/bulk", authenticateToken, async (req, res) => {
+  const { materials } = req.body;
+  const userId = req.user.id;
+
+  if (!Array.isArray(materials) || materials.length === 0) {
+    return res
+      .status(400)
+      .json({ error: "Materials must be a non-empty array" });
+  }
+
+  try {
+    const createdMaterials = [];
+    for (const data of materials) {
+      const material = new MaterialModel({ ...data, userId });
+      await material.save();
+      createdMaterials.push(material);
+    }
+    res.status(201).json(createdMaterials);
+  } catch (err) {
+    console.error("Bulk material creation failed:", err);
+    res.status(500).json({ error: "Error creating materials" });
   }
 });
 
@@ -1971,7 +2050,7 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
         materialName: foundMaterial ? foundMaterial.materialName : "",
         shortText: foundMaterial ? foundMaterial.shortText : "",
         materialGroup: foundMaterial ? foundMaterial.materialGroup : "",
-        unit: foundMaterial ? foundMaterial.unit : "",
+        unit: m.unit ?? foundMaterial?.unit ?? "",
         quantity: m.quantity,
         deliveryDate: m.deliveryDate,
         plant: m.plant || "",

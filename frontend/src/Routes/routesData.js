@@ -140,6 +140,14 @@ const MaterialList = React.lazy(() =>
   import('../components/MaterialList/index.jsx')
 );
 
+const CreateMaterialList = React.lazy(() =>
+  import('../components/MaterialList/CreateMaterialList.jsx')
+);
+
+const EditMaterialList = React.lazy(() =>
+  import('../components/MaterialList/EditMaterialList.jsx')
+);
+
 import {
   productsData,
   solutionsData,
@@ -334,8 +342,16 @@ export const privateRoutes = [
     element: EditVendorMaster,
   },
   {
-    path: '/sourcing/basicData',
+    path: '/sourcing/materialMaster',
     element: MaterialList,
+  },
+  {
+    path: '/sourcing/materialMaster/create',
+    element: CreateMaterialList,
+  },
+  {
+    path: '/sourcing/materialMaster/edit/:id',
+    element: EditMaterialList,
   },
 ];
 

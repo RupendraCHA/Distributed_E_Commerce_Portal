@@ -129,7 +129,9 @@ const EditPurchaseOrder = () => {
 
   return (
     <Container>
-      <h2>Edit Purchase Order</h2>
+      <h1 style={{ fontSize: '22px', fontWeight: 'bold', marginTop: '10px' }}>
+        Edit Purchase Order
+      </h1>
 
       {/* Supplier and Document Date Inputs */}
       <TextField

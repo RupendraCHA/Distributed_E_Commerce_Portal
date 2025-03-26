@@ -67,10 +67,11 @@ const PurchaseRequisitionList = () => {
           <TableHead>
             <TableRow>
               <TableCell>S.No</TableCell>
-              <TableCell>Status</TableCell>
               <TableCell>Item No</TableCell>
               <TableCell>Material</TableCell>
               <TableCell>Short Text</TableCell>
+              <TableCell>Status</TableCell>
+
               <TableCell>Quantity</TableCell>
               <TableCell>Unit</TableCell>
               <TableCell>Delivery Date</TableCell>
@@ -95,11 +96,11 @@ const PurchaseRequisitionList = () => {
             {requisitions.map((req, index) => (
               <TableRow key={req._id}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{req.status || '-'}</TableCell>
                 {[
                   { key: 'itemNo' },
                   { key: 'materialName' },
                   { key: 'shortText' },
+                  { key: 'status' },
                   { key: 'quantity' },
                   { key: 'unit', defaultValue: '-' },
                   { key: 'deliveryDate' },

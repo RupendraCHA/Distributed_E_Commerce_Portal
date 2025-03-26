@@ -9,16 +9,25 @@ import {
   Paper,
   TableContainer,
   Typography,
+  Button,
+  IconButton,
+  Tooltip,
 } from '@mui/material';
+import { Edit } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const MaterialList = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
+  const token = localStorage.getItem('token');
   const [materials, setMaterials] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     axios
-      .get(`${server_Url}/api/v1/getMaterialIds`)
+      .get(`${server_Url}/api/v1/getMaterialIds`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => setMaterials(res.data))
       .catch((err) => console.error('Error fetching materials:', err));
   }, []);
@@ -39,6 +48,7 @@ const MaterialList = () => {
     'Agreement',
     'Item Info Record',
     'MPN Material',
+    'Actions', // Added action column
   ];
 
   return (
@@ -46,6 +56,16 @@ const MaterialList = () => {
       <Typography variant="h5" gutterBottom sx={{ mt: 2, fontWeight: 'bold' }}>
         Material List
       </Typography>
+
+      {/* Create Material Button */}
+      <Button
+        variant="contained"
+        color="primary"
+        style={{ float: 'right', marginBottom: '20px' }}
+        onClick={() => navigate('/sourcing/materialMaster/create')}
+      >
+        Create
+      </Button>
 
       <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 500 }}>
         <Table>
@@ -76,6 +96,18 @@ const MaterialList = () => {
                 <TableCell>{mat.agreement || '-'}</TableCell>
                 <TableCell>{mat.itemInfoRecord || '-'}</TableCell>
                 <TableCell>{mat.mpnMaterial || '-'}</TableCell>
+                <TableCell>
+                  <Tooltip title="Edit">
+                    <IconButton
+                      color="primary"
+                      onClick={() =>
+                        navigate(`/sourcing/materialMaster/edit/${mat._id}`)
+                      }
+                    >
+                      <Edit />
+                    </IconButton>
+                  </Tooltip>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
