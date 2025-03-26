@@ -100,7 +100,7 @@ const CreateMaterialList = () => {
   return (
     <Container>
       <h1 style={{ fontSize: '22px', fontWeight: 'bold', marginTop: '10px' }}>
-        Create Material List
+        Create Material Master
       </h1>
       {materials.map((material, index) => (
         <div

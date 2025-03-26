@@ -54,7 +54,7 @@ const MaterialList = () => {
   return (
     <Container>
       <Typography variant="h5" gutterBottom sx={{ mt: 2, fontWeight: 'bold' }}>
-        Material List
+        Material Master
       </Typography>
 
       {/* Create Material Button */}
