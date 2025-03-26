@@ -50,9 +50,15 @@ const CreatePurchaseRequisition = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get(server_Url + '/api/v1/getMaterialIds').then((res) => {
-      setMaterials(res.data);
-    });
+    const token = localStorage.getItem('token');
+
+    axios
+      .get(server_Url + '/api/v1/getMaterialIds', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => {
+        setMaterials(res.data);
+      });
   }, []);
   useEffect(() => {
     const token = localStorage.getItem('token');
