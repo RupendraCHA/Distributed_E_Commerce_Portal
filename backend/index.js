@@ -21,6 +21,7 @@ const {
   InboundDeliveryModel,
   VendorBillModel,
   VendorMasterModel,
+  ItemInfoRecordModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -2298,6 +2299,67 @@ app.put("/api/v1/vendor-bill/:id", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Server error", error });
   }
 });
+
+// Create
+app.post("/api/v1/item-info-records", authenticateToken, async (req, res) => {
+  try {
+    const newRecord = new ItemInfoRecordModel({
+      userId: req.user.id,
+      ...req.body,
+    });
+    await newRecord.save();
+    res.status(201).json(newRecord);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Failed to create item info record", details: err });
+  }
+});
+
+// Get all
+app.get("/api/v1/item-info-records", authenticateToken, async (req, res) => {
+  try {
+    const records = await ItemInfoRecordModel.find({ userId: req.user.id });
+    res.status(200).json(records);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Failed to fetch item info records", details: err });
+  }
+});
+
+// Get by ID
+app.get(
+  "/api/v1/item-info-records/:id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const record = await ItemInfoRecordModel.findById(req.params.id);
+      if (!record) return res.status(404).json({ error: "Record not found" });
+      res.status(200).json(record);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch record", details: err });
+    }
+  }
+);
+
+// Update by ID
+app.put(
+  "/api/v1/item-info-records/:id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const updated = await ItemInfoRecordModel.findByIdAndUpdate(
+        req.params.id,
+        { ...req.body },
+        { new: true }
+      );
+      res.status(200).json(updated);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update record", details: err });
+    }
+  }
+);
 
 // New endpoint (optional optimization)
 app.get("/api/v1/vendors-list", authenticateToken, async (req, res) => {

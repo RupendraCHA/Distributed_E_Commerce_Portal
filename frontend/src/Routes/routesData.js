@@ -148,6 +148,18 @@ const EditMaterialList = React.lazy(() =>
   import('../components/MaterialList/EditMaterialList.jsx')
 );
 
+const ItemInfoRecords = React.lazy(() =>
+  import('../components/ItemInfoRecords/index.jsx')
+);
+
+const CreateItemInfoRecords = React.lazy(() =>
+  import('../components/ItemInfoRecords/CreateItemInfoRecords.jsx')
+);
+
+const EditItemInfoRecords = React.lazy(() =>
+  import('../components/ItemInfoRecords/EditItemInfoRecords.jsx')
+);
+
 import {
   productsData,
   solutionsData,
@@ -352,6 +364,18 @@ export const privateRoutes = [
   {
     path: '/sourcing/materialMaster/edit/:id',
     element: EditMaterialList,
+  },
+  {
+    path: '/sourcing/item-info-records',
+    element: ItemInfoRecords,
+  },
+  {
+    path: '/sourcing/item-info-records/create',
+    element: CreateItemInfoRecords,
+  },
+  {
+    path: '/sourcing/item-info-records/edit/:id',
+    element: EditItemInfoRecords,
   },
 ];
 
