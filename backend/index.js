@@ -381,9 +381,9 @@ app.get("/api/v1/distributors/products", async (req, res) => {
       .map((product) =>
         productQuantities[product.productId] > 0
           ? {
-              ...product.toObject(),
-              quantity: productQuantities[product.productId] || 0, // Ensure default is 0
-            }
+            ...product.toObject(),
+            quantity: productQuantities[product.productId] || 0, // Ensure default is 0
+          }
           : {}
       )
       .filter((product) => product.productId);
@@ -832,12 +832,12 @@ app.get("/distributors/products", async (req, res) => {
         );
         return product
           ? {
-              ...product.toObject(),
-              quantity: productInfo.quantity,
-              price: `$${productInfo.price || product.price || 0}`,
-              distributorIds: Array.from(productInfo.distributors),
-              warehouseDetails: productInfo.warehouseDetails,
-            }
+            ...product.toObject(),
+            quantity: productInfo.quantity,
+            price: `$${productInfo.price || product.price || 0}`,
+            distributorIds: Array.from(productInfo.distributors),
+            warehouseDetails: productInfo.warehouseDetails,
+          }
           : null;
       })
       .filter((product) => product !== null);
@@ -1833,16 +1833,35 @@ app.get("/products", async (req, res) => {
 app.get("/api/v1/getMaterialIds", authenticateToken, async (req, res) => {
   try {
     console.log("Fetching material IDs...");
-    const materials = await MaterialModel.find(
-      {},
-      "sNo itemNo materialId materialName shortText materialGroup unit plant storageLocation purchasingGroup requisitioner trackingNo splitIndicator purchasingOrg agreement itemInfoRecord mpnMaterial"
-    );
-    res.json(materials);
+    const materials = await MaterialModel.find({}, [
+      "sNo",
+      "itemNo",
+      "materialId",
+      "materialName",
+      "shortText",
+      "materialGroup",
+      "unit",
+      "plant",
+      "storageLocation",
+      "purchasingGroup",
+      "requisitioner",
+      "trackingNo",
+      "splitIndicator",
+      "purchasingOrg",
+      "agreement",
+      "itemInfoRecord",
+      "mpnMaterial",
+      "suppliers"
+    ])
+
+    res.status(200).json(materials);
   } catch (error) {
-    console.error("Error fetching materials:", error.message);
+    console.error("Error fetching materials:", error);
     res.status(500).json({ message: "Server Error" });
   }
 });
+
+
 
 app.post("/api/v1/materials", authenticateToken, async (req, res) => {
   try {

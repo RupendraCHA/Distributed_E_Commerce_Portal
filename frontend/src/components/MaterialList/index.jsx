@@ -37,6 +37,7 @@ const MaterialList = () => {
     'Item No',
     'Material ID',
     'Material Name',
+    'Vendors',
     'Short Text',
     'Material Group',
     'Plant',
@@ -50,7 +51,7 @@ const MaterialList = () => {
     'MPN Material',
     'Actions', // Added action column
   ];
-
+  console.log({ materials })
   return (
     <Container>
       <Typography variant="h5" gutterBottom sx={{ mt: 2, fontWeight: 'bold' }}>
@@ -85,6 +86,11 @@ const MaterialList = () => {
                 <TableCell>{mat.itemNo || '-'}</TableCell>
                 <TableCell>{mat.materialId}</TableCell>
                 <TableCell>{mat.materialName || '-'}</TableCell>
+                <TableCell>
+                  {Array.isArray(mat.suppliers) && mat.suppliers.length > 0
+                    ? mat.suppliers.join(', ')
+                    : '-'}
+                </TableCell>
                 <TableCell>{mat.shortText || '-'}</TableCell>
                 <TableCell>{mat.materialGroup || '-'}</TableCell>
                 <TableCell>{mat.plant || '-'}</TableCell>

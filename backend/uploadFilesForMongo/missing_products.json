@@ -21,7 +21,12 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR001",
     "itemInfoRecord": "IIR0001",
-    "mpnMaterial": "MPN0001"
+    "mpnMaterial": "MPN0001",
+    "suppliers": [
+      "SUP003",
+      "SUP004",
+      "SUP002"
+    ]
   },
   {
     "_id": {
@@ -45,7 +50,12 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR002",
     "itemInfoRecord": "IIR0002",
-    "mpnMaterial": "MPN0002"
+    "mpnMaterial": "MPN0002",
+    "suppliers": [
+      "SUP001",
+      "SUP004",
+      "SUP003"
+    ]
   },
   {
     "_id": {
@@ -69,7 +79,11 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR003",
     "itemInfoRecord": "IIR0003",
-    "mpnMaterial": "MPN0003"
+    "mpnMaterial": "MPN0003",
+    "suppliers": [
+      "SUP004",
+      "SUP003"
+    ]
   },
   {
     "_id": {
@@ -93,7 +107,11 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR004",
     "itemInfoRecord": "IIR0004",
-    "mpnMaterial": "MPN0004"
+    "mpnMaterial": "MPN0004",
+    "suppliers": [
+      "SUP005",
+      "SUP003"
+    ]
   },
   {
     "_id": {
@@ -117,7 +135,10 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR005",
     "itemInfoRecord": "IIR0005",
-    "mpnMaterial": "MPN0005"
+    "mpnMaterial": "MPN0005",
+    "suppliers": [
+      "SUP003"
+    ]
   },
   {
     "_id": {
@@ -141,7 +162,11 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR006",
     "itemInfoRecord": "IIR0006",
-    "mpnMaterial": "MPN0006"
+    "mpnMaterial": "MPN0006",
+    "suppliers": [
+      "SUP005",
+      "SUP004"
+    ]
   },
   {
     "_id": {
@@ -165,7 +190,11 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR007",
     "itemInfoRecord": "IIR0007",
-    "mpnMaterial": "MPN0007"
+    "mpnMaterial": "MPN0007",
+    "suppliers": [
+      "SUP003",
+      "SUP001"
+    ]
   },
   {
     "_id": {
@@ -189,7 +218,12 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR008",
     "itemInfoRecord": "IIR0008",
-    "mpnMaterial": "MPN0008"
+    "mpnMaterial": "MPN0008",
+    "suppliers": [
+      "SUP003",
+      "SUP002",
+      "SUP004"
+    ]
   },
   {
     "_id": {
@@ -213,7 +247,12 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR009",
     "itemInfoRecord": "IIR0009",
-    "mpnMaterial": "MPN0009"
+    "mpnMaterial": "MPN0009",
+    "suppliers": [
+      "SUP005",
+      "SUP001",
+      "SUP002"
+    ]
   },
   {
     "_id": {
@@ -237,7 +276,10 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR010",
     "itemInfoRecord": "IIR0010",
-    "mpnMaterial": "MPN0010"
+    "mpnMaterial": "MPN0010",
+    "suppliers": [
+      "SUP001"
+    ]
   },
   {
     "_id": {
@@ -261,7 +303,10 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR011",
     "itemInfoRecord": "IIR0011",
-    "mpnMaterial": "MPN0011"
+    "mpnMaterial": "MPN0011",
+    "suppliers": [
+      "SUP002"
+    ]
   },
   {
     "_id": {
@@ -285,7 +330,10 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR012",
     "itemInfoRecord": "IIR0012",
-    "mpnMaterial": "MPN0012"
+    "mpnMaterial": "MPN0012",
+    "suppliers": [
+      "SUP004"
+    ]
   },
   {
     "_id": {
@@ -309,7 +357,11 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR013",
     "itemInfoRecord": "IIR0013",
-    "mpnMaterial": "MPN0013"
+    "mpnMaterial": "MPN0013",
+    "suppliers": [
+      "SUP005",
+      "SUP002"
+    ]
   },
   {
     "_id": {
@@ -333,7 +385,12 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR014",
     "itemInfoRecord": "IIR0014",
-    "mpnMaterial": "MPN0014"
+    "mpnMaterial": "MPN0014",
+    "suppliers": [
+      "SUP002",
+      "SUP004",
+      "SUP001"
+    ]
   },
   {
     "_id": {
@@ -357,7 +414,12 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR015",
     "itemInfoRecord": "IIR0015",
-    "mpnMaterial": "MPN0015"
+    "mpnMaterial": "MPN0015",
+    "suppliers": [
+      "SUP004",
+      "SUP002",
+      "SUP001"
+    ]
   },
   {
     "_id": {
@@ -381,7 +443,12 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR016",
     "itemInfoRecord": "IIR0016",
-    "mpnMaterial": "MPN0016"
+    "mpnMaterial": "MPN0016",
+    "suppliers": [
+      "SUP004",
+      "SUP003",
+      "SUP001"
+    ]
   },
   {
     "_id": {
@@ -405,7 +472,11 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR017",
     "itemInfoRecord": "IIR0017",
-    "mpnMaterial": "MPN0017"
+    "mpnMaterial": "MPN0017",
+    "suppliers": [
+      "SUP001",
+      "SUP002"
+    ]
   },
   {
     "_id": {
@@ -429,7 +500,11 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR018",
     "itemInfoRecord": "IIR0018",
-    "mpnMaterial": "MPN0018"
+    "mpnMaterial": "MPN0018",
+    "suppliers": [
+      "SUP005",
+      "SUP003"
+    ]
   },
   {
     "_id": {
@@ -453,7 +528,11 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR019",
     "itemInfoRecord": "IIR0019",
-    "mpnMaterial": "MPN0019"
+    "mpnMaterial": "MPN0019",
+    "suppliers": [
+      "SUP004",
+      "SUP002"
+    ]
   },
   {
     "_id": {
@@ -477,7 +556,12 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR020",
     "itemInfoRecord": "IIR0020",
-    "mpnMaterial": "MPN0020"
+    "mpnMaterial": "MPN0020",
+    "suppliers": [
+      "SUP003",
+      "SUP001",
+      "SUP002"
+    ]
   },
   {
     "_id": {
@@ -501,7 +585,11 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR021",
     "itemInfoRecord": "IIR0021",
-    "mpnMaterial": "MPN0021"
+    "mpnMaterial": "MPN0021",
+    "suppliers": [
+      "SUP004",
+      "SUP002"
+    ]
   },
   {
     "_id": {
@@ -525,7 +613,10 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR022",
     "itemInfoRecord": "IIR0022",
-    "mpnMaterial": "MPN0022"
+    "mpnMaterial": "MPN0022",
+    "suppliers": [
+      "SUP001"
+    ]
   },
   {
     "_id": {
@@ -549,7 +640,12 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR023",
     "itemInfoRecord": "IIR0023",
-    "mpnMaterial": "MPN0023"
+    "mpnMaterial": "MPN0023",
+    "suppliers": [
+      "SUP002",
+      "SUP004",
+      "SUP003"
+    ]
   },
   {
     "_id": {
@@ -573,7 +669,10 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR024",
     "itemInfoRecord": "IIR0024",
-    "mpnMaterial": "MPN0024"
+    "mpnMaterial": "MPN0024",
+    "suppliers": [
+      "SUP002"
+    ]
   },
   {
     "_id": {
@@ -597,7 +696,12 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR025",
     "itemInfoRecord": "IIR0025",
-    "mpnMaterial": "MPN0025"
+    "mpnMaterial": "MPN0025",
+    "suppliers": [
+      "SUP005",
+      "SUP001",
+      "SUP002"
+    ]
   },
   {
     "_id": {
@@ -621,7 +725,10 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR026",
     "itemInfoRecord": "IIR0026",
-    "mpnMaterial": "MPN0026"
+    "mpnMaterial": "MPN0026",
+    "suppliers": [
+      "SUP004"
+    ]
   },
   {
     "_id": {
@@ -645,7 +752,12 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR027",
     "itemInfoRecord": "IIR0027",
-    "mpnMaterial": "MPN0027"
+    "mpnMaterial": "MPN0027",
+    "suppliers": [
+      "SUP005",
+      "SUP002",
+      "SUP004"
+    ]
   },
   {
     "_id": {
@@ -669,7 +781,10 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR028",
     "itemInfoRecord": "IIR0028",
-    "mpnMaterial": "MPN0028"
+    "mpnMaterial": "MPN0028",
+    "suppliers": [
+      "SUP003"
+    ]
   },
   {
     "_id": {
@@ -693,7 +808,10 @@
     "purchasingOrg": "PO2",
     "agreement": "AGR029",
     "itemInfoRecord": "IIR0029",
-    "mpnMaterial": "MPN0029"
+    "mpnMaterial": "MPN0029",
+    "suppliers": [
+      "SUP001"
+    ]
   },
   {
     "_id": {
@@ -717,6 +835,9 @@
     "purchasingOrg": "PO1",
     "agreement": "AGR030",
     "itemInfoRecord": "IIR0030",
-    "mpnMaterial": "MPN0030"
+    "mpnMaterial": "MPN0030",
+    "suppliers": [
+      "SUP004"
+    ]
   }
 ]

@@ -31,6 +31,7 @@ const MaterialSchema = new mongoose.Schema(
     agreement: { type: String, default: "" },
     itemInfoRecord: { type: String, default: "" },
     mpnMaterial: { type: String, default: "" },
+    suppliers: [String] // instead of ObjectId
   },
   { timestamps: true }
 );
