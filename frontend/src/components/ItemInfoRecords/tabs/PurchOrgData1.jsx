@@ -5,6 +5,10 @@ import {
   FormControlLabel,
   Checkbox,
   Autocomplete,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import axios from 'axios';
 
@@ -12,6 +16,7 @@ const PurchOrgData1 = ({ formData, setFormData }) => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
 
   const [materialOptions, setMaterialOptions] = useState([]);
+  const [filteredVendors, setFilteredVendors] = useState([]);
 
   useEffect(() => {
     const fetchMaterials = async () => {
@@ -29,6 +34,9 @@ const PurchOrgData1 = ({ formData, setFormData }) => {
     fetchMaterials();
   }, []);
 
+
+
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -42,6 +50,11 @@ const PurchOrgData1 = ({ formData, setFormData }) => {
 
   const handleMaterialSelect = (e, newValue) => {
     if (!newValue) return;
+
+    const supplierIds = newValue.suppliers || [];
+
+    setFilteredVendors(supplierIds); // save filtered list for dropdown
+
     setFormData((prev) => ({
       ...prev,
       purchOrgData1: {
@@ -50,22 +63,68 @@ const PurchOrgData1 = ({ formData, setFormData }) => {
         materialGroup: newValue.materialGroup,
         plant: newValue.plant,
         purchasingOrg: newValue.purchasingOrg,
+        supplier: '', // reset supplier on material change
       },
     }));
   };
 
-  const data = formData.purchOrgData1 || {};
 
+
+  const data = formData.purchOrgData1 || {};
+  useEffect(() => {
+    const prefillVendorsForMaterial = async () => {
+      if (!data.material) return;
+
+      try {
+        const selectedMaterial = materialOptions.find(
+          (m) => m.materialId === data.material
+        );
+
+        if (selectedMaterial) {
+          const supplierIds = selectedMaterial.suppliers || [];
+          setFilteredVendors(supplierIds);
+        } else {
+          // fetch from API as fallback if not in materialOptions yet
+          const res = await axios.get(`${server_Url}/api/v1/getMaterialIds`, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          });
+          const allMaterials = res.data;
+          setMaterialOptions(allMaterials);
+
+          const matchedMaterial = allMaterials.find(
+            (m) => m.materialId === data.material
+          );
+          const supplierIds = matchedMaterial?.suppliers || [];
+          setFilteredVendors(supplierIds);
+        }
+      } catch (err) {
+        console.error('Error pre-filling suppliers:', err);
+      }
+    };
+
+    prefillVendorsForMaterial();
+  }, [data.material, materialOptions.length]);
   return (
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6} md={4}>
-        <TextField
-          fullWidth
-          label="Supplier"
-          name="supplier"
-          value={data.supplier || ''}
-          onChange={handleChange}
-        />
+        <FormControl fullWidth>
+          <InputLabel>Supplier</InputLabel>
+          <Select
+            label="Supplier"
+            name="supplier"
+            value={data.supplier || ''}
+            onChange={handleChange}
+            disabled={!data.material} // disabled until material selected
+          >
+            {filteredVendors.map((supplierId) => (
+              <MenuItem key={supplierId} value={supplierId}>
+                {supplierId}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Grid>
 
       <Grid item xs={12} sm={6} md={4}>
@@ -116,7 +175,6 @@ const PurchOrgData1 = ({ formData, setFormData }) => {
         />
       </Grid>
 
-      {/* Control Section */}
       <Grid item xs={12} sm={6} md={4}>
         <TextField
           fullWidth
@@ -154,7 +212,6 @@ const PurchOrgData1 = ({ formData, setFormData }) => {
         />
       </Grid>
 
-      {/* Checkboxes */}
       <Grid item xs={12} sm={6} md={4}>
         <FormControlLabel
           control={
@@ -178,7 +235,6 @@ const PurchOrgData1 = ({ formData, setFormData }) => {
         />
       </Grid>
 
-      {/* Shipping and Price Section */}
       <Grid item xs={12} sm={6} md={4}>
         <TextField
           fullWidth

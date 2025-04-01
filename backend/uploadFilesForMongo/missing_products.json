@@ -1,843 +1,125 @@
 [
   {
-    "_id": {
-      "$oid": "0c0d29c1efa641f3ac967938"
+    "userId": "679c6f25f98a84823dd64ab7",
+    "purchOrgData1": {
+      "material": "MAT001",
+      "materialGroup": "Group A",
+      "plant": "Plant 1",
+      "purchasingOrg": "PO1",
+      "supplier": "SUP003",
+      "deliveryTime": "5",
+      "purchaseGroup": "PG1",
+      "standardQty": "100",
+      "minimumQty": "10",
+      "grBasedIV": true,
+      "noERS": false,
+      "netPrice": "150",
+      "effectivePrice": "145",
+      "validTo": "2025-12-31"
     },
-    "sNo": {
-      "$numberInt": "1"
+    "purchOrgData2": {
+      "quotation": "Q001",
+      "quotationFrom": "Vendor A",
+      "documentDate": "2025-03-20",
+      "purchasingDoc": "PD001",
+      "rfq": "RFQ001",
+      "rfqRequired": true,
+      "settGroup1": "SG1",
+      "settGroup2": "SG2",
+      "settGroup3": "SG3",
+      "noSubsequentSettlement": false
     },
-    "status": "",
-    "itemNo": "ITM001",
-    "materialId": "MAT001",
-    "materialName": "Material Name 1",
-    "shortText": "Short description 1",
-    "materialGroup": "Group 2",
-    "plant": "Plant 2",
-    "storageLocation": "SL2",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User1",
-    "trackingNo": "TRK0001",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR001",
-    "itemInfoRecord": "IIR0001",
-    "mpnMaterial": "MPN0001",
-    "suppliers": [
-      "SUP003",
-      "SUP004",
-      "SUP002"
-    ]
+    "sourceListOverview": {
+      "material": "MAT001",
+      "plant": "Plant 1",
+      "validFrom": "2025-04-01",
+      "validTo": "2025-12-31",
+      "supplier": "SUP003",
+      "pOrg": "PO1",
+      "agmt": false,
+      "fixedItemInfoRecordId": ""
+    }
   },
   {
-    "_id": {
-      "$oid": "264d705228424226a44977cd"
+    "userId": "679c6f25f98a84823dd64ab7",
+    "purchOrgData1": {
+      "material": "MAT001",
+      "materialGroup": "Group A",
+      "plant": "Plant 1",
+      "purchasingOrg": "PO1",
+      "supplier": "SUP004",
+      "deliveryTime": "6",
+      "purchaseGroup": "PG1",
+      "standardQty": "120",
+      "minimumQty": "15",
+      "grBasedIV": false,
+      "noERS": true,
+      "netPrice": "155",
+      "effectivePrice": "150",
+      "validTo": "2025-12-31"
     },
-    "sNo": {
-      "$numberInt": "2"
+    "purchOrgData2": {
+      "quotation": "Q002",
+      "quotationFrom": "Vendor B",
+      "documentDate": "2025-03-22",
+      "purchasingDoc": "PD002",
+      "rfq": "RFQ002",
+      "rfqRequired": false,
+      "settGroup1": "SG1",
+      "settGroup2": "SG2",
+      "settGroup3": "SG3",
+      "noSubsequentSettlement": true
     },
-    "status": "",
-    "itemNo": "ITM002",
-    "materialId": "MAT002",
-    "materialName": "Material Name 2",
-    "shortText": "Short description 2",
-    "materialGroup": "Group 3",
-    "plant": "Plant 3",
-    "storageLocation": "SL3",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User2",
-    "trackingNo": "TRK0002",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR002",
-    "itemInfoRecord": "IIR0002",
-    "mpnMaterial": "MPN0002",
-    "suppliers": [
-      "SUP001",
-      "SUP004",
-      "SUP003"
-    ]
+    "sourceListOverview": {
+      "material": "MAT001",
+      "plant": "Plant 1",
+      "validFrom": "2025-04-01",
+      "validTo": "2025-12-31",
+      "supplier": "SUP004",
+      "pOrg": "PO1",
+      "agmt": true,
+      "fixedItemInfoRecordId": ""
+    }
   },
   {
-    "_id": {
-      "$oid": "7d501dd9bd6e41028d105673"
+    "userId": "679c6f25f98a84823dd64ab7",
+    "purchOrgData1": {
+      "material": "MAT001",
+      "materialGroup": "Group A",
+      "plant": "Plant 1",
+      "purchasingOrg": "PO1",
+      "supplier": "SUP002",
+      "deliveryTime": "7",
+      "purchaseGroup": "PG1",
+      "standardQty": "130",
+      "minimumQty": "20",
+      "grBasedIV": true,
+      "noERS": false,
+      "netPrice": "160",
+      "effectivePrice": "158",
+      "validTo": "2025-12-31"
     },
-    "sNo": {
-      "$numberInt": "3"
+    "purchOrgData2": {
+      "quotation": "Q003",
+      "quotationFrom": "Vendor C",
+      "documentDate": "2025-03-24",
+      "purchasingDoc": "PD003",
+      "rfq": "RFQ003",
+      "rfqRequired": false,
+      "settGroup1": "SG1",
+      "settGroup2": "SG2",
+      "settGroup3": "SG3",
+      "noSubsequentSettlement": false
     },
-    "status": "",
-    "itemNo": "ITM003",
-    "materialId": "MAT003",
-    "materialName": "Material Name 3",
-    "shortText": "Short description 3",
-    "materialGroup": "Group 4",
-    "plant": "Plant 1",
-    "storageLocation": "SL4",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User3",
-    "trackingNo": "TRK0003",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR003",
-    "itemInfoRecord": "IIR0003",
-    "mpnMaterial": "MPN0003",
-    "suppliers": [
-      "SUP004",
-      "SUP003"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "fbe4880eecf143d8a5292337"
-    },
-    "sNo": {
-      "$numberInt": "4"
-    },
-    "status": "",
-    "itemNo": "ITM004",
-    "materialId": "MAT004",
-    "materialName": "Material Name 4",
-    "shortText": "Short description 4",
-    "materialGroup": "Group 5",
-    "plant": "Plant 2",
-    "storageLocation": "SL1",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User4",
-    "trackingNo": "TRK0004",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR004",
-    "itemInfoRecord": "IIR0004",
-    "mpnMaterial": "MPN0004",
-    "suppliers": [
-      "SUP005",
-      "SUP003"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "a70f8bb9f24246a68af63133"
-    },
-    "sNo": {
-      "$numberInt": "5"
-    },
-    "status": "",
-    "itemNo": "ITM005",
-    "materialId": "MAT005",
-    "materialName": "Material Name 5",
-    "shortText": "Short description 5",
-    "materialGroup": "Group 1",
-    "plant": "Plant 3",
-    "storageLocation": "SL2",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User5",
-    "trackingNo": "TRK0005",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR005",
-    "itemInfoRecord": "IIR0005",
-    "mpnMaterial": "MPN0005",
-    "suppliers": [
-      "SUP003"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "5f6963609a594b8692d8b97b"
-    },
-    "sNo": {
-      "$numberInt": "6"
-    },
-    "status": "",
-    "itemNo": "ITM006",
-    "materialId": "MAT006",
-    "materialName": "Material Name 6",
-    "shortText": "Short description 6",
-    "materialGroup": "Group 2",
-    "plant": "Plant 1",
-    "storageLocation": "SL3",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User6",
-    "trackingNo": "TRK0006",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR006",
-    "itemInfoRecord": "IIR0006",
-    "mpnMaterial": "MPN0006",
-    "suppliers": [
-      "SUP005",
-      "SUP004"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "ca5b9933baeb401fb88dfe6a"
-    },
-    "sNo": {
-      "$numberInt": "7"
-    },
-    "status": "",
-    "itemNo": "ITM007",
-    "materialId": "MAT007",
-    "materialName": "Material Name 7",
-    "shortText": "Short description 7",
-    "materialGroup": "Group 3",
-    "plant": "Plant 2",
-    "storageLocation": "SL4",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User7",
-    "trackingNo": "TRK0007",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR007",
-    "itemInfoRecord": "IIR0007",
-    "mpnMaterial": "MPN0007",
-    "suppliers": [
-      "SUP003",
-      "SUP001"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "52995c7735da47bd8f983425"
-    },
-    "sNo": {
-      "$numberInt": "8"
-    },
-    "status": "",
-    "itemNo": "ITM008",
-    "materialId": "MAT008",
-    "materialName": "Material Name 8",
-    "shortText": "Short description 8",
-    "materialGroup": "Group 4",
-    "plant": "Plant 3",
-    "storageLocation": "SL1",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User8",
-    "trackingNo": "TRK0008",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR008",
-    "itemInfoRecord": "IIR0008",
-    "mpnMaterial": "MPN0008",
-    "suppliers": [
-      "SUP003",
-      "SUP002",
-      "SUP004"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "73fad31d68724901829bf055"
-    },
-    "sNo": {
-      "$numberInt": "9"
-    },
-    "status": "",
-    "itemNo": "ITM009",
-    "materialId": "MAT009",
-    "materialName": "Material Name 9",
-    "shortText": "Short description 9",
-    "materialGroup": "Group 5",
-    "plant": "Plant 1",
-    "storageLocation": "SL2",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User9",
-    "trackingNo": "TRK0009",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR009",
-    "itemInfoRecord": "IIR0009",
-    "mpnMaterial": "MPN0009",
-    "suppliers": [
-      "SUP005",
-      "SUP001",
-      "SUP002"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "7512670607084aa8adcb5747"
-    },
-    "sNo": {
-      "$numberInt": "10"
-    },
-    "status": "",
-    "itemNo": "ITM010",
-    "materialId": "MAT010",
-    "materialName": "Material Name 10",
-    "shortText": "Short description 10",
-    "materialGroup": "Group 1",
-    "plant": "Plant 2",
-    "storageLocation": "SL3",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User10",
-    "trackingNo": "TRK0010",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR010",
-    "itemInfoRecord": "IIR0010",
-    "mpnMaterial": "MPN0010",
-    "suppliers": [
-      "SUP001"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "7b44e8af9cfb4a269682b5f5"
-    },
-    "sNo": {
-      "$numberInt": "11"
-    },
-    "status": "",
-    "itemNo": "ITM011",
-    "materialId": "MAT011",
-    "materialName": "Material Name 11",
-    "shortText": "Short description 11",
-    "materialGroup": "Group 2",
-    "plant": "Plant 3",
-    "storageLocation": "SL4",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User11",
-    "trackingNo": "TRK0011",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR011",
-    "itemInfoRecord": "IIR0011",
-    "mpnMaterial": "MPN0011",
-    "suppliers": [
-      "SUP002"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "722115c3185c46dea626ad8f"
-    },
-    "sNo": {
-      "$numberInt": "12"
-    },
-    "status": "",
-    "itemNo": "ITM012",
-    "materialId": "MAT012",
-    "materialName": "Material Name 12",
-    "shortText": "Short description 12",
-    "materialGroup": "Group 3",
-    "plant": "Plant 1",
-    "storageLocation": "SL1",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User12",
-    "trackingNo": "TRK0012",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR012",
-    "itemInfoRecord": "IIR0012",
-    "mpnMaterial": "MPN0012",
-    "suppliers": [
-      "SUP004"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "40d7e71a1e194d3da530d568"
-    },
-    "sNo": {
-      "$numberInt": "13"
-    },
-    "status": "",
-    "itemNo": "ITM013",
-    "materialId": "MAT013",
-    "materialName": "Material Name 13",
-    "shortText": "Short description 13",
-    "materialGroup": "Group 4",
-    "plant": "Plant 2",
-    "storageLocation": "SL2",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User13",
-    "trackingNo": "TRK0013",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR013",
-    "itemInfoRecord": "IIR0013",
-    "mpnMaterial": "MPN0013",
-    "suppliers": [
-      "SUP005",
-      "SUP002"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "9a7dc787ccb6457a90d90a8b"
-    },
-    "sNo": {
-      "$numberInt": "14"
-    },
-    "status": "",
-    "itemNo": "ITM014",
-    "materialId": "MAT014",
-    "materialName": "Material Name 14",
-    "shortText": "Short description 14",
-    "materialGroup": "Group 5",
-    "plant": "Plant 3",
-    "storageLocation": "SL3",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User14",
-    "trackingNo": "TRK0014",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR014",
-    "itemInfoRecord": "IIR0014",
-    "mpnMaterial": "MPN0014",
-    "suppliers": [
-      "SUP002",
-      "SUP004",
-      "SUP001"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "8647ae4e46ae4a23904fec9d"
-    },
-    "sNo": {
-      "$numberInt": "15"
-    },
-    "status": "",
-    "itemNo": "ITM015",
-    "materialId": "MAT015",
-    "materialName": "Material Name 15",
-    "shortText": "Short description 15",
-    "materialGroup": "Group 1",
-    "plant": "Plant 1",
-    "storageLocation": "SL4",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User15",
-    "trackingNo": "TRK0015",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR015",
-    "itemInfoRecord": "IIR0015",
-    "mpnMaterial": "MPN0015",
-    "suppliers": [
-      "SUP004",
-      "SUP002",
-      "SUP001"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "9be448b921894e4ab3fd416d"
-    },
-    "sNo": {
-      "$numberInt": "16"
-    },
-    "status": "",
-    "itemNo": "ITM016",
-    "materialId": "MAT016",
-    "materialName": "Material Name 16",
-    "shortText": "Short description 16",
-    "materialGroup": "Group 2",
-    "plant": "Plant 2",
-    "storageLocation": "SL1",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User16",
-    "trackingNo": "TRK0016",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR016",
-    "itemInfoRecord": "IIR0016",
-    "mpnMaterial": "MPN0016",
-    "suppliers": [
-      "SUP004",
-      "SUP003",
-      "SUP001"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "bd9365c727c745cbb98adc4e"
-    },
-    "sNo": {
-      "$numberInt": "17"
-    },
-    "status": "",
-    "itemNo": "ITM017",
-    "materialId": "MAT017",
-    "materialName": "Material Name 17",
-    "shortText": "Short description 17",
-    "materialGroup": "Group 3",
-    "plant": "Plant 3",
-    "storageLocation": "SL2",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User17",
-    "trackingNo": "TRK0017",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR017",
-    "itemInfoRecord": "IIR0017",
-    "mpnMaterial": "MPN0017",
-    "suppliers": [
-      "SUP001",
-      "SUP002"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "1f857a84583842b8aee86e0a"
-    },
-    "sNo": {
-      "$numberInt": "18"
-    },
-    "status": "",
-    "itemNo": "ITM018",
-    "materialId": "MAT018",
-    "materialName": "Material Name 18",
-    "shortText": "Short description 18",
-    "materialGroup": "Group 4",
-    "plant": "Plant 1",
-    "storageLocation": "SL3",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User18",
-    "trackingNo": "TRK0018",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR018",
-    "itemInfoRecord": "IIR0018",
-    "mpnMaterial": "MPN0018",
-    "suppliers": [
-      "SUP005",
-      "SUP003"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "f6b4fb63ffe345b29fd59a9f"
-    },
-    "sNo": {
-      "$numberInt": "19"
-    },
-    "status": "",
-    "itemNo": "ITM019",
-    "materialId": "MAT019",
-    "materialName": "Material Name 19",
-    "shortText": "Short description 19",
-    "materialGroup": "Group 5",
-    "plant": "Plant 2",
-    "storageLocation": "SL4",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User19",
-    "trackingNo": "TRK0019",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR019",
-    "itemInfoRecord": "IIR0019",
-    "mpnMaterial": "MPN0019",
-    "suppliers": [
-      "SUP004",
-      "SUP002"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "3a3b69c95917470e95c1bb6e"
-    },
-    "sNo": {
-      "$numberInt": "20"
-    },
-    "status": "",
-    "itemNo": "ITM020",
-    "materialId": "MAT020",
-    "materialName": "Material Name 20",
-    "shortText": "Short description 20",
-    "materialGroup": "Group 1",
-    "plant": "Plant 3",
-    "storageLocation": "SL1",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User20",
-    "trackingNo": "TRK0020",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR020",
-    "itemInfoRecord": "IIR0020",
-    "mpnMaterial": "MPN0020",
-    "suppliers": [
-      "SUP003",
-      "SUP001",
-      "SUP002"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "380fd678c33642beb9fbea7a"
-    },
-    "sNo": {
-      "$numberInt": "21"
-    },
-    "status": "",
-    "itemNo": "ITM021",
-    "materialId": "MAT021",
-    "materialName": "Material Name 21",
-    "shortText": "Short description 21",
-    "materialGroup": "Group 2",
-    "plant": "Plant 1",
-    "storageLocation": "SL2",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User21",
-    "trackingNo": "TRK0021",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR021",
-    "itemInfoRecord": "IIR0021",
-    "mpnMaterial": "MPN0021",
-    "suppliers": [
-      "SUP004",
-      "SUP002"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "844baee4964e467fb8b00fea"
-    },
-    "sNo": {
-      "$numberInt": "22"
-    },
-    "status": "",
-    "itemNo": "ITM022",
-    "materialId": "MAT022",
-    "materialName": "Material Name 22",
-    "shortText": "Short description 22",
-    "materialGroup": "Group 3",
-    "plant": "Plant 2",
-    "storageLocation": "SL3",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User22",
-    "trackingNo": "TRK0022",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR022",
-    "itemInfoRecord": "IIR0022",
-    "mpnMaterial": "MPN0022",
-    "suppliers": [
-      "SUP001"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "4f7231d08c764e9f9fadf1a3"
-    },
-    "sNo": {
-      "$numberInt": "23"
-    },
-    "status": "",
-    "itemNo": "ITM023",
-    "materialId": "MAT023",
-    "materialName": "Material Name 23",
-    "shortText": "Short description 23",
-    "materialGroup": "Group 4",
-    "plant": "Plant 3",
-    "storageLocation": "SL4",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User23",
-    "trackingNo": "TRK0023",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR023",
-    "itemInfoRecord": "IIR0023",
-    "mpnMaterial": "MPN0023",
-    "suppliers": [
-      "SUP002",
-      "SUP004",
-      "SUP003"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "b9f1c73ee4cb4246b0bbae53"
-    },
-    "sNo": {
-      "$numberInt": "24"
-    },
-    "status": "",
-    "itemNo": "ITM024",
-    "materialId": "MAT024",
-    "materialName": "Material Name 24",
-    "shortText": "Short description 24",
-    "materialGroup": "Group 5",
-    "plant": "Plant 1",
-    "storageLocation": "SL1",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User24",
-    "trackingNo": "TRK0024",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR024",
-    "itemInfoRecord": "IIR0024",
-    "mpnMaterial": "MPN0024",
-    "suppliers": [
-      "SUP002"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "aab8fdbb3b714e33aea41827"
-    },
-    "sNo": {
-      "$numberInt": "25"
-    },
-    "status": "",
-    "itemNo": "ITM025",
-    "materialId": "MAT025",
-    "materialName": "Material Name 25",
-    "shortText": "Short description 25",
-    "materialGroup": "Group 1",
-    "plant": "Plant 2",
-    "storageLocation": "SL2",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User25",
-    "trackingNo": "TRK0025",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR025",
-    "itemInfoRecord": "IIR0025",
-    "mpnMaterial": "MPN0025",
-    "suppliers": [
-      "SUP005",
-      "SUP001",
-      "SUP002"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "b29d389d7c4c48e88f460bf4"
-    },
-    "sNo": {
-      "$numberInt": "26"
-    },
-    "status": "",
-    "itemNo": "ITM026",
-    "materialId": "MAT026",
-    "materialName": "Material Name 26",
-    "shortText": "Short description 26",
-    "materialGroup": "Group 2",
-    "plant": "Plant 3",
-    "storageLocation": "SL3",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User26",
-    "trackingNo": "TRK0026",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR026",
-    "itemInfoRecord": "IIR0026",
-    "mpnMaterial": "MPN0026",
-    "suppliers": [
-      "SUP004"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "c9ab834c1bb849e0abdeb1a6"
-    },
-    "sNo": {
-      "$numberInt": "27"
-    },
-    "status": "",
-    "itemNo": "ITM027",
-    "materialId": "MAT027",
-    "materialName": "Material Name 27",
-    "shortText": "Short description 27",
-    "materialGroup": "Group 3",
-    "plant": "Plant 1",
-    "storageLocation": "SL4",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User27",
-    "trackingNo": "TRK0027",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR027",
-    "itemInfoRecord": "IIR0027",
-    "mpnMaterial": "MPN0027",
-    "suppliers": [
-      "SUP005",
-      "SUP002",
-      "SUP004"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "a70255efaa2245f0808e3b95"
-    },
-    "sNo": {
-      "$numberInt": "28"
-    },
-    "status": "",
-    "itemNo": "ITM028",
-    "materialId": "MAT028",
-    "materialName": "Material Name 28",
-    "shortText": "Short description 28",
-    "materialGroup": "Group 4",
-    "plant": "Plant 2",
-    "storageLocation": "SL1",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User28",
-    "trackingNo": "TRK0028",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR028",
-    "itemInfoRecord": "IIR0028",
-    "mpnMaterial": "MPN0028",
-    "suppliers": [
-      "SUP003"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "61afcfc3eefa48dab41c726f"
-    },
-    "sNo": {
-      "$numberInt": "29"
-    },
-    "status": "",
-    "itemNo": "ITM029",
-    "materialId": "MAT029",
-    "materialName": "Material Name 29",
-    "shortText": "Short description 29",
-    "materialGroup": "Group 5",
-    "plant": "Plant 3",
-    "storageLocation": "SL2",
-    "purchasingGroup": "PG2",
-    "requisitioner": "User29",
-    "trackingNo": "TRK0029",
-    "splitIndicator": "",
-    "purchasingOrg": "PO2",
-    "agreement": "AGR029",
-    "itemInfoRecord": "IIR0029",
-    "mpnMaterial": "MPN0029",
-    "suppliers": [
-      "SUP001"
-    ]
-  },
-  {
-    "_id": {
-      "$oid": "fccc9ad738e3435d80640123"
-    },
-    "sNo": {
-      "$numberInt": "30"
-    },
-    "status": "",
-    "itemNo": "ITM030",
-    "materialId": "MAT030",
-    "materialName": "Material Name 30",
-    "shortText": "Short description 30",
-    "materialGroup": "Group 1",
-    "plant": "Plant 1",
-    "storageLocation": "SL3",
-    "purchasingGroup": "PG1",
-    "requisitioner": "User30",
-    "trackingNo": "TRK0030",
-    "splitIndicator": "",
-    "purchasingOrg": "PO1",
-    "agreement": "AGR030",
-    "itemInfoRecord": "IIR0030",
-    "mpnMaterial": "MPN0030",
-    "suppliers": [
-      "SUP004"
-    ]
+    "sourceListOverview": {
+      "material": "MAT001",
+      "plant": "Plant 1",
+      "validFrom": "2025-04-01",
+      "validTo": "2025-12-31",
+      "supplier": "SUP002",
+      "pOrg": "PO1",
+      "agmt": false,
+      "fixedItemInfoRecordId": ""
+    }
   }
 ]

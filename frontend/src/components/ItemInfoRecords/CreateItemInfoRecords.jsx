@@ -14,18 +14,53 @@ const CreateItemInfoRecords = () => {
     purchOrgData2: {},
     sourceListOverview: {},
   });
+  const [isLoading, setIsLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  const handleSubmit = () => {
-    axios
-      .post(`${server_Url}/api/v1/item-info-records`, formData, {
+  const handleSubmit = async () => {
+    const { material, supplier } = formData.purchOrgData1;
+    if (!material || !supplier) {
+      alert('Please select both Material and Supplier.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const checkRes = await axios.get(`${server_Url}/api/v1/item-info-records`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-      })
-      .then(() => navigate('/sourcing/item-info-records'))
-      .catch((err) => console.error('Error creating item info record:', err));
+      });
+
+      const duplicate = checkRes.data.find(
+        (rec) =>
+          rec?.purchOrgData1?.material === material &&
+          rec?.purchOrgData1?.supplier === supplier
+      );
+
+      if (duplicate) {
+        alert('An Item Info Record with this Material and Supplier already exists.');
+        setIsLoading(false);
+        return;
+      }
+
+      await axios.post(`${server_Url}/api/v1/item-info-records`, formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      navigate('/sourcing/item-info-records');
+    } catch (err) {
+      console.error('Error creating item info record:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+
 
   return (
     <Container>
@@ -73,7 +108,7 @@ const CreateItemInfoRecords = () => {
         onClick={handleSubmit}
         sx={{ marginTop: 2 }}
       >
-        Save Info Record
+        {isLoading ? 'Saving...' : 'Save Info Record'}
       </Button>
     </Container>
   );

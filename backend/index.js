@@ -1873,10 +1873,23 @@ app.post("/api/v1/materials", authenticateToken, async (req, res) => {
   }
 });
 
-// Get All Materials
+// Get All Materials or by materialId
 app.get("/api/v1/materials", authenticateToken, async (req, res) => {
-  const materials = await MaterialModel.find({ userId: req.user.id });
-  res.json(materials);
+  try {
+    const { material } = req.query;
+    const query = { userId: req.user.id };
+
+    // If materialId is provided, add it to the query
+    if (material) {
+      query.materialId = material;
+    }
+
+    const materials = await MaterialModel.find(query);
+    res.status(200).json(materials);
+  } catch (err) {
+    console.error("Failed to fetch materials:", err);
+    res.status(500).json({ error: "Server error", details: err.message });
+  }
 });
 
 // Update Material
@@ -2335,10 +2348,19 @@ app.post("/api/v1/item-info-records", authenticateToken, async (req, res) => {
   }
 });
 
-// Get all
+// Get all or filtered by material
 app.get("/api/v1/item-info-records", authenticateToken, async (req, res) => {
   try {
-    const records = await ItemInfoRecordModel.find({ userId: req.user.id });
+    const { material } = req.query;
+
+    const query = { userId: req.user.id };
+
+    // If material is provided, filter by it (stored inside purchOrgData1.material)
+    if (material) {
+      query['purchOrgData1.material'] = material;
+    }
+
+    const records = await ItemInfoRecordModel.find(query);
     res.status(200).json(records);
   } catch (err) {
     res
@@ -2346,6 +2368,23 @@ app.get("/api/v1/item-info-records", authenticateToken, async (req, res) => {
       .json({ error: "Failed to fetch item info records", details: err });
   }
 });
+app.get("/api/v1/item-info-records/material/:id", authenticateToken, async (req, res) => {
+  try {
+    const materialId = req.params.id; // ✅ From route params
+    const query = {
+      userId: req.user.id,
+      'purchOrgData1.material': materialId
+    };
+
+    const records = await ItemInfoRecordModel.find(query);
+    res.status(200).json(records);
+  } catch (err) {
+    console.error("Failed to fetch item info records by material", err);
+    res.status(500).json({ error: "Failed to fetch item info records", details: err.message });
+  }
+});
+
+
 
 // Get by ID
 app.get(

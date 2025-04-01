@@ -36,7 +36,7 @@ async function importMissingProducts(
 const uri =
   "mongodb+srv://githubdevelopment:Rvsoft1234@cluster0.nqiv3.mongodb.net/Visionsoft";
 const databaseName = "Visionsoft"; // Replace with your database name
-const collectionName = "materials"; // Replace with your collection name
+const collectionName = "iteminforecords"; // Replace with your collection name
 const filePath = "missing_products.json";
 
 importMissingProducts(uri, databaseName, collectionName, filePath);

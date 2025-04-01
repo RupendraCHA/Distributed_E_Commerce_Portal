@@ -16,6 +16,8 @@ const EditItemInfoRecords = () => {
     purchOrgData2: {},
     sourceListOverview: {},
   });
+  const [isLoading, setIsLoading] = useState(false);
+
 
   useEffect(() => {
     axios
@@ -28,16 +30,50 @@ const EditItemInfoRecords = () => {
       .catch((err) => console.error('Error fetching item info record:', err));
   }, [id]);
 
-  const handleUpdate = () => {
-    axios
-      .put(`${server_Url}/api/v1/item-info-records/${id}`, formData, {
+  const handleUpdate = async () => {
+    const { material, supplier } = formData.purchOrgData1;
+    if (!material || !supplier) {
+      alert('Please select both Material and Supplier.');
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      const checkRes = await axios.get(`${server_Url}/api/v1/item-info-records`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-      })
-      .then(() => navigate('/sourcing/item-info-records'))
-      .catch((err) => console.error('Error updating item info record:', err));
+      });
+
+      const duplicate = checkRes.data.find(
+        (rec) =>
+          rec._id !== id &&
+          rec?.purchOrgData1?.material === material &&
+          rec?.purchOrgData1?.supplier === supplier
+      );
+
+      if (duplicate) {
+        alert('Another record with this Material and Supplier already exists.');
+        setIsLoading(false);
+        return;
+      }
+
+      await axios.put(`${server_Url}/api/v1/item-info-records/${id}`, formData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+
+      navigate('/sourcing/item-info-records');
+    } catch (err) {
+      console.error('Error updating item info record:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+
 
   return (
     <Container>
@@ -85,7 +121,7 @@ const EditItemInfoRecords = () => {
         onClick={handleUpdate}
         sx={{ marginTop: 2 }}
       >
-        Update Info Record
+        {isLoading ? 'Updating...' : 'Update Info Record'}
       </Button>
     </Container>
   );
