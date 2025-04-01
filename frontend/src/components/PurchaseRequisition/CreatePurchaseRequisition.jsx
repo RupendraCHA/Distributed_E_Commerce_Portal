@@ -15,6 +15,10 @@ import { Add, Delete } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+const CustomTextField = (props) => (
+  <TextField fullWidth sx={{ minWidth: '120px' }} {...props} />
+);
+
 const CreatePurchaseRequisition = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
   const [materials, setMaterials] = useState([]);
@@ -45,7 +49,6 @@ const CreatePurchaseRequisition = () => {
       mpnMaterial: '',
     },
   ]);
-  const [vendors, setVendors] = useState([]);
 
   const navigate = useNavigate();
 
@@ -60,23 +63,15 @@ const CreatePurchaseRequisition = () => {
         setMaterials(res.data);
       });
   }, []);
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    axios
-      .get(server_Url + '/api/v1/vendors-list', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setVendors(res.data))
-      .catch((err) => console.error('Error fetching vendors:', err));
-  }, []);
 
-  const handleChange = (index, field, value) => {
+
+  const handleChange = async (index, field, value) => {
     const updatedRows = [...rows];
     updatedRows[index][field] = value;
 
     if (field === 'materialId') {
       const selectedMaterial = materials.find((p) => p.materialId === value);
-      console.log({ selectedMaterial });
+      const token = localStorage.getItem('token');
 
       if (selectedMaterial) {
         updatedRows[index].itemNo =
@@ -85,24 +80,45 @@ const CreatePurchaseRequisition = () => {
         updatedRows[index].shortText = selectedMaterial.shortText || '';
         updatedRows[index].materialGroup = selectedMaterial.materialGroup || '';
         updatedRows[index].plant = selectedMaterial.plant || '';
-        updatedRows[index].storageLocation =
-          selectedMaterial.storageLocation || '';
-        updatedRows[index].purchasingGroup =
-          selectedMaterial.purchasingGroup || '';
+        updatedRows[index].storageLocation = selectedMaterial.storageLocation || '';
+        updatedRows[index].purchasingGroup = selectedMaterial.purchasingGroup || '';
         updatedRows[index].requisitioner = selectedMaterial.requisitioner || '';
         updatedRows[index].trackingNo = selectedMaterial.trackingNo || '';
-        updatedRows[index].splitIndicator =
-          selectedMaterial.splitIndicator || '';
+        updatedRows[index].splitIndicator = selectedMaterial.splitIndicator || '';
         updatedRows[index].purchasingOrg = selectedMaterial.purchasingOrg || '';
         updatedRows[index].agreement = selectedMaterial.agreement || '';
-        updatedRows[index].itemInfoRecord =
-          selectedMaterial.itemInfoRecord || '';
+        updatedRows[index].itemInfoRecord = selectedMaterial.itemInfoRecord || '';
         updatedRows[index].mpnMaterial = selectedMaterial.mpnMaterial || '';
+
+        // ✅ Auto-fetch fixed supplier
+        try {
+          const res = await axios.get(
+            `${server_Url}/api/v1/item-info-records?material=${value}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          const fixedRecord = res.data.find(
+            (rec) => rec.sourceListOverview?.fixedItemInfoRecordId === rec._id
+          );
+
+          if (fixedRecord) {
+            updatedRows[index].vendor = fixedRecord.purchOrgData1?.supplier || '';
+            updatedRows[index].fixedVendorIS = 'Yes';
+          } else {
+            updatedRows[index].vendor = '';
+            updatedRows[index].fixedVendorIS = 'No Fixed Vendor Found';
+          }
+        } catch (error) {
+          console.error('Error fetching fixed vendor:', error);
+        }
       }
     }
 
     setRows(updatedRows);
   };
+
 
   const addRow = () => {
     setRows([
@@ -202,7 +218,7 @@ const CreatePurchaseRequisition = () => {
               <TableRow key={index}>
                 <TableCell>{row.sNo}</TableCell>
                 <TableCell>
-                  <TextField value={row.itemNo} disabled fullWidth />
+                  <CustomTextField value={row.itemNo} disabled fullWidth />
                 </TableCell>
                 <TableCell>
                   <Autocomplete
@@ -212,28 +228,21 @@ const CreatePurchaseRequisition = () => {
                       handleChange(index, 'materialId', newValue)
                     }
                     renderInput={(params) => (
-                      <TextField {...params} label="Material ID" fullWidth />
+                      <CustomTextField {...params} label="Material ID" fullWidth />
                     )}
                   />
                 </TableCell>
                 <TableCell>
-                  <TextField value={row.materialName} disabled fullWidth />
+                  <CustomTextField value={row.materialName} disabled fullWidth />
                 </TableCell>
                 <TableCell key="vendor">
-                  <Autocomplete
-                    options={vendors}
-                    getOptionLabel={(option) => option.name}
-                    value={vendors.find((v) => v.id === row.vendor) || null}
-                    onChange={(event, newValue) =>
-                      handleChange(index, 'vendor', newValue ? newValue.id : '')
-                    }
-                    renderInput={(params) => (
-                      <TextField {...params} label="Vendor" fullWidth />
-                    )}
-                    isOptionEqualToValue={(option, value) =>
-                      option.id === value.id
-                    }
-                  />
+                  <TableCell key="vendor">
+                    <CustomTextField
+                      fullWidth
+                      value={row.vendor}
+                      disabled
+                    />
+                  </TableCell>
                 </TableCell>
 
                 {[
@@ -257,7 +266,7 @@ const CreatePurchaseRequisition = () => {
                   { key: 'mpnMaterial', disabled: true },
                 ].map(({ key, type, disabled }) => (
                   <TableCell key={key}>
-                    <TextField
+                    <CustomTextField
                       type={type || 'text'}
                       value={row[key]}
                       onChange={(e) => handleChange(index, key, e.target.value)}

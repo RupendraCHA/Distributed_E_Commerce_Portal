@@ -14,7 +14,9 @@ import {
 import { Add, Delete } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-
+const CustomTextField = (props) => (
+  <TextField fullWidth sx={{ minWidth: '120px' }} {...props} />
+);
 const EditPurchaseRequisition = () => {
   const { id } = useParams();
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
@@ -56,7 +58,7 @@ const EditPurchaseRequisition = () => {
       });
   }, [id]);
 
-  const handleChange = (index, field, value) => {
+  const handleChange = async (index, field, value) => {
     const updatedMaterials = [...requisition.materials];
     updatedMaterials[index][field] = value;
 
@@ -65,17 +67,38 @@ const EditPurchaseRequisition = () => {
       if (selectedMaterial) {
         updatedMaterials[index].materialName = selectedMaterial.materialName;
         updatedMaterials[index].shortText = selectedMaterial.shortText || '-';
-        updatedMaterials[index].materialGroup =
-          selectedMaterial.materialGroup || '-';
-        updatedMaterials[index].itemNo = `ITM${String(index + 1).padStart(
-          3,
-          '0'
-        )}`;
+        updatedMaterials[index].materialGroup = selectedMaterial.materialGroup || '-';
+        updatedMaterials[index].itemNo = `ITM${String(index + 1).padStart(3, '0')}`;
+
+        // ✅ Fetch fixed supplier for selected material
+        try {
+          const res = await axios.get(
+            `${server_Url}/api/v1/item-info-records?material=${value}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          const fixedRecord = res.data.find(
+            (rec) => rec.sourceListOverview?.fixedItemInfoRecordId === rec._id
+          );
+
+          if (fixedRecord) {
+            updatedMaterials[index].vendor = fixedRecord.purchOrgData1?.supplier || '';
+            updatedMaterials[index].fixedVendorIS = 'Yes';
+          } else {
+            updatedMaterials[index].vendor = '';
+            updatedMaterials[index].fixedVendorIS = 'No Fixed Vendor Found';
+          }
+        } catch (err) {
+          console.error('Error fetching fixed vendor in edit mode:', err);
+        }
       }
     }
 
     setRequisition({ ...requisition, materials: updatedMaterials });
   };
+
 
   const addRow = () => {
     setRequisition({
@@ -187,7 +210,7 @@ const EditPurchaseRequisition = () => {
               <TableRow key={index}>
                 <TableCell>{material.sNo}</TableCell>
                 <TableCell>
-                  <TextField value={material.itemNo} disabled fullWidth />
+                  <CustomTextField value={material.itemNo} disabled fullWidth />
                 </TableCell>
                 <TableCell>
                   <Autocomplete
@@ -197,31 +220,21 @@ const EditPurchaseRequisition = () => {
                       handleChange(index, 'materialId', newValue)
                     }
                     renderInput={(params) => (
-                      <TextField {...params} label="Material ID" fullWidth />
+                      <CustomTextField {...params} label="Material ID" fullWidth />
                     )}
                   />
                 </TableCell>
                 <TableCell>
-                  <TextField value={material.materialName} disabled fullWidth />
+                  <CustomTextField value={material.materialName} disabled fullWidth />
                 </TableCell>
                 <TableCell key="vendor">
-                  <Autocomplete
-                    options={vendors}
-                    getOptionLabel={(option) => option.name}
-                    value={
-                      vendors.find((v) => v.id === material.vendor) || null
-                    }
-                    onChange={(event, newValue) =>
-                      handleChange(index, 'vendor', newValue ? newValue.id : '')
-                    }
-                    renderInput={(params) => (
-                      <TextField {...params} label="Vendor" fullWidth />
-                    )}
-                    isOptionEqualToValue={(option, value) =>
-                      option.id === value.id
-                    }
+                  <CustomTextField
+                    fullWidth
+                    value={material.vendor}
+                    disabled
                   />
                 </TableCell>
+
 
                 {[
                   { key: 'quantity', type: 'number' },
@@ -244,7 +257,7 @@ const EditPurchaseRequisition = () => {
                   { key: 'mpnMaterial', disabled: true },
                 ].map(({ key, type, disabled }) => (
                   <TableCell key={key}>
-                    <TextField
+                    <CustomTextField
                       type={type || 'text'}
                       value={material[key]}
                       onChange={(e) => handleChange(index, key, e.target.value)}
