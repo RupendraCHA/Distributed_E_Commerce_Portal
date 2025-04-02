@@ -18,6 +18,8 @@ import axios from 'axios';
 const CreateInboundDelivery = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
   const [materials, setMaterials] = useState([]);
+  const token = localStorage.getItem('token');
+
   const [rows, setRows] = useState([
     {
       sNo: 1,
@@ -41,7 +43,9 @@ const CreateInboundDelivery = () => {
 
   useEffect(() => {
     axios
-      .get(server_Url + '/api/v1/getMaterialIds')
+      .get(server_Url + '/api/v1/getMaterialIds', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
       .then((res) => {
         const sortedMaterials = res.data.sort((a, b) => a.sNo - b.sNo);
         setMaterials(sortedMaterials);
@@ -49,20 +53,66 @@ const CreateInboundDelivery = () => {
       .catch((err) => console.error('Error fetching materials:', err));
   }, []);
 
-  const handleChange = (index, field, value) => {
+  const handleChange = async (index, field, value) => {
     const updatedRows = [...rows];
     updatedRows[index][field] = value;
 
     if (field === 'materialId') {
       const selectedMaterial = materials.find((p) => p.materialId === value);
+
       if (selectedMaterial) {
         updatedRows[index].materialName = selectedMaterial.materialName;
-        updatedRows[index].unit = selectedMaterial.unit || 1;
+        updatedRows[index].unit = selectedMaterial.unit || '';
+
+        // 🧠 Fetch fixed vendor
+        try {
+          const res = await axios.get(
+            `${server_Url}/api/v1/item-info-records?material=${value}`,
+            {
+              headers: { Authorization: `Bearer ${token}` },
+            }
+          );
+
+          const fixedRecord = res.data.find(
+            (rec) => rec.sourceListOverview?.fixedItemInfoRecordId === rec._id
+          );
+
+          if (fixedRecord) {
+            const supplierId = fixedRecord.purchOrgData1?.supplier;
+
+            if (supplierId) {
+              try {
+                const vendorRes = await axios.get(
+                  `${server_Url}/api/v1/vendor-name/${supplierId}`,
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                );
+
+                setSupplierId(supplierId);
+                setSupplierName(vendorRes.data.name || supplierId);
+              } catch (err) {
+                console.error('Error fetching vendor name:', err);
+                setSupplierId(supplierId);
+                setSupplierName(supplierId); // fallback
+              }
+            } else {
+              setSupplierId('');
+              setSupplierName('');
+            }
+          } else {
+            setSupplierId('');
+            setSupplierName('');
+          }
+        } catch (err) {
+          console.error('Error fetching fixed vendor:', err);
+        }
       }
     }
 
     setRows(updatedRows);
   };
+
 
   const addRow = () => {
     setRows([
@@ -114,6 +164,7 @@ const CreateInboundDelivery = () => {
         onChange={(e) => setSupplierId(e.target.value)}
         fullWidth
         margin="normal"
+        disabled
       />
       <TextField
         label="Supplier Name"
@@ -121,6 +172,7 @@ const CreateInboundDelivery = () => {
         onChange={(e) => setSupplierName(e.target.value)}
         fullWidth
         margin="normal"
+        disabled
       />
       <TextField
         label="Document Date"
