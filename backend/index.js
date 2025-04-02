@@ -2419,6 +2419,42 @@ app.put(
   }
 );
 
+app.get("/api/v1/vendor-name/:supplierId", authenticateToken, async (req, res) => {
+  try {
+    const { supplierId } = req.params;
+
+    const vendor = await VendorMasterModel.findOne({
+      "vendorAddress.supplierid": supplierId,
+    });
+    if (!vendor || !vendor.vendorAddress?.name) {
+      return res.status(404).json({ error: "Vendor not found or name missing" });
+    }
+
+    res.status(200).json({ name: vendor.vendorAddress.name });
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching vendor name", details: err });
+  }
+});
+
+app.get("/api/v1/supplier-id/:vendorName", authenticateToken, async (req, res) => {
+  try {
+    const { vendorName } = req.params;
+
+    const vendor = await VendorMasterModel.findOne({
+      "vendorAddress.name": vendorName,
+    });
+
+    if (!vendor || !vendor.vendorAddress?.supplierid) {
+      return res.status(404).json({ error: "Supplier ID not found for this vendor" });
+    }
+
+    res.status(200).json({ supplierId: vendor.vendorAddress.supplierid });
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching supplier ID", details: err });
+  }
+});
+
+
 // New endpoint (optional optimization)
 app.get("/api/v1/vendors-list", authenticateToken, async (req, res) => {
   try {

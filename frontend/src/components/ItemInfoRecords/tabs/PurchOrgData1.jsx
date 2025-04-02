@@ -109,25 +109,6 @@ const PurchOrgData1 = ({ formData, setFormData }) => {
   return (
     <Grid container spacing={2}>
       <Grid item xs={12} sm={6} md={4}>
-        <FormControl fullWidth>
-          <InputLabel>Supplier</InputLabel>
-          <Select
-            label="Supplier"
-            name="supplier"
-            value={data.supplier || ''}
-            onChange={handleChange}
-            disabled={!data.material} // disabled until material selected
-          >
-            {filteredVendors.map((supplierId) => (
-              <MenuItem key={supplierId} value={supplierId}>
-                {supplierId}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Grid>
-
-      <Grid item xs={12} sm={6} md={4}>
         <Autocomplete
           options={materialOptions}
           getOptionLabel={(option) =>
@@ -146,6 +127,26 @@ const PurchOrgData1 = ({ formData, setFormData }) => {
           )}
         />
       </Grid>
+      <Grid item xs={12} sm={6} md={4}>
+        <FormControl fullWidth>
+          <InputLabel>Supplier</InputLabel>
+          <Select
+            label="Supplier"
+            name="supplier"
+            value={data.supplier || ''}
+            onChange={handleChange}
+            disabled={!data.material} // disabled until material selected
+          >
+            {filteredVendors.map((supplierId) => (
+              <MenuItem key={supplierId} value={supplierId}>
+                {supplierId}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Grid>
+
+
 
       <Grid item xs={12} sm={6} md={4}>
         <TextField

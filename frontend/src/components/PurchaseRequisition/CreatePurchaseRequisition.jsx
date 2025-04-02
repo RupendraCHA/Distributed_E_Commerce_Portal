@@ -104,12 +104,30 @@ const CreatePurchaseRequisition = () => {
           );
 
           if (fixedRecord) {
-            updatedRows[index].vendor = fixedRecord.purchOrgData1?.supplier || '';
-            updatedRows[index].fixedVendorIS = 'Yes';
-          } else {
-            updatedRows[index].vendor = '';
-            updatedRows[index].fixedVendorIS = 'No Fixed Vendor Found';
+            const supplierId = fixedRecord.purchOrgData1?.supplier || '';
+
+            if (supplierId) {
+              try {
+                const vendorRes = await axios.get(
+                  `${server_Url}/api/v1/vendor-name/${supplierId}`,
+                  {
+                    headers: { Authorization: `Bearer ${token}` },
+                  }
+                );
+
+                updatedRows[index].vendor = vendorRes.data.name || supplierId;
+                updatedRows[index].fixedVendorIS = 'Yes';
+              } catch (err) {
+                console.error('Error fetching vendor name:', err);
+                updatedRows[index].vendor = supplierId; // fallback
+                updatedRows[index].fixedVendorIS = 'Vendor Name Not Found';
+              }
+            } else {
+              updatedRows[index].vendor = '';
+              updatedRows[index].fixedVendorIS = 'No Fixed Vendor Found';
+            }
           }
+
         } catch (error) {
           console.error('Error fetching fixed vendor:', error);
         }

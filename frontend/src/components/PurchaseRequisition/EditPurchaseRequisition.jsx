@@ -24,18 +24,8 @@ const EditPurchaseRequisition = () => {
   const [materials, setMaterials] = useState([]);
   const [requisition, setRequisition] = useState({ materials: [] });
   const token = localStorage.getItem('token');
-  const [vendors, setVendors] = useState([]);
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
 
-    axios
-      .get(server_Url + '/api/v1/vendors-list', {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setVendors(res.data))
-      .catch((err) => console.error('Error fetching vendors:', err));
-  }, []);
 
   useEffect(() => {
     axios
@@ -84,9 +74,24 @@ const EditPurchaseRequisition = () => {
           );
 
           if (fixedRecord) {
-            updatedMaterials[index].vendor = fixedRecord.purchOrgData1?.supplier || '';
-            updatedMaterials[index].fixedVendorIS = 'Yes';
-          } else {
+            const supplierId = fixedRecord.purchOrgData1?.supplier || '';
+            console.log({ supplierId });
+
+            if (supplierId) {
+              const vendorRes = await axios.get(
+                `${server_Url}/api/v1/vendor-name/${supplierId}`,
+                {
+                  headers: { Authorization: `Bearer ${token}` },
+                }
+              );
+              updatedMaterials[index].vendor = vendorRes.data.name || supplierId;
+              updatedMaterials[index].fixedVendorIS = 'Yes';
+            } else {
+              updatedMaterials[index].vendor = '';
+              updatedMaterials[index].fixedVendorIS = 'No Fixed Vendor Found';
+            }
+          }
+          else {
             updatedMaterials[index].vendor = '';
             updatedMaterials[index].fixedVendorIS = 'No Fixed Vendor Found';
           }

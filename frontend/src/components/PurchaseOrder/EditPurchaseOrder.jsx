@@ -29,6 +29,7 @@ const EditPurchaseOrder = () => {
   const token = localStorage.getItem('token');
 
   useEffect(() => {
+    // Fetch materials
     axios
       .get(server_Url + '/api/v1/getMaterialIds', {
         headers: { Authorization: `Bearer ${token}` },
@@ -38,12 +39,35 @@ const EditPurchaseOrder = () => {
         setMaterials(sortedMaterials);
       });
 
+    // Fetch purchase order
     axios
       .get(`${server_Url}/api/v1/purchase-order/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setPurchaseOrder(res.data));
+      .then(async (res) => {
+        const po = res.data;
+        setPurchaseOrder(po);
+
+        if (po.supplierName) {
+          try {
+            const supplierRes = await axios.get(
+              `${server_Url}/api/v1/supplier-id/${po.supplierName}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
+
+            setPurchaseOrder((prev) => ({
+              ...prev,
+              supplierId: supplierRes.data.supplierId || '',
+            }));
+          } catch (err) {
+            console.error('Failed to fetch supplier ID:', err);
+          }
+        }
+      });
   }, [id]);
+
 
   const handleChange = (index, field, value) => {
     const updatedItems = [...purchaseOrder.items];
@@ -141,6 +165,7 @@ const EditPurchaseOrder = () => {
           setPurchaseOrder({ ...purchaseOrder, supplierId: e.target.value })
         }
         fullWidth
+        disabled
         margin="normal"
       />
       <TextField
@@ -149,6 +174,7 @@ const EditPurchaseOrder = () => {
         onChange={(e) =>
           setPurchaseOrder({ ...purchaseOrder, supplierName: e.target.value })
         }
+        disabled
         fullWidth
         margin="normal"
       />
@@ -317,8 +343,8 @@ const EditPurchaseOrder = () => {
                           ? 'date'
                           : field.includes('quantity') ||
                             field.includes('netPrice')
-                          ? 'number'
-                          : 'text'
+                            ? 'number'
+                            : 'text'
                       }
                       value={item[field]}
                       onChange={(e) =>
