@@ -28,7 +28,7 @@ const CreateItemInfoRecords = () => {
     setIsLoading(true);
 
     try {
-      const checkRes = await axios.get(`${server_Url}/api/v1/item-info-records`, {
+      const checkRes = await axios.get(`${server_Url}/api/v1/item-info-records?material=${material}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -46,11 +46,35 @@ const CreateItemInfoRecords = () => {
         return;
       }
 
-      await axios.post(`${server_Url}/api/v1/item-info-records`, formData, {
+      // If it's the first record for this material, we'll make it fixed
+      const isFirstRecord = checkRes.data.length === 0;
+
+      const postRes = await axios.post(`${server_Url}/api/v1/item-info-records`, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
+
+
+      const createdId = postRes.data._id;
+
+      // Update the record to make it fixed if it's the first one
+      if (isFirstRecord) {
+        await axios.put(
+          `${server_Url}/api/v1/item-info-records/${createdId}`,
+          {
+            sourceListOverview: {
+              ...formData.sourceListOverview,
+              fixedItemInfoRecordId: createdId,
+            },
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+          }
+        );
+      }
 
       navigate('/sourcing/item-info-records');
     } catch (err) {
@@ -59,6 +83,7 @@ const CreateItemInfoRecords = () => {
       setIsLoading(false);
     }
   };
+
 
 
 
