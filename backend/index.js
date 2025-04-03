@@ -2348,6 +2348,49 @@ app.post("/api/v1/item-info-records", authenticateToken, async (req, res) => {
   }
 });
 
+// Update by ID
+app.put("/api/v1/item-info-records/:id", authenticateToken, async (req, res) => {
+  try {
+    const { sourceListOverview, purchOrgData1 } = req.body;
+    const fixedId = sourceListOverview?.fixedItemInfoRecordId;
+
+    // If this record is choosing another record to be fixed
+    if (fixedId) {
+      // Unset the fixedItemInfoRecordId from all records with the same material
+      await ItemInfoRecordModel.updateMany(
+        {
+          "purchOrgData1.material": purchOrgData1.material,
+        },
+        {
+          $unset: {
+            "sourceListOverview.fixedItemInfoRecordId": "",
+          },
+        }
+      );
+
+      // Set fixedItemInfoRecordId on the actual fixed record
+      await ItemInfoRecordModel.findByIdAndUpdate(fixedId, {
+        $set: {
+          "sourceListOverview.fixedItemInfoRecordId": fixedId,
+        },
+      });
+    }
+
+    // Now update the current record (the one being edited)
+    const updated = await ItemInfoRecordModel.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body },
+      { new: true }
+    );
+
+    res.status(200).json(updated);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update record", details: err });
+  }
+});
+
+
+
 
 
 // Get all or filtered by material
@@ -2403,23 +2446,7 @@ app.get(
   }
 );
 
-// Update by ID
-app.put(
-  "/api/v1/item-info-records/:id",
-  authenticateToken,
-  async (req, res) => {
-    try {
-      const updated = await ItemInfoRecordModel.findByIdAndUpdate(
-        req.params.id,
-        { ...req.body },
-        { new: true }
-      );
-      res.status(200).json(updated);
-    } catch (err) {
-      res.status(500).json({ error: "Failed to update record", details: err });
-    }
-  }
-);
+
 
 app.get("/api/v1/vendor-name/:supplierId", authenticateToken, async (req, res) => {
   try {

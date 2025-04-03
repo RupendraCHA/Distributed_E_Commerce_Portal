@@ -78,38 +78,44 @@ const ItemInfoRecords = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {records.map((rec, index) => (
-                <TableRow key={rec._id}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{rec.purchOrgData1?.supplier || 'N/A'}</TableCell>
-                  <TableCell>{rec.purchOrgData1?.material || 'N/A'}</TableCell>
-                  <TableCell>{rec.purchOrgData1?.plant || 'N/A'}</TableCell>
-                  <TableCell>
-                    {rec.purchOrgData1?.purchasingOrg || 'N/A'}
-                  </TableCell>
-                  <TableCell>
-                    {rec.purchOrgData1?.standardQty || 'N/A'}
-                  </TableCell>
-                  <TableCell>{rec.purchOrgData1?.netPrice || 'N/A'}</TableCell>
-                  <TableCell>{rec.purchOrgData1?.validTo || 'N/A'}</TableCell>
-                  <TableCell>
-                    {rec.sourceListOverview?.fixedItemInfoRecordId === rec._id
-                      ? 'Yes'
-                      : 'No'}
-                  </TableCell>
-                  <TableCell>
-                    <IconButton
-                      color="primary"
-                      onClick={() =>
-                        navigate(`/sourcing/item-info-records/edit/${rec._id}`)
-                      }
-                    >
-                      <Edit />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {records.map((rec, index) => {
+                // Find the fixedItemInfoRecordId for this material
+                const material = rec.purchOrgData1?.material;
+                const fixedRecordForMaterial = records.find(r =>
+                  r.purchOrgData1?.material === material &&
+                  r.sourceListOverview?.fixedItemInfoRecordId === r._id
+                );
+
+                const isFixed = fixedRecordForMaterial?._id === rec._id;
+
+                return (
+                  <TableRow key={rec._id}>
+                    <TableCell>{index + 1}</TableCell>
+                    <TableCell>{rec.purchOrgData1?.supplier || 'N/A'}</TableCell>
+                    <TableCell>{rec.purchOrgData1?.material || 'N/A'}</TableCell>
+                    <TableCell>{rec.purchOrgData1?.plant || 'N/A'}</TableCell>
+                    <TableCell>{rec.purchOrgData1?.purchasingOrg || 'N/A'}</TableCell>
+                    <TableCell>{rec.purchOrgData1?.standardQty || 'N/A'}</TableCell>
+                    <TableCell>{rec.purchOrgData1?.netPrice || 'N/A'}</TableCell>
+                    <TableCell>{rec.purchOrgData1?.validTo || 'N/A'}</TableCell>
+                    <TableCell>
+                      {rec.sourceListOverview?.fixedItemInfoRecordId === rec._id ? 'Yes' : 'No'}
+                    </TableCell>
+                    <TableCell>
+                      <IconButton
+                        color="primary"
+                        onClick={() =>
+                          navigate(`/sourcing/item-info-records/edit/${rec._id}`)
+                        }
+                      >
+                        <Edit />
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
+
           </Table>
         )}
       </TableContainer>

@@ -129,8 +129,22 @@ const CreatePurchaseOrder = () => {
 
       <Autocomplete
         options={requisitions}
-        getOptionLabel={(option) => `REQ-${option._id}`}
+        getOptionLabel={(option) => {
+          const firstItem = option.materials?.[0] || {};
+          return `REQ-${option._id?.slice(-5)} | ${firstItem.materialName || 'Material'} | ${firstItem.vendor || 'Vendor'} | ${firstItem.shortText || 'Short Text'} | Item No: ${firstItem.itemNo || 'N/A'}`;
+        }}
         onChange={(event, newValue) => setSelectedRequisition(newValue)}
+        renderOption={(props, option) => {
+          const firstItem = option.materials?.[0] || {};
+          return (
+            <li {...props}>
+              <div>
+                <strong>{`REQ-${option._id?.slice(-5)}`}</strong> | {firstItem.materialName || 'Material'} | {firstItem.vendor || 'Vendor'}<br />
+                {firstItem.shortText || 'Short Text'} | Item No: {firstItem.itemNo || 'N/A'}
+              </div>
+            </li>
+          );
+        }}
         renderInput={(params) => (
           <TextField
             {...params}
@@ -140,6 +154,8 @@ const CreatePurchaseOrder = () => {
           />
         )}
       />
+
+
 
       <TextField
         label="Supplier ID"

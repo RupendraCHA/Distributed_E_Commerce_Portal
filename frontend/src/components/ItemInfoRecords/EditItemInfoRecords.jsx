@@ -32,6 +32,8 @@ const EditItemInfoRecords = () => {
 
   const handleUpdate = async () => {
     const { material, supplier } = formData.purchOrgData1;
+    const isFixed = formData?.sourceListOverview?.fixedItemInfoRecordId === id;
+
     if (!material || !supplier) {
       alert('Please select both Material and Supplier.');
       return;
@@ -40,7 +42,7 @@ const EditItemInfoRecords = () => {
     setIsLoading(true);
 
     try {
-      const checkRes = await axios.get(`${server_Url}/api/v1/item-info-records`, {
+      const checkRes = await axios.get(`${server_Url}/api/v1/item-info-records?material=${material}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -59,7 +61,12 @@ const EditItemInfoRecords = () => {
         return;
       }
 
-      await axios.put(`${server_Url}/api/v1/item-info-records/${id}`, formData, {
+      // Send the updated data (with fixedItemInfoRecordId if this is fixed)
+      const updatedPayload = {
+        ...formData,
+      };
+
+      await axios.put(`${server_Url}/api/v1/item-info-records/${id}`, updatedPayload, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
