@@ -40,6 +40,18 @@ export const SourcingData = [
     title: 'Vendor Master',
     path: '/sourcing/vendor-master',
   },
+  {
+    title: 'Material Master',
+    path: '/sourcing/materialMaster',
+  },
+  {
+    title: 'Item Info Records',
+    path: '/sourcing/item-info-records',
+  },
+  {
+    title: 'Vendor Agreements',
+    path: '/sourcing/vendor-agreements',
+  },
 ];
 export const pricingData = [
   'List Price',

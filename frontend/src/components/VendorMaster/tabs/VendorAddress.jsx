@@ -17,6 +17,13 @@ const VendorAddress = ({ formData, setFormData }) => {
       <Grid item xs={12} sm={6} md={4}>
         <TextField
           fullWidth
+          label="Id"
+          name="supplierid"
+          value={formData.vendorAddress?.supplierid || ''}
+          onChange={handleChange}
+        />
+        <TextField
+          fullWidth
           label="Title"
           name="title"
           value={formData.vendorAddress?.title || ''}

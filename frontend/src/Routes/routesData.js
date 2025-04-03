@@ -136,6 +136,29 @@ const CreateVendorMaster = React.lazy(() =>
 const EditVendorMaster = React.lazy(() =>
   import('../components/VendorMaster/EditVendorMaster.jsx')
 );
+const MaterialList = React.lazy(() =>
+  import('../components/MaterialList/index.jsx')
+);
+
+const CreateMaterialList = React.lazy(() =>
+  import('../components/MaterialList/CreateMaterialList.jsx')
+);
+
+const EditMaterialList = React.lazy(() =>
+  import('../components/MaterialList/EditMaterialList.jsx')
+);
+
+const ItemInfoRecords = React.lazy(() =>
+  import('../components/ItemInfoRecords/index.jsx')
+);
+
+const CreateItemInfoRecords = React.lazy(() =>
+  import('../components/ItemInfoRecords/CreateItemInfoRecords.jsx')
+);
+
+const EditItemInfoRecords = React.lazy(() =>
+  import('../components/ItemInfoRecords/EditItemInfoRecords.jsx')
+);
 
 import {
   productsData,
@@ -329,6 +352,30 @@ export const privateRoutes = [
   {
     path: '/sourcing/vendor-master/edit/:id',
     element: EditVendorMaster,
+  },
+  {
+    path: '/sourcing/materialMaster',
+    element: MaterialList,
+  },
+  {
+    path: '/sourcing/materialMaster/create',
+    element: CreateMaterialList,
+  },
+  {
+    path: '/sourcing/materialMaster/edit/:id',
+    element: EditMaterialList,
+  },
+  {
+    path: '/sourcing/item-info-records',
+    element: ItemInfoRecords,
+  },
+  {
+    path: '/sourcing/item-info-records/create',
+    element: CreateItemInfoRecords,
+  },
+  {
+    path: '/sourcing/item-info-records/edit/:id',
+    element: EditItemInfoRecords,
   },
 ];
 

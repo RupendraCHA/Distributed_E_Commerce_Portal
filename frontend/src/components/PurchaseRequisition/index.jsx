@@ -21,7 +21,19 @@ const PurchaseRequisitionList = () => {
   const [requisitions, setRequisitions] = useState([]);
   const navigate = useNavigate();
   const token = localStorage.getItem('token'); // Retrieve user token
-
+  const [vendors, setVendors] = useState([]);
+  const getVendorName = (vendorId) => {
+    const vendor = vendors.find((v) => v.id === vendorId);
+    return vendor ? vendor.name : vendorId || '-';
+  };
+  useEffect(() => {
+    axios
+      .get(server_Url + '/api/v1/vendors-list', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setVendors(res.data))
+      .catch((err) => console.error('Error fetching vendors:', err));
+  }, []);
   useEffect(() => {
     axios
       .get(server_Url + '/api/v1/requisition', {
@@ -55,10 +67,11 @@ const PurchaseRequisitionList = () => {
           <TableHead>
             <TableRow>
               <TableCell>S.No</TableCell>
-              <TableCell>Status</TableCell>
               <TableCell>Item No</TableCell>
               <TableCell>Material</TableCell>
               <TableCell>Short Text</TableCell>
+              <TableCell>Status</TableCell>
+
               <TableCell>Quantity</TableCell>
               <TableCell>Unit</TableCell>
               <TableCell>Delivery Date</TableCell>
@@ -83,11 +96,11 @@ const PurchaseRequisitionList = () => {
             {requisitions.map((req, index) => (
               <TableRow key={req._id}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{req.status || '-'}</TableCell>
                 {[
                   { key: 'itemNo' },
                   { key: 'materialName' },
                   { key: 'shortText' },
+                  { key: 'status' },
                   { key: 'quantity' },
                   { key: 'unit', defaultValue: '-' },
                   { key: 'deliveryDate' },
@@ -97,7 +110,7 @@ const PurchaseRequisitionList = () => {
                   { key: 'purchasingGroup', defaultValue: '-' },
                   { key: 'requisitioner', defaultValue: '-' },
                   { key: 'trackingNo', defaultValue: '-' },
-                  { key: 'vendor', defaultValue: '-' },
+                  { key: 'vendor', render: (mat) => getVendorName(mat.vendor) },
                   { key: 'fixedVendorIS', defaultValue: '-' },
                   { key: 'readVendorSPG', defaultValue: '-' },
                   { key: 'splitIndicator', defaultValue: '-' },
@@ -105,10 +118,13 @@ const PurchaseRequisitionList = () => {
                   { key: 'agreement', defaultValue: '-' },
                   { key: 'itemInfoRecord', defaultValue: '-' },
                   { key: 'mpnMaterial', defaultValue: '-' },
-                ].map(({ key, defaultValue }) => (
+                ].map(({ key, defaultValue, render }) => (
                   <TableCell key={key}>
                     {req.materials.map((mat) => (
-                      <div key={mat.materialId}>{mat[key] || defaultValue}</div>
+                      <div key={mat.materialId}>
+                        {' '}
+                        {render ? render(mat) : mat[key] || defaultValue}
+                      </div>
                     ))}
                   </TableCell>
                 ))}

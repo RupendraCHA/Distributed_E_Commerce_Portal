@@ -66,6 +66,9 @@ const VendorList = () => {
                   <strong>S.No</strong>
                 </TableCell>
                 <TableCell>
+                  <strong>Id</strong>
+                </TableCell>
+                <TableCell>
                   <strong>Vendor Name</strong>
                 </TableCell>
                 <TableCell>
@@ -89,6 +92,7 @@ const VendorList = () => {
               {vendors.map((vendor, index) => (
                 <TableRow key={vendor._id}>
                   <TableCell>{index + 1}</TableCell>
+                  <TableCell>{vendor.vendorAddress?.supplierid || 'N/A'}</TableCell>
                   <TableCell>{vendor.vendorAddress?.name || 'N/A'}</TableCell>
                   <TableCell>
                     {vendor.vendorAddress?.country || 'N/A'}

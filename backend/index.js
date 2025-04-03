@@ -21,6 +21,7 @@ const {
   InboundDeliveryModel,
   VendorBillModel,
   VendorMasterModel,
+  ItemInfoRecordModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -380,9 +381,9 @@ app.get("/api/v1/distributors/products", async (req, res) => {
       .map((product) =>
         productQuantities[product.productId] > 0
           ? {
-              ...product.toObject(),
-              quantity: productQuantities[product.productId] || 0, // Ensure default is 0
-            }
+            ...product.toObject(),
+            quantity: productQuantities[product.productId] || 0, // Ensure default is 0
+          }
           : {}
       )
       .filter((product) => product.productId);
@@ -831,12 +832,12 @@ app.get("/distributors/products", async (req, res) => {
         );
         return product
           ? {
-              ...product.toObject(),
-              quantity: productInfo.quantity,
-              price: `$${productInfo.price || product.price || 0}`,
-              distributorIds: Array.from(productInfo.distributors),
-              warehouseDetails: productInfo.warehouseDetails,
-            }
+            ...product.toObject(),
+            quantity: productInfo.quantity,
+            price: `$${productInfo.price || product.price || 0}`,
+            distributorIds: Array.from(productInfo.distributors),
+            warehouseDetails: productInfo.warehouseDetails,
+          }
           : null;
       })
       .filter((product) => product !== null);
@@ -1829,17 +1830,128 @@ app.get("/products", async (req, res) => {
 });
 
 // Get all material IDs
-app.get("/api/v1/getMaterialIds", async (req, res) => {
+app.get("/api/v1/getMaterialIds", authenticateToken, async (req, res) => {
   try {
     console.log("Fetching material IDs...");
-    const materials = await MaterialModel.find(
-      {},
-      "sNo itemNo materialId materialName shortText materialGroup unit"
-    );
-    res.json(materials);
+    const materials = await MaterialModel.find({}, [
+      "sNo",
+      "itemNo",
+      "materialId",
+      "materialName",
+      "shortText",
+      "materialGroup",
+      "unit",
+      "plant",
+      "storageLocation",
+      "purchasingGroup",
+      "requisitioner",
+      "trackingNo",
+      "splitIndicator",
+      "purchasingOrg",
+      "agreement",
+      "itemInfoRecord",
+      "mpnMaterial",
+      "suppliers"
+    ])
+
+    res.status(200).json(materials);
   } catch (error) {
-    console.error("Error fetching materials:", error.message);
+    console.error("Error fetching materials:", error);
     res.status(500).json({ message: "Server Error" });
+  }
+});
+
+
+
+app.post("/api/v1/materials", authenticateToken, async (req, res) => {
+  try {
+    const material = new MaterialModel({ ...req.body, userId: req.user.id });
+    await material.save();
+    res.status(201).json(material);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// Get All Materials or by materialId
+app.get("/api/v1/materials", authenticateToken, async (req, res) => {
+  try {
+    const { material } = req.query;
+    const query = { userId: req.user.id };
+
+    // If materialId is provided, add it to the query
+    if (material) {
+      query.materialId = material;
+    }
+
+    const materials = await MaterialModel.find(query);
+    res.status(200).json(materials);
+  } catch (err) {
+    console.error("Failed to fetch materials:", err);
+    res.status(500).json({ error: "Server error", details: err.message });
+  }
+});
+
+// Update Material
+app.put("/api/v1/materials/:id", authenticateToken, async (req, res) => {
+  try {
+    const updated = await MaterialModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updated);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+app.get("/api/v1/materials/last", authenticateToken, async (req, res) => {
+  try {
+    const last = ((await MaterialModel.find({})
+      .sort({ itemNo: -1 })
+      .limit(1)) || [])[0];
+    console.log({ last });
+
+    const lastSNo = (last?.itemNo).split("ITM")[1] || 0;
+    console.log({ lastSNo: Number(lastSNo) });
+
+    res.status(200).json({ lastSNo: Number(lastSNo) });
+  } catch (error) {
+    console.error("Error fetching last material:", error);
+    res.status(500).json({ message: "Failed to fetch last serial number" });
+  }
+});
+
+// Get Material by ID
+app.get("/api/v1/materials/:id", authenticateToken, async (req, res) => {
+  const material = await MaterialModel.findById(req.params.id);
+  if (!material) return res.status(404).json({ error: "Material not found" });
+  res.json(material);
+});
+
+// POST /api/v1/materials/bulk
+app.post("/api/v1/materials/bulk", authenticateToken, async (req, res) => {
+  const { materials } = req.body;
+  const userId = req.user.id;
+
+  if (!Array.isArray(materials) || materials.length === 0) {
+    return res
+      .status(400)
+      .json({ error: "Materials must be a non-empty array" });
+  }
+
+  try {
+    const createdMaterials = [];
+    for (const data of materials) {
+      const material = new MaterialModel({ ...data, userId });
+      await material.save();
+      createdMaterials.push(material);
+    }
+    res.status(201).json(createdMaterials);
+  } catch (err) {
+    console.error("Bulk material creation failed:", err);
+    res.status(500).json({ error: "Error creating materials" });
   }
 });
 
@@ -1882,6 +1994,7 @@ app.post("/api/v1/requisition", authenticateToken, async (req, res) => {
         requisitioner: m.requisitioner || "",
         trackingNo: m.trackingNo || "",
         supplier: m.supplier || "",
+        vendor: m.vendor || "",
         fixedVendorIS: m.fixedVendorIS || "",
         status: "Open", // Default status
         readVendorSPG: m.readVendorSPG || "",
@@ -1970,7 +2083,7 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
         materialName: foundMaterial ? foundMaterial.materialName : "",
         shortText: foundMaterial ? foundMaterial.shortText : "",
         materialGroup: foundMaterial ? foundMaterial.materialGroup : "",
-        unit: foundMaterial ? foundMaterial.unit : "",
+        unit: m.unit ?? foundMaterial?.unit ?? "",
         quantity: m.quantity,
         deliveryDate: m.deliveryDate,
         plant: m.plant || "",
@@ -1979,6 +2092,7 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
         requisitioner: m.requisitioner || "",
         trackingNo: m.trackingNo || "",
         supplier: m.supplier || "",
+        vendor: m.vendor || "",
         fixedVendorIS: m.fixedVendorIS || "",
         status: m.status || "Open",
         readVendorSPG: m.readVendorSPG || "",
@@ -2215,6 +2329,175 @@ app.put("/api/v1/vendor-bill/:id", authenticateToken, async (req, res) => {
     res.json(updatedBill);
   } catch (error) {
     res.status(500).json({ message: "Server error", error });
+  }
+});
+
+// Create
+app.post("/api/v1/item-info-records", authenticateToken, async (req, res) => {
+  try {
+    const newRecord = new ItemInfoRecordModel({
+      userId: req.user.id,
+      ...req.body,
+    });
+    await newRecord.save();
+    res.status(201).json(newRecord);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Failed to create item info record", details: err });
+  }
+});
+
+// Update by ID
+app.put("/api/v1/item-info-records/:id", authenticateToken, async (req, res) => {
+  try {
+    const { sourceListOverview, purchOrgData1 } = req.body;
+    const fixedId = sourceListOverview?.fixedItemInfoRecordId;
+
+    // If this record is choosing another record to be fixed
+    if (fixedId) {
+      // Unset the fixedItemInfoRecordId from all records with the same material
+      await ItemInfoRecordModel.updateMany(
+        {
+          "purchOrgData1.material": purchOrgData1.material,
+        },
+        {
+          $unset: {
+            "sourceListOverview.fixedItemInfoRecordId": "",
+          },
+        }
+      );
+
+      // Set fixedItemInfoRecordId on the actual fixed record
+      await ItemInfoRecordModel.findByIdAndUpdate(fixedId, {
+        $set: {
+          "sourceListOverview.fixedItemInfoRecordId": fixedId,
+        },
+      });
+    }
+
+    // Now update the current record (the one being edited)
+    const updated = await ItemInfoRecordModel.findByIdAndUpdate(
+      req.params.id,
+      { ...req.body },
+      { new: true }
+    );
+
+    res.status(200).json(updated);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update record", details: err });
+  }
+});
+
+
+
+
+
+// Get all or filtered by material
+app.get("/api/v1/item-info-records", authenticateToken, async (req, res) => {
+  try {
+    const { material } = req.query;
+
+    const query = { userId: req.user.id };
+
+    // If material is provided, filter by it (stored inside purchOrgData1.material)
+    if (material) {
+      query['purchOrgData1.material'] = material;
+    }
+
+    const records = await ItemInfoRecordModel.find(query);
+    res.status(200).json(records);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ error: "Failed to fetch item info records", details: err });
+  }
+});
+app.get("/api/v1/item-info-records/material/:id", authenticateToken, async (req, res) => {
+  try {
+    const materialId = req.params.id; // ✅ From route params
+    const query = {
+      userId: req.user.id,
+      'purchOrgData1.material': materialId
+    };
+
+    const records = await ItemInfoRecordModel.find(query);
+    res.status(200).json(records);
+  } catch (err) {
+    console.error("Failed to fetch item info records by material", err);
+    res.status(500).json({ error: "Failed to fetch item info records", details: err.message });
+  }
+});
+
+
+
+// Get by ID
+app.get(
+  "/api/v1/item-info-records/:id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const record = await ItemInfoRecordModel.findById(req.params.id);
+      if (!record) return res.status(404).json({ error: "Record not found" });
+      res.status(200).json(record);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to fetch record", details: err });
+    }
+  }
+);
+
+
+
+app.get("/api/v1/vendor-name/:supplierId", authenticateToken, async (req, res) => {
+  try {
+    const { supplierId } = req.params;
+
+    const vendor = await VendorMasterModel.findOne({
+      "vendorAddress.supplierid": supplierId,
+    });
+    if (!vendor || !vendor.vendorAddress?.name) {
+      return res.status(404).json({ error: "Vendor not found or name missing" });
+    }
+
+    res.status(200).json({ name: vendor.vendorAddress.name });
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching vendor name", details: err });
+  }
+});
+
+app.get("/api/v1/supplier-id/:vendorName", authenticateToken, async (req, res) => {
+  try {
+    const { vendorName } = req.params;
+
+    const vendor = await VendorMasterModel.findOne({
+      "vendorAddress.name": vendorName,
+    });
+
+    if (!vendor || !vendor.vendorAddress?.supplierid) {
+      return res.status(404).json({ error: "Supplier ID not found for this vendor" });
+    }
+
+    res.status(200).json({ supplierId: vendor.vendorAddress.supplierid });
+  } catch (err) {
+    res.status(500).json({ error: "Error fetching supplier ID", details: err });
+  }
+});
+
+
+// New endpoint (optional optimization)
+app.get("/api/v1/vendors-list", authenticateToken, async (req, res) => {
+  try {
+    const vendors = await VendorMasterModel.find(
+      { userId: req.user.id },
+      { _id: 1, "vendorAddress.name": 1 }
+    );
+    const formatted = vendors.map((v) => ({
+      id: v._id,
+      name: v.vendorAddress?.name || "Unnamed Vendor",
+    }));
+    res.json(formatted);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
