@@ -159,6 +159,9 @@ const CreateItemInfoRecords = React.lazy(() =>
 const EditItemInfoRecords = React.lazy(() =>
   import('../components/ItemInfoRecords/EditItemInfoRecords.jsx')
 );
+const CreateRecipetOrder = React.lazy(() =>
+  import('../components/Manufacturing/CreateRecieptOrder.jsx')
+);
 
 import {
   productsData,
@@ -376,6 +379,10 @@ export const privateRoutes = [
   {
     path: '/sourcing/item-info-records/edit/:id',
     element: EditItemInfoRecords,
+  },
+  {
+    path: '/sourcing/create-process-order',
+    element: CreateRecipetOrder,
   },
 ];
 
