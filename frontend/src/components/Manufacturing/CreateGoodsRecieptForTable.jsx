@@ -29,7 +29,7 @@ const GoodsReceiptTable = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     axios
-      .get(`${server_Url}/api/v1/materials`, {
+      .get(`${server_Url}/api/v1/getMaterialIds`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => {
@@ -72,10 +72,29 @@ const GoodsReceiptTable = () => {
 
   return (
     <Container maxWidth="md">
-       <h2 style={{ margin: '20px 0px', fontWeight: 'bold' }}>
-       Create Goods Receipt
-       </h2>
+      <h2 style={{ margin: '20px 0px', fontWeight: 'bold' }}>
+        Create Goods Receipt
+      </h2>
       <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Autocomplete
+            options={materialOptions}
+            getOptionLabel={(option) =>
+              option.materialName
+                ? `${option.materialName} (${option.materialId})`
+                : option.materialId
+            }
+            onChange={(e, newValue) => {
+              setMaterial(newValue?.materialId || '');
+              setPlant(newValue?.plant || '');
+              setStorageLocation(newValue?.storageLocation || '');
+              setValuationType(newValue?.valuationType || ''); // optional if you want
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Material" fullWidth />
+            )}
+          />
+        </Grid>
         <Grid item xs={6}>
           <TextField
             label="Document Date"
@@ -112,16 +131,7 @@ const GoodsReceiptTable = () => {
             fullWidth
           />
         </Grid>
-        <Grid item xs={12}>
-          <Autocomplete
-            options={materialOptions}
-            getOptionLabel={(option) => option.materialName || option.materialNumber}
-            onChange={(e, newValue) => setMaterial(newValue?.materialNumber || '')}
-            renderInput={(params) => (
-              <TextField {...params} label="Material" fullWidth />
-            )}
-          />
-        </Grid>
+
         <Grid item xs={6}>
           <TextField
             label="Quantity"
