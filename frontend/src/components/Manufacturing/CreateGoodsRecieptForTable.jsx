@@ -72,9 +72,9 @@ const GoodsReceiptTable = () => {
 
   return (
     <Container maxWidth="md">
-      <h2 style={{ marginTop: '20px', fontWeight: 'bold' }}>
-        Create Goods Receipt
-      </h2>
+       <h2 style={{ margin: '20px 0px', fontWeight: 'bold' }}>
+       Create Goods Receipt
+       </h2>
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <TextField

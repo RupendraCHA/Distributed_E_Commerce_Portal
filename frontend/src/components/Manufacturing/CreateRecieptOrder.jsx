@@ -58,9 +58,10 @@ const CreateProcessOrder = () => {
 
   return (
     <Container maxWidth="md">
-      <h2 style={{ marginTop: '20px', fontWeight: 'bold' }}>
-        Create Process Order
-      </h2>
+       <h2 style={{ margin: '20px 0px', fontWeight: 'bold' }}>
+       Create Process Order
+       </h2>
+
 
       <Grid container spacing={2}>
         <Grid item xs={12}>

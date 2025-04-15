@@ -200,9 +200,14 @@ const Header = () => {
                         },
                       },
                     ]}
+                    sx={{
+                      ":root":{
+                        zIndex:1000
+                      }
+                    }}
                   >
                     <ClickAwayListener onClickAway={handleManufacturingPopperClose}>
-                      <Paper>
+                      <Paper >
                         <MenuList
                           autoFocusItem={Boolean(anchorElForManufacturing)}
                           id="menu-list-grow"

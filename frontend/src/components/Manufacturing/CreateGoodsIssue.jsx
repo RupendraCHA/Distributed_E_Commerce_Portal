@@ -58,7 +58,7 @@ const CreateGoodsIssue = () => {
 
   return (
     <Container maxWidth="md">
-      <h2 style={{ marginTop: '20px', fontWeight: 'bold' }}>
+      <h2 style={{ margin: '20px 0px', fontWeight: 'bold' }}>
         Create Goods Issue for Process Order
       </h2>
 
