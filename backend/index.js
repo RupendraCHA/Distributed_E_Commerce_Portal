@@ -22,6 +22,7 @@ const {
   VendorBillModel,
   VendorMasterModel,
   ItemInfoRecordModel,
+  VendorAgreementModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -50,7 +51,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = process.env.PORT;
 
 // const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com" // Visionsoft
-const checkoutURLs = "https://distributed-e-commerce-portal-frontend.onrender.com"
+const checkoutURLs =
+  "https://distributed-e-commerce-portal-frontend.onrender.com";
 // const checkoutURLs = "http://localhost:5173"
 
 const connectDB = async () => {
@@ -373,7 +375,8 @@ const fetchSAPData = async () => {
     const password = "Nikhil@12345";
 
     const headers = {
-      Authorization: "Basic " + Buffer.from(`${username}:${password}`).toString("base64"),
+      Authorization:
+        "Basic " + Buffer.from(`${username}:${password}`).toString("base64"),
     };
 
     const response = await fetch(url, {
@@ -403,24 +406,50 @@ const fetchSAPData = async () => {
     lastFetched = now;
     return enriched;
   } catch (error) {
-    console.warn("⚠️ SAP Fetch failed, proceeding without SAP data:", error.message);
+    console.warn(
+      "⚠️ SAP Fetch failed, proceeding without SAP data:",
+      error.message
+    );
     return []; // Fallback to empty list if SAP fails
   }
 };
-
 
 const capitalizeId = (id) => id.charAt(0).toUpperCase() + id.slice(1);
 
 const enrichSAPData = (products) => {
   const meta = {
-    AGRPUMP: { image: "https://res.cloudinary.com/...pyongi.jpg", brand: "Materials" },
-    BENALIUM: { image: "https://res.cloudinary.com/...hqeypc.jpg", brand: "Materials" },
-    BRASS: { image: "https://res.cloudinary.com/...bxwkyf.jpg", brand: "Materials" },
-    LED: { image: "https://res.cloudinary.com/...otjrgh.webp", brand: "Materials" },
-    MNIPICKAXES: { image: "https://res.cloudinary.com/...kgkxpu.webp", brand: "Materials" },
-    SITTAPER: { image: "https://res.cloudinary.com/...a6hh4a.jpg", brand: "Materials" },
-    SULPHUR: { image: "https://res.cloudinary.com/...ai3zwv.jpg", brand: "Materials" },
-    THORIUM: { image: "https://res.cloudinary.com/...wrdyaa.webp", brand: "Materials" },
+    AGRPUMP: {
+      image: "https://res.cloudinary.com/...pyongi.jpg",
+      brand: "Materials",
+    },
+    BENALIUM: {
+      image: "https://res.cloudinary.com/...hqeypc.jpg",
+      brand: "Materials",
+    },
+    BRASS: {
+      image: "https://res.cloudinary.com/...bxwkyf.jpg",
+      brand: "Materials",
+    },
+    LED: {
+      image: "https://res.cloudinary.com/...otjrgh.webp",
+      brand: "Materials",
+    },
+    MNIPICKAXES: {
+      image: "https://res.cloudinary.com/...kgkxpu.webp",
+      brand: "Materials",
+    },
+    SITTAPER: {
+      image: "https://res.cloudinary.com/...a6hh4a.jpg",
+      brand: "Materials",
+    },
+    SULPHUR: {
+      image: "https://res.cloudinary.com/...ai3zwv.jpg",
+      brand: "Materials",
+    },
+    THORIUM: {
+      image: "https://res.cloudinary.com/...wrdyaa.webp",
+      brand: "Materials",
+    },
     TIE: {
       image: "https://res.cloudinary.com/...gojtdh.webp",
       brand: "Materials",
@@ -428,7 +457,10 @@ const enrichSAPData = (products) => {
       productName: "URANIUM",
       description: "This is a radioactive element & generates Nuclear Energy",
     },
-    TILE: { image: "https://res.cloudinary.com/...ylgnow.jpg", brand: "Materials" },
+    TILE: {
+      image: "https://res.cloudinary.com/...ylgnow.jpg",
+      brand: "Materials",
+    },
   };
 
   return products.map((product) => {
@@ -441,6 +473,31 @@ const enrichSAPData = (products) => {
     };
   });
 };
+
+app.post("/api/v1/vendor-agreements", async (req, res) => {
+  const data = new VendorAgreementModel(req.body);
+  await data.save();
+  res.status(201).send(data);
+});
+
+app.get("/api/v1/vendor-agreements", async (req, res) => {
+  const data = await VendorAgreementModel.find();
+  res.send(data);
+});
+
+app.get("/api/v1/vendor-agreements/:id", async (req, res) => {
+  const data = await VendorAgreementModel.findById(req.params.id);
+  res.send(data);
+});
+
+app.put("/api/v1/vendor-agreements/:id", async (req, res) => {
+  const data = await VendorAgreementModel.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+  res.send(data);
+});
 
 // Main Route Handler
 app.get("/api/v1/distributors/products", async (req, res) => {
@@ -455,7 +512,8 @@ app.get("/api/v1/distributors/products", async (req, res) => {
     distributors.forEach((distributor) => {
       distributor.warehouses.forEach((warehouse) => {
         warehouse.inventory.forEach((item) => {
-          productQuantities[item.productId] = (productQuantities[item.productId] || 0) + item.quantity;
+          productQuantities[item.productId] =
+            (productQuantities[item.productId] || 0) + item.quantity;
         });
       });
     });
@@ -474,7 +532,6 @@ app.get("/api/v1/distributors/products", async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
-
 
 app.post("/confirm-payment", authenticateToken, async (req, res) => {
   try {
@@ -748,12 +805,12 @@ app.get("/distributors/products", async (req, res) => {
         );
         return product
           ? {
-            ...product.toObject(),
-            quantity: productInfo.quantity,
-            price: `$${productInfo.price || product.price || 0}`,
-            distributorIds: Array.from(productInfo.distributors),
-            warehouseDetails: productInfo.warehouseDetails,
-          }
+              ...product.toObject(),
+              quantity: productInfo.quantity,
+              price: `$${productInfo.price || product.price || 0}`,
+              distributorIds: Array.from(productInfo.distributors),
+              warehouseDetails: productInfo.warehouseDetails,
+            }
           : null;
       })
       .filter((product) => product !== null);
@@ -1739,13 +1796,13 @@ app.get("/products", async (req, res) => {
       );
     }
 
-    return res.status(200).json(products);``
+    return res.status(200).json(products);
+    ``;
   } catch (error) {
     console.error("Error in /products:", error.stack || error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
-
 
 // Get all material IDs
 app.get("/api/v1/getMaterialIds", authenticateToken, async (req, res) => {
@@ -1768,8 +1825,8 @@ app.get("/api/v1/getMaterialIds", authenticateToken, async (req, res) => {
       "agreement",
       "itemInfoRecord",
       "mpnMaterial",
-      "suppliers"
-    ])
+      "suppliers",
+    ]);
 
     res.status(200).json(materials);
   } catch (error) {
@@ -1777,8 +1834,6 @@ app.get("/api/v1/getMaterialIds", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
-
-
 
 app.post("/api/v1/materials", authenticateToken, async (req, res) => {
   try {
@@ -2266,49 +2321,49 @@ app.post("/api/v1/item-info-records", authenticateToken, async (req, res) => {
 });
 
 // Update by ID
-app.put("/api/v1/item-info-records/:id", authenticateToken, async (req, res) => {
-  try {
-    const { sourceListOverview, purchOrgData1 } = req.body;
-    const fixedId = sourceListOverview?.fixedItemInfoRecordId;
+app.put(
+  "/api/v1/item-info-records/:id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { sourceListOverview, purchOrgData1 } = req.body;
+      const fixedId = sourceListOverview?.fixedItemInfoRecordId;
 
-    // If this record is choosing another record to be fixed
-    if (fixedId) {
-      // Unset the fixedItemInfoRecordId from all records with the same material
-      await ItemInfoRecordModel.updateMany(
-        {
-          "purchOrgData1.material": purchOrgData1.material,
-        },
-        {
-          $unset: {
-            "sourceListOverview.fixedItemInfoRecordId": "",
+      // If this record is choosing another record to be fixed
+      if (fixedId) {
+        // Unset the fixedItemInfoRecordId from all records with the same material
+        await ItemInfoRecordModel.updateMany(
+          {
+            "purchOrgData1.material": purchOrgData1.material,
           },
-        }
+          {
+            $unset: {
+              "sourceListOverview.fixedItemInfoRecordId": "",
+            },
+          }
+        );
+
+        // Set fixedItemInfoRecordId on the actual fixed record
+        await ItemInfoRecordModel.findByIdAndUpdate(fixedId, {
+          $set: {
+            "sourceListOverview.fixedItemInfoRecordId": fixedId,
+          },
+        });
+      }
+
+      // Now update the current record (the one being edited)
+      const updated = await ItemInfoRecordModel.findByIdAndUpdate(
+        req.params.id,
+        { ...req.body },
+        { new: true }
       );
 
-      // Set fixedItemInfoRecordId on the actual fixed record
-      await ItemInfoRecordModel.findByIdAndUpdate(fixedId, {
-        $set: {
-          "sourceListOverview.fixedItemInfoRecordId": fixedId,
-        },
-      });
+      res.status(200).json(updated);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update record", details: err });
     }
-
-    // Now update the current record (the one being edited)
-    const updated = await ItemInfoRecordModel.findByIdAndUpdate(
-      req.params.id,
-      { ...req.body },
-      { new: true }
-    );
-
-    res.status(200).json(updated);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to update record", details: err });
   }
-});
-
-
-
-
+);
 
 // Get all or filtered by material
 app.get("/api/v1/item-info-records", authenticateToken, async (req, res) => {
@@ -2319,7 +2374,7 @@ app.get("/api/v1/item-info-records", authenticateToken, async (req, res) => {
 
     // If material is provided, filter by it (stored inside purchOrgData1.material)
     if (material) {
-      query['purchOrgData1.material'] = material;
+      query["purchOrgData1.material"] = material;
     }
 
     const records = await ItemInfoRecordModel.find(query);
@@ -2330,23 +2385,28 @@ app.get("/api/v1/item-info-records", authenticateToken, async (req, res) => {
       .json({ error: "Failed to fetch item info records", details: err });
   }
 });
-app.get("/api/v1/item-info-records/material/:id", authenticateToken, async (req, res) => {
-  try {
-    const materialId = req.params.id; // ✅ From route params
-    const query = {
-      userId: req.user.id,
-      'purchOrgData1.material': materialId
-    };
+app.get(
+  "/api/v1/item-info-records/material/:id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const materialId = req.params.id; // ✅ From route params
+      const query = {
+        userId: req.user.id,
+        "purchOrgData1.material": materialId,
+      };
 
-    const records = await ItemInfoRecordModel.find(query);
-    res.status(200).json(records);
-  } catch (err) {
-    console.error("Failed to fetch item info records by material", err);
-    res.status(500).json({ error: "Failed to fetch item info records", details: err.message });
+      const records = await ItemInfoRecordModel.find(query);
+      res.status(200).json(records);
+    } catch (err) {
+      console.error("Failed to fetch item info records by material", err);
+      res.status(500).json({
+        error: "Failed to fetch item info records",
+        details: err.message,
+      });
+    }
   }
-});
-
-
+);
 
 // Get by ID
 app.get(
@@ -2363,43 +2423,56 @@ app.get(
   }
 );
 
+app.get(
+  "/api/v1/vendor-name/:supplierId",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { supplierId } = req.params;
 
+      const vendor = await VendorMasterModel.findOne({
+        "vendorAddress.supplierid": supplierId,
+      });
+      if (!vendor || !vendor.vendorAddress?.name) {
+        return res
+          .status(404)
+          .json({ error: "Vendor not found or name missing" });
+      }
 
-app.get("/api/v1/vendor-name/:supplierId", authenticateToken, async (req, res) => {
-  try {
-    const { supplierId } = req.params;
-
-    const vendor = await VendorMasterModel.findOne({
-      "vendorAddress.supplierid": supplierId,
-    });
-    if (!vendor || !vendor.vendorAddress?.name) {
-      return res.status(404).json({ error: "Vendor not found or name missing" });
+      res.status(200).json({ name: vendor.vendorAddress.name });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ error: "Error fetching vendor name", details: err });
     }
-
-    res.status(200).json({ name: vendor.vendorAddress.name });
-  } catch (err) {
-    res.status(500).json({ error: "Error fetching vendor name", details: err });
   }
-});
+);
 
-app.get("/api/v1/supplier-id/:vendorName", authenticateToken, async (req, res) => {
-  try {
-    const { vendorName } = req.params;
+app.get(
+  "/api/v1/supplier-id/:vendorName",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { vendorName } = req.params;
 
-    const vendor = await VendorMasterModel.findOne({
-      "vendorAddress.name": vendorName,
-    });
+      const vendor = await VendorMasterModel.findOne({
+        "vendorAddress.name": vendorName,
+      });
 
-    if (!vendor || !vendor.vendorAddress?.supplierid) {
-      return res.status(404).json({ error: "Supplier ID not found for this vendor" });
+      if (!vendor || !vendor.vendorAddress?.supplierid) {
+        return res
+          .status(404)
+          .json({ error: "Supplier ID not found for this vendor" });
+      }
+
+      res.status(200).json({ supplierId: vendor.vendorAddress.supplierid });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ error: "Error fetching supplier ID", details: err });
     }
-
-    res.status(200).json({ supplierId: vendor.vendorAddress.supplierid });
-  } catch (err) {
-    res.status(500).json({ error: "Error fetching supplier ID", details: err });
   }
-});
-
+);
 
 // New endpoint (optional optimization)
 app.get("/api/v1/vendors-list", authenticateToken, async (req, res) => {

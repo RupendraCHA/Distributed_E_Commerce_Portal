@@ -10,6 +10,7 @@ const InboundDeliveryModel = require("./InboundDeliverySchema");
 const VendorBillModel = require("./vendor_bill_schema");
 const VendorMasterModel = require("./VendorMasterSchema");
 const ItemInfoRecordModel = require("./ItemInfoRecordSchema");
+const VendorAgreementModel = require("./vendorAgreementSchema");
 module.exports = {
   EmployeeModel,
   AddressModel,
@@ -23,4 +24,5 @@ module.exports = {
   VendorBillModel,
   VendorMasterModel,
   ItemInfoRecordModel,
+  VendorAgreementModel,
 };

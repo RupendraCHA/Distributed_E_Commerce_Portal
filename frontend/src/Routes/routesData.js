@@ -168,6 +168,15 @@ const CreateGoodIssueForProcessOrder = React.lazy(() =>
 const CreateGoodsRecieptForTable = React.lazy(() =>
   import('../components/Manufacturing/CreateGoodsRecieptForTable.jsx')
 );
+const CreateVendorAgreement = React.lazy(() =>
+  import('../components/VendorAgreements/CreateVendorAgreement.jsx')
+);
+const EditVendorAgreement = React.lazy(() =>
+  import('../components/VendorAgreements/EditVendorAgreement.jsx')
+);
+const VendorAgreementList = React.lazy(() =>
+  import('../components/VendorAgreements/VendorAgreementList.jsx')
+);
 
 import {
   productsData,
@@ -391,12 +400,24 @@ export const privateRoutes = [
     element: CreateRecipetOrder,
   },
   {
-       path: '/sourcing/good-issue-for-process-order',
+    path: '/sourcing/good-issue-for-process-order',
     element: CreateGoodIssueForProcessOrder,
   },
   {
     path: '/sourcing/good-reciept-for-table',
     element: CreateGoodsRecieptForTable,
+  },
+  {
+    path: '/sourcing/vendor-agreements/create',
+    element: CreateVendorAgreement,
+  },
+  {
+    path: '/sourcing/vendor-agreements',
+    element: VendorAgreementList,
+  },
+  {
+    path: '/sourcing/vendor-agreements/edit/:id',
+    element: EditVendorAgreement,
   },
 ];
 
