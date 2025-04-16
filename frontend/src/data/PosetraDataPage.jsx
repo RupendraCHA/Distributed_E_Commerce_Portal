@@ -55,18 +55,17 @@ export const SourcingData = [
 ];
 export const ManufacturingData = [
   {
-    title: 'Create Process Order',
-    path: '/sourcing/create-process-order',
+    title: 'Process Order',
+    path: '/manufacturing/receipt-orders',
   },
   {
     title: 'Good Issue For Process Order',
-    path: '/sourcing/good-issue-for-process-order',
+    path: '/manufacturing/goods-issue',
   },
   {
     title: 'Goods Reciept For Table',
-    path: '/sourcing/good-reciept-for-table',
+    path: '/manufacturing/goods-receipt',
   },
-
 ];
 export const pricingData = [
   'List Price',
