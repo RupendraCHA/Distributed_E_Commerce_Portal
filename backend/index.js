@@ -23,6 +23,8 @@ const {
   VendorMasterModel,
   ItemInfoRecordModel,
   VendorAgreementModel,
+  GoodsIssueModel,
+  ManufactureGoodsReceiptModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -33,6 +35,7 @@ const posetraProducts = require("./data/posetraProducts");
 const RequisitionModel = require("./Models/RequisitionSchema");
 const MaterialModel = require("./Models/MaterialsModel");
 const PurchaseOrderModel = require("./Models/PurchaseOrderSchema");
+const ReceiptOrderModel = require("./Models/RecieptOrder");
 const app = express();
 app.use(express.json());
 app.use(
@@ -2092,6 +2095,145 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
   } catch (error) {
     console.error("Error updating requisition:", error.message);
     res.status(500).json({ message: "Error updating requisition" });
+  }
+});
+
+app.post("/api/v1/goods-issue/", async (req, res) => {
+  try {
+    const goodsIssue = new GoodsIssueModel(req.body);
+    await goodsIssue.save();
+    res.status(201).json(goodsIssue);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// LIST ALL
+app.get("/api/v1/goods-issue/", async (req, res) => {
+  try {
+    const data = await GoodsIssueModel.find().sort({ createdAt: -1 });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// EDIT
+app.put("/api/v1/goods-issue/:id", async (req, res) => {
+  try {
+    const updated = await GoodsIssueModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+      }
+    );
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET BY ID
+app.get("/api/v1/goods-issue/:id", async (req, res) => {
+  try {
+    const data = await GoodsIssueModel.findById(req.params.id);
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Create
+app.post("/api/v1/receipt-orders/", async (req, res) => {
+  try {
+    const receiptOrder = new ReceiptOrderModel(req.body);
+    await receiptOrder.save();
+    res.status(201).json(receiptOrder);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// List
+app.get("/api/v1/receipt-orders/", async (req, res) => {
+  try {
+    const all = await ReceiptOrderModel.find().sort({
+      createdAt: -1,
+    });
+    res.json(all);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get by ID
+app.get("/api/v1/receipt-orders/:id", async (req, res) => {
+  try {
+    const data = await ReceiptOrderModel.findById(req.params.id);
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update
+app.put("/api/v1/receipt-orders/:id", async (req, res) => {
+  try {
+    const updated = await ReceiptOrderModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/v1/manufacture-goods-receipt", async (req, res) => {
+  try {
+    const receipt = new ManufactureGoodsReceiptModel(req.body);
+    await receipt.save();
+    res.status(201).json(receipt);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get All
+app.get("/api/v1/manufacture-goods-receipt", async (req, res) => {
+  try {
+    const data = await ManufactureGoodsReceiptModel.find().sort({
+      createdAt: -1,
+    });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get by ID
+app.get("/api/v1/manufacture-goods-receipt/:id", async (req, res) => {
+  try {
+    const receipt = await ManufactureGoodsReceiptModel.findById(req.params.id);
+    res.json(receipt);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update
+app.put("/api/v1/manufacture-goods-receipt/:id", async (req, res) => {
+  try {
+    const updated = await ManufactureGoodsReceiptModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

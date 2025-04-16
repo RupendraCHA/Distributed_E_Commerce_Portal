@@ -159,15 +159,7 @@ const CreateItemInfoRecords = React.lazy(() =>
 const EditItemInfoRecords = React.lazy(() =>
   import('../components/ItemInfoRecords/EditItemInfoRecords.jsx')
 );
-const CreateRecipetOrder = React.lazy(() =>
-  import('../components/Manufacturing/CreateRecieptOrder.jsx')
-);
-const CreateGoodIssueForProcessOrder = React.lazy(() =>
-  import('../components/Manufacturing/CreateGoodsIssue.jsx')
-);
-const CreateGoodsRecieptForTable = React.lazy(() =>
-  import('../components/Manufacturing/CreateGoodsRecieptForTable.jsx')
-);
+
 const CreateVendorAgreement = React.lazy(() =>
   import('../components/VendorAgreements/CreateVendorAgreement.jsx')
 );
@@ -176,6 +168,46 @@ const EditVendorAgreement = React.lazy(() =>
 );
 const VendorAgreementList = React.lazy(() =>
   import('../components/VendorAgreements/VendorAgreementList.jsx')
+);
+const GoodIssueForProcessOrderList = React.lazy(() =>
+  import(
+    '../components/Manufacturing/GoodsIssueProcessOrder/ListGoodsIssue.jsx'
+  )
+);
+const EditGoodIssueForProcessOrder = React.lazy(() =>
+  import(
+    '../components/Manufacturing/GoodsIssueProcessOrder/EditGoodsIssue.jsx'
+  )
+);
+
+const CreateGoodIssueForProcessOrder = React.lazy(() =>
+  import(
+    '../components/Manufacturing/GoodsIssueProcessOrder/CreateGoodsIssue.jsx'
+  )
+);
+const CreateReceiptOrder = React.lazy(() =>
+  import('../components/Manufacturing/RecieptOrder/CreateReceiptOrder.jsx')
+);
+const EditReceiptOrder = React.lazy(() =>
+  import('../components/Manufacturing/RecieptOrder/EditReceiptOrder.jsx')
+);
+const ListReceiptOrders = React.lazy(() =>
+  import('../components/Manufacturing/RecieptOrder/ListReceiptOrders.jsx')
+);
+const CreateGoodsReceiptForTable = React.lazy(() =>
+  import(
+    '../components/Manufacturing/GoodsRecieptForTable/CreateGoodsReceipt.jsx'
+  )
+);
+const EditGoodsReceiptForTable = React.lazy(() =>
+  import(
+    '../components/Manufacturing/GoodsRecieptForTable/EditGoodsReceipt.jsx'
+  )
+);
+const ListGoodsReceiptForTable = React.lazy(() =>
+  import(
+    '../components/Manufacturing/GoodsRecieptForTable/ListGoodsReceipts.jsx'
+  )
 );
 
 import {
@@ -395,18 +427,44 @@ export const privateRoutes = [
     path: '/sourcing/item-info-records/edit/:id',
     element: EditItemInfoRecords,
   },
+
   {
-    path: '/sourcing/create-process-order',
-    element: CreateRecipetOrder,
-  },
-  {
-    path: '/sourcing/good-issue-for-process-order',
+    path: '/manufacturing/goods-issue/create',
     element: CreateGoodIssueForProcessOrder,
   },
   {
-    path: '/sourcing/good-reciept-for-table',
-    element: CreateGoodsRecieptForTable,
+    path: '/manufacturing/goods-issue',
+    element: GoodIssueForProcessOrderList,
   },
+  {
+    path: '/manufacturing/goods-issue/edit/:id',
+    element: EditGoodIssueForProcessOrder,
+  },
+  {
+    path: '/manufacturing/receipt-orders',
+    element: ListReceiptOrders,
+  },
+  {
+    path: '/manufacturing/receipt-orders/create',
+    element: CreateReceiptOrder,
+  },
+  {
+    path: '/manufacturing/receipt-orders/edit/:id',
+    element: EditReceiptOrder,
+  },
+  {
+    path: '/manufacturing/goods-receipt',
+    element: ListGoodsReceiptForTable,
+  },
+  {
+    path: '/manufacturing/goods-receipt/create',
+    element: CreateGoodsReceiptForTable,
+  },
+  {
+    path: '/manufacturing/goods-receipt/edit/:id',
+    element: EditGoodsReceiptForTable,
+  },
+
   {
     path: '/sourcing/vendor-agreements/create',
     element: CreateVendorAgreement,

@@ -7,9 +7,11 @@ import {
   Grid,
 } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const CreateReceiptOrder = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
+  const navigate = useNavigate();
 
   const [materialOptions, setMaterialOptions] = useState([]);
   const [materialId, setMaterialId] = useState('');
@@ -25,12 +27,8 @@ const CreateReceiptOrder = () => {
       .get(`${server_Url}/api/v1/getMaterialIds`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => {
-        setMaterialOptions(res.data);
-      })
-      .catch((err) => {
-        console.error('Error fetching materials:', err);
-      });
+      .then((res) => setMaterialOptions(res.data))
+      .catch((err) => console.error('Error fetching materials:', err));
   }, []);
 
   const handleCreateReceipt = () => {
@@ -49,7 +47,7 @@ const CreateReceiptOrder = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        alert('Receipt Order created successfully');
+        navigate('/manufacturing/receipt-orders');
       })
       .catch((err) => {
         console.error('Error creating receipt order:', err);
@@ -89,7 +87,6 @@ const CreateReceiptOrder = () => {
             fullWidth
           />
         </Grid>
-
         <Grid item xs={6}>
           <TextField
             label="Storage Location"
@@ -98,17 +95,15 @@ const CreateReceiptOrder = () => {
             fullWidth
           />
         </Grid>
-
         <Grid item xs={6}>
           <TextField
             label="Quantity"
+            type="number"
             value={quantity}
             onChange={(e) => setQuantity(e.target.value)}
-            type="number"
             fullWidth
           />
         </Grid>
-
         <Grid item xs={6}>
           <TextField
             label="Unit"
@@ -117,7 +112,6 @@ const CreateReceiptOrder = () => {
             fullWidth
           />
         </Grid>
-
         <Grid item xs={12}>
           <TextField
             label="Purchase Order Reference"
