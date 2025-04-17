@@ -147,6 +147,17 @@ const CreateMaterialList = React.lazy(() =>
 const EditMaterialList = React.lazy(() =>
   import('../components/MaterialList/EditMaterialList.jsx')
 );
+const ManufacturingMaterialList = React.lazy(() =>
+  import('../components/Manufacturing/MaterialList/index.jsx')
+);
+
+const ManufacturingCreateMaterialList = React.lazy(() =>
+  import('../components/Manufacturing/MaterialList/CreateMaterialList.jsx')
+);
+
+const ManufacturingEditMaterialList = React.lazy(() =>
+  import('../components/Manufacturing/MaterialList/EditMaterialList.jsx')
+);
 
 const ItemInfoRecords = React.lazy(() =>
   import('../components/ItemInfoRecords/index.jsx')
@@ -476,6 +487,18 @@ export const privateRoutes = [
   {
     path: '/sourcing/vendor-agreements/edit/:id',
     element: EditVendorAgreement,
+  },
+  {
+    path: '/manufacturing/product-master',
+    element: ManufacturingMaterialList,
+  },
+  {
+    path: '/manufacturing/product-master/create',
+    element: ManufacturingCreateMaterialList,
+  },
+  {
+    path: '/manufacturing/product-master/edit/:id',
+    element: ManufacturingEditMaterialList,
   },
 ];
 

@@ -55,6 +55,26 @@ export const SourcingData = [
 ];
 export const ManufacturingData = [
   {
+    title:"Product Master",
+    path: '/manufacturing/product-master',
+  },
+  {
+    title:"Bill of Material",
+    path: '/manufacturing/bill-of-material',
+  },
+  {
+    title:"Recipe",
+    path: '/manufacturing/recipe',
+  },
+  {
+    title:"Production Plan",
+    path: '/manufacturing/production-plan',
+  },
+  {
+    title:"MRP",
+    path: '/manufacturing/mrp',
+  },
+  {
     title: 'Process Order',
     path: '/manufacturing/receipt-orders',
   },
@@ -63,9 +83,13 @@ export const ManufacturingData = [
     path: '/manufacturing/goods-issue',
   },
   {
-    title: 'Goods Reciept For Table',
+    title: 'Goods Receipt For The Production Order',
     path: '/manufacturing/goods-receipt',
   },
+  {
+    title: 'Production Order Settlement',
+    path: '/manufacturing/production-order-settlement',
+  }
 ];
 export const pricingData = [
   'List Price',
