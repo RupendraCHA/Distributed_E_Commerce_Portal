@@ -221,6 +221,16 @@ const ListGoodsReceiptForTable = React.lazy(() =>
   )
 );
 
+const BillOfMaterial = React.lazy(() =>
+  import('../components/Manufacturing/BillOfMaterial/BillOfMaterialList.jsx')
+);
+const CreateBillOfMaterial = React.lazy(() =>
+  import('../components/Manufacturing/BillOfMaterial/CreateBillOfMaterial.jsx')
+);
+const EditBillOfMaterial = React.lazy(() =>
+  import('../components/Manufacturing/BillOfMaterial/EditBillOfMaterial.jsx')
+);
+
 import {
   productsData,
   solutionsData,
@@ -499,6 +509,18 @@ export const privateRoutes = [
   {
     path: '/manufacturing/product-master/edit/:id',
     element: ManufacturingEditMaterialList,
+  },
+  {
+    path: '/manufacturing/bill-of-material',
+    element: BillOfMaterial,
+  },
+  {
+    path: '/manufacturing/bill-of-material/create',
+    element: CreateBillOfMaterial,
+  },
+  {
+    path: '/manufacturing/bill-of-material/edit/:id',
+    element: EditBillOfMaterial,
   },
 ];
 

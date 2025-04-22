@@ -55,23 +55,23 @@ export const SourcingData = [
 ];
 export const ManufacturingData = [
   {
-    title:"Product Master",
+    title: 'Product Master',
     path: '/manufacturing/product-master',
   },
   {
-    title:"Bill of Material",
+    title: 'Bill of Material',
     path: '/manufacturing/bill-of-material',
   },
   {
-    title:"Recipe",
+    title: 'Recipe',
     path: '/manufacturing/recipe',
   },
   {
-    title:"Production Plan",
+    title: 'Production Plan',
     path: '/manufacturing/production-plan',
   },
   {
-    title:"MRP",
+    title: 'MRP',
     path: '/manufacturing/mrp',
   },
   {
@@ -89,7 +89,7 @@ export const ManufacturingData = [
   {
     title: 'Production Order Settlement',
     path: '/manufacturing/production-order-settlement',
-  }
+  },
 ];
 export const pricingData = [
   'List Price',

@@ -25,6 +25,7 @@ const {
   VendorAgreementModel,
   GoodsIssueModel,
   ManufactureGoodsReceiptModel,
+  BillOfMaterialModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -753,6 +754,35 @@ app.get("/api/v1/allorders", authenticateToken, async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Error fetching orders" });
   }
+});
+
+// GET all BOMs
+app.get("/api/v1/billofmaterial", async (req, res) => {
+  const boms = await BillOfMaterialModel.find();
+  res.json(boms);
+});
+
+// GET single BOM by ID
+app.get("/api/v1/billofmaterial/:id", async (req, res) => {
+  const bom = await BillOfMaterialModel.findById(req.params.id);
+  res.json(bom);
+});
+
+// CREATE BOM
+app.post("/api/v1/billofmaterial", async (req, res) => {
+  const newBom = new BillOfMaterialModel(req.body);
+  await newBom.save();
+  res.json({ message: "BOM created successfully", bom: newBom });
+});
+
+// UPDATE BOM
+app.put("/api/v1/billofmaterial/:id", async (req, res) => {
+  const updated = await BillOfMaterialModel.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+  res.json({ message: "BOM updated", bom: updated });
 });
 
 app.get("/distributors/products", async (req, res) => {
