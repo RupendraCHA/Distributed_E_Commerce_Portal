@@ -1,4 +1,3 @@
-// File: CreateBillOfMaterial.jsx
 import React, { useEffect, useState } from 'react';
 import {
   Container,
@@ -7,7 +6,14 @@ import {
   Typography,
   Button,
   Autocomplete,
+  IconButton,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
 } from '@mui/material';
+import { Add, Delete } from '@mui/icons-material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -28,42 +34,69 @@ const CreateBillOfMaterial = () => {
     group: '',
     groupCounter: '',
     itemCategory: '',
-    component: '',
-    componentDescription: '',
-    quantity: '',
-    compUnit: '',
-    itemText: '',
-    scrap: '',
-    operation: '',
+    components: [],
   });
+
   const [materialOptions, setMaterialOptions] = useState([]);
+  const [materials, setMaterials] = useState([]);
+  const navigate = useNavigate();
   const token = localStorage.getItem('token');
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
-  const navigate = useNavigate();
 
   useEffect(() => {
     axios
       .get(`${server_Url}/api/v1/getMaterialIds`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setMaterialOptions(res.data))
+      .then((res) => {
+        setMaterialOptions(res.data);
+        setMaterials(res.data);
+      })
       .catch((err) => console.error('Error fetching materials:', err));
   }, []);
 
-  const handleAutoFill = (value) => {
+  const handleFormChange = (e) => {
+    const { name, value } = e.target;
+    setForm((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleAddComponent = () => {
+    setForm((prev) => ({
+      ...prev,
+      components: [
+        ...prev.components,
+        {
+          component: '',
+          componentDescription: '',
+          quantity: '',
+          compUnit: '',
+          itemText: '',
+          scrap: '',
+          operation: '',
+        },
+      ],
+    }));
+  };
+
+  const handleComponentChange = (index, field, value) => {
+    const updated = [...form.components];
+    updated[index][field] = value;
+    setForm({ ...form, components: updated });
+  };
+
+  const handleRemoveComponent = (index) => {
+    const updated = form.components.filter((_, i) => i !== index);
+    setForm({ ...form, components: updated });
+  };
+
+  const handleMaterialSelect = (value) => {
     if (!value) return;
-    setForm({
-      ...form,
+    setForm((prev) => ({
+      ...prev,
       materialCode: value.materialId,
       plant: value.plant || '',
       unit: value.unit || '',
-      componentDescription: value.description || '',
-    });
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    }));
   };
 
   const handleSubmit = () => {
@@ -80,6 +113,7 @@ const CreateBillOfMaterial = () => {
       <Typography variant="h5" sx={{ fontWeight: 'bold', mt: 2 }}>
         Create Bill of Material
       </Typography>
+
       <Grid container spacing={2} sx={{ mt: 1 }}>
         <Grid item xs={12} sm={6}>
           <Autocomplete
@@ -87,12 +121,13 @@ const CreateBillOfMaterial = () => {
             getOptionLabel={(option) =>
               `${option.materialId} - ${option.materialName}`
             }
-            onChange={(e, value) => handleAutoFill(value)}
+            onChange={(e, value) => handleMaterialSelect(value)}
             renderInput={(params) => (
               <TextField {...params} label="Material ID" fullWidth />
             )}
           />
         </Grid>
+
         {[
           'plant',
           'alternativeBOM',
@@ -108,22 +143,13 @@ const CreateBillOfMaterial = () => {
           'group',
           'groupCounter',
           'itemCategory',
-          'component',
-          'componentDescription',
-          'quantity',
-          'compUnit',
-          'itemText',
-          'scrap',
-          'operation',
         ].map((key) => (
           <Grid item xs={12} sm={6} key={key}>
             <TextField
               name={key}
-              label={key
-                .replace(/([A-Z])/g, ' $1')
-                .replace(/^./, (str) => str.toUpperCase())}
+              label={key.replace(/([A-Z])/g, ' $1')}
               value={form[key]}
-              onChange={handleChange}
+              onChange={handleFormChange}
               fullWidth
               type={key.toLowerCase().includes('date') ? 'date' : 'text'}
               InputLabelProps={
@@ -133,10 +159,72 @@ const CreateBillOfMaterial = () => {
           </Grid>
         ))}
       </Grid>
+
+      <Typography variant="h6" sx={{ mt: 4 }}>
+        Components
+      </Typography>
+
+      <Button
+        startIcon={<Add />}
+        onClick={handleAddComponent}
+        variant="outlined"
+        sx={{ mb: 2 }}
+      >
+        Add Component
+      </Button>
+
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Component</TableCell>
+            <TableCell>Description</TableCell>
+            <TableCell>Quantity</TableCell>
+            <TableCell>Unit</TableCell>
+            <TableCell>Item Text</TableCell>
+            <TableCell>Scrap</TableCell>
+            <TableCell>Operation</TableCell>
+            <TableCell>Action</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {form.components.map((comp, index) => (
+            <TableRow key={index}>
+              {[
+                'component',
+                'componentDescription',
+                'quantity',
+                'compUnit',
+                'itemText',
+                'scrap',
+                'operation',
+              ].map((field) => (
+                <TableCell key={field}>
+                  <TextField
+                    fullWidth
+                    value={comp[field]}
+                    onChange={(e) =>
+                      handleComponentChange(index, field, e.target.value)
+                    }
+                  />
+                </TableCell>
+              ))}
+              <TableCell>
+                <IconButton
+                  onClick={() => handleRemoveComponent(index)}
+                  color="error"
+                >
+                  <Delete />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
       <Button
         variant="contained"
         color="primary"
-        sx={{ mt: 3 }}
+        sx={{ mt: 4 }}
         onClick={handleSubmit}
       >
         Create BOM

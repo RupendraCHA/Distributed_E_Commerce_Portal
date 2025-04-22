@@ -43,15 +43,7 @@ const BillOfMaterialList = () => {
     'Validity Start',
     'Validity End',
     'Status',
-    'Lot Size',
-    'Revision Level',
-    'Group',
-    'Group Counter',
-    'Component',
-    'Component Description',
-    'Quantity',
-    'Comp Unit',
-    'Operation',
+    'Component Count',
     'Actions',
   ];
 
@@ -70,7 +62,7 @@ const BillOfMaterialList = () => {
         Create
       </Button>
 
-      <TableContainer component={Paper} sx={{ mt: 2, maxHeight: 500 }}>
+      <TableContainer component={Paper} sx={{ mt: 2 }}>
         <Table stickyHeader>
           <TableHead>
             <TableRow>
@@ -94,15 +86,7 @@ const BillOfMaterialList = () => {
                 <TableCell>{bom.validityStart}</TableCell>
                 <TableCell>{bom.validityEnd}</TableCell>
                 <TableCell>{bom.status}</TableCell>
-                <TableCell>{bom.lotSize}</TableCell>
-                <TableCell>{bom.revisionLevel}</TableCell>
-                <TableCell>{bom.group}</TableCell>
-                <TableCell>{bom.groupCounter}</TableCell>
-                <TableCell>{bom.component}</TableCell>
-                <TableCell>{bom.componentDescription}</TableCell>
-                <TableCell>{bom.quantity}</TableCell>
-                <TableCell>{bom.compUnit}</TableCell>
-                <TableCell>{bom.operation}</TableCell>
+                <TableCell>{bom.components?.length || 0}</TableCell>
                 <TableCell>
                   <Tooltip title="Edit">
                     <IconButton

@@ -1,4 +1,3 @@
-// File: EditBillOfMaterial.jsx
 import React, { useEffect, useState } from 'react';
 import {
   Container,
@@ -6,12 +5,23 @@ import {
   TextField,
   Typography,
   Button,
-  Autocomplete,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  IconButton,
 } from '@mui/material';
+import { Delete } from '@mui/icons-material';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useNavigate, useParams } from 'react-router-dom';
 
 const EditBillOfMaterial = () => {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const token = localStorage.getItem('token');
+  const server_Url = import.meta.env.VITE_API_SERVER_URL;
+
   const [form, setForm] = useState({
     materialCode: '',
     plant: '',
@@ -28,20 +38,8 @@ const EditBillOfMaterial = () => {
     group: '',
     groupCounter: '',
     itemCategory: '',
-    component: '',
-    componentDescription: '',
-    quantity: '',
-    compUnit: '',
-    itemText: '',
-    scrap: '',
-    operation: '',
+    components: [],
   });
-
-  const [materialOptions, setMaterialOptions] = useState([]);
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const token = localStorage.getItem('token');
-  const server_Url = import.meta.env.VITE_API_SERVER_URL;
 
   useEffect(() => {
     axios
@@ -49,30 +47,23 @@ const EditBillOfMaterial = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setForm(res.data))
-      .catch((err) => console.error(err));
-
-    axios
-      .get(`${server_Url}/api/v1/getMaterialIds`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setMaterialOptions(res.data))
-      .catch((err) => console.error('Error fetching materials:', err));
+      .catch((err) => console.error('Error fetching BOM:', err));
   }, [id]);
 
-  const handleChange = (e) => {
+  const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setForm({ ...form, [name]: value });
+    setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleAutoFill = (value) => {
-    if (!value) return;
-    setForm({
-      ...form,
-      materialCode: value.materialId,
-      plant: value.plant || '',
-      unit: value.unit || '',
-      componentDescription: value.description || '',
-    });
+  const handleComponentChange = (index, field, value) => {
+    const updated = [...form.components];
+    updated[index][field] = value;
+    setForm({ ...form, components: updated });
+  };
+
+  const handleRemoveComponent = (index) => {
+    const updated = form.components.filter((_, i) => i !== index);
+    setForm({ ...form, components: updated });
   };
 
   const handleSubmit = () => {
@@ -81,7 +72,7 @@ const EditBillOfMaterial = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => navigate('/manufacturing/bill-of-material'))
-      .catch((err) => console.error(err));
+      .catch((err) => console.error('Error updating BOM:', err));
   };
 
   return (
@@ -89,23 +80,18 @@ const EditBillOfMaterial = () => {
       <Typography variant="h5" sx={{ fontWeight: 'bold', mt: 2 }}>
         Edit Bill of Material
       </Typography>
+
       <Grid container spacing={2} sx={{ mt: 1 }}>
         <Grid item xs={12} sm={6}>
-          <Autocomplete
-            options={materialOptions}
-            getOptionLabel={(option) =>
-              `${option.materialId} - ${option.materialName}`
-            }
-            value={
-              materialOptions.find((m) => m.materialId === form.materialCode) ||
-              null
-            }
-            onChange={(e, value) => handleAutoFill(value)}
-            renderInput={(params) => (
-              <TextField {...params} label="Material ID" fullWidth />
-            )}
+          <TextField
+            name="materialCode"
+            label="Material Code"
+            value={form.materialCode}
+            fullWidth
+            disabled
           />
         </Grid>
+
         {[
           'plant',
           'alternativeBOM',
@@ -121,22 +107,13 @@ const EditBillOfMaterial = () => {
           'group',
           'groupCounter',
           'itemCategory',
-          'component',
-          'componentDescription',
-          'quantity',
-          'compUnit',
-          'itemText',
-          'scrap',
-          'operation',
         ].map((key) => (
           <Grid item xs={12} sm={6} key={key}>
             <TextField
               name={key}
-              label={key
-                .replace(/([A-Z])/g, ' $1')
-                .replace(/^./, (str) => str.toUpperCase())}
+              label={key.replace(/([A-Z])/g, ' $1')}
               value={form[key]}
-              onChange={handleChange}
+              onChange={handleFormChange}
               fullWidth
               type={key.toLowerCase().includes('date') ? 'date' : 'text'}
               InputLabelProps={
@@ -146,13 +123,66 @@ const EditBillOfMaterial = () => {
           </Grid>
         ))}
       </Grid>
+
+      <Typography variant="h6" sx={{ mt: 4 }}>
+        Components
+      </Typography>
+
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Component</TableCell>
+            <TableCell>Description</TableCell>
+            <TableCell>Quantity</TableCell>
+            <TableCell>Unit</TableCell>
+            <TableCell>Item Text</TableCell>
+            <TableCell>Scrap</TableCell>
+            <TableCell>Operation</TableCell>
+            <TableCell>Action</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {form.components.map((comp, index) => (
+            <TableRow key={index}>
+              {[
+                'component',
+                'componentDescription',
+                'quantity',
+                'compUnit',
+                'itemText',
+                'scrap',
+                'operation',
+              ].map((field) => (
+                <TableCell key={field}>
+                  <TextField
+                    fullWidth
+                    value={comp[field]}
+                    onChange={(e) =>
+                      handleComponentChange(index, field, e.target.value)
+                    }
+                  />
+                </TableCell>
+              ))}
+              <TableCell>
+                <IconButton
+                  onClick={() => handleRemoveComponent(index)}
+                  color="error"
+                >
+                  <Delete />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
       <Button
         variant="contained"
         color="primary"
-        sx={{ mt: 3 }}
+        sx={{ mt: 4 }}
         onClick={handleSubmit}
       >
-        Update BOM
+        Save Changes
       </Button>
     </Container>
   );
