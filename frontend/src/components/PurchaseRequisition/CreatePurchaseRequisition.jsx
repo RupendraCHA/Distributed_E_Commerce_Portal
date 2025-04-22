@@ -321,7 +321,7 @@ const CreatePurchaseRequisition = () => {
         color="primary"
         style={{ marginTop: '10px', marginLeft: '10px' }}
       >
-        Save Purchase Order
+        Save Purchase Requisition
       </Button>
     </Container>
   );

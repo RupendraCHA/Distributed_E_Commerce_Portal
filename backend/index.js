@@ -22,6 +22,10 @@ const {
   VendorBillModel,
   VendorMasterModel,
   ItemInfoRecordModel,
+  VendorAgreementModel,
+  GoodsIssueModel,
+  ManufactureGoodsReceiptModel,
+  BillOfMaterialModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -32,6 +36,7 @@ const posetraProducts = require("./data/posetraProducts");
 const RequisitionModel = require("./Models/RequisitionSchema");
 const MaterialModel = require("./Models/MaterialsModel");
 const PurchaseOrderModel = require("./Models/PurchaseOrderSchema");
+const ReceiptOrderModel = require("./Models/RecieptOrder");
 const app = express();
 app.use(express.json());
 app.use(
@@ -49,9 +54,10 @@ const Stripe_Key = process.env.Stripe_Key;
 const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = process.env.PORT;
 
-const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com" // Visionsoft
-// const checkoutURLs = "https://distributed-e-commerce-portal-frontend.onrender.com"
-// const checkoutURLs = "http://localhost:5173"
+// const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com" // Visionsoft
+// const checkoutURLs =
+//   "https://distributed-e-commerce-portal-frontend.onrender.com";
+const checkoutURLs = "http://localhost:5173";
 
 const connectDB = async () => {
   try {
@@ -133,7 +139,6 @@ const getSapDataDetails = async () => {
       };
       dataFieldsForSAP.push(newObject);
     });
-    // console.log(dataFieldsForSAP)
 
     const getProductId = (product) => {
       return (
@@ -249,7 +254,6 @@ const getSapDataDetails = async () => {
     });
     updatedData = updatedData1;
   }
-  // console.log("U",updatedData)
   return updatedData;
 };
 
@@ -357,205 +361,178 @@ app.get("/api/v1/getDataFromSap", async (req, res) => {
   }
 });
 
-app.get("/api/v1/distributors/products", async (req, res) => {
+let sapCache = null;
+let lastFetched = 0;
+
+const SAP_CACHE_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+
+const fetchSAPData = async () => {
+  const now = Date.now();
+  if (sapCache && now - lastFetched < SAP_CACHE_DURATION_MS) {
+    return sapCache;
+  }
+
   try {
-    let allProductsData;
-    const distributors = await DistributorModel.find();
-
-    // Consolidate product quantities from all distributors using reduce
-    const productQuantities = distributors.reduce((acc, distributor) => {
-      distributor.warehouses.forEach((warehouse) => {
-        warehouse.inventory.forEach((item) => {
-          acc[item.productId] = (acc[item.productId] || 0) + item.quantity;
-        });
-      });
-      return acc;
-    }, {});
-    console.log(distributors);
-    // Fetch all products
-    const products = await ProductModel.find();
-    console.log(products);
-
-    // Map product data and merge quantity from productQuantities
-    const finalProductList = products
-      .map((product) =>
-        productQuantities[product.productId] > 0
-          ? {
-            ...product.toObject(),
-            quantity: productQuantities[product.productId] || 0, // Ensure default is 0
-          }
-          : {}
-      )
-      .filter((product) => product.productId);
-
-    // Log to verify the final list of products
-    // console.log(finalProductList);
-
     const url =
       "http://52.38.202.58:8080/sap/opu/odata/VSHANEYA/ZMATERIAL_SRV/Material_data1Set?$format=json";
     const username = "NikhilA";
     const password = "Nikhil@12345";
-    // Encode the credentials in base64 for Basic Authentication
-    const headers = new Headers();
-    headers.set("Authorization", "Basic " + btoa(username + ":" + password));
-    // Make the request to the OData service
+
+    const headers = {
+      Authorization:
+        "Basic " + Buffer.from(`${username}:${password}`).toString("base64"),
+    };
+
     const response = await fetch(url, {
       method: "GET",
-      headers: headers,
+      headers,
+      timeout: 10000, // 10 seconds timeout (optional)
     });
 
-    // Check if the response is okay
-    let dataFieldsForSAP = [];
-    if (response.ok) {
-      const data = await response.json();
+    if (!response.ok) throw new Error(`SAP returned ${response.status}`);
 
-      // # 3) Destructuring the fields, adding them into an Array and consoling them
+    const data = await response.json();
+    const sapProducts = data.d.results.map((item) => ({
+      productId: capitalizeId(item.Product_ID),
+      productName: item.Product,
+      category: item.Material_Category,
+      brand: "",
+      description: item.Material_Description,
+      price: item.Price_Of_Product,
+      weight: item.Allowed_Packaging_Weight + " lb",
+      stock: item.Storage_percentage,
+      expirationDate: item.Expiration_Date,
+      image: "",
+    }));
 
-      data.d.results.map((eachRecord) => {
-        let newObject = {
-          productId: eachRecord.Product_ID,
-          productName: eachRecord.Product,
-          category: eachRecord.Material_Category,
-          brand: "",
-          description: eachRecord.Material_Description,
-          price: eachRecord.Price_Of_Product,
-          weight: eachRecord.Allowed_Packaging_Weight,
-          stock: eachRecord.Storage_percentage,
-          expirationDate: eachRecord.Expiration_Date,
-          image: "",
-        };
-        dataFieldsForSAP.push(newObject);
-      });
-      // console.log(dataFieldsForSAP)
-
-      const getProductId = (product) => {
-        return (
-          product.productId.slice(0, 1).toUpperCase() +
-          product.productId.slice(1, product.productId.length)
-        );
-      };
-      const updatedData = dataFieldsForSAP.map((product) => {
-        if (product.productName === "AGRPUMP") {
-          return {
-            ...product,
-            productId: getProductId(product),
-            category: "Materials",
-            brand: "Materials",
-            weight: product.weight + " lb",
-            image:
-              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206530/41jM54U8FgL._AC_UF1000_1000_QL80__pyongi.jpg",
-          };
-        } else if (product.productName === "BENALIUM") {
-          return {
-            ...product,
-            productId: getProductId(product),
-            category: "Materials",
-            brand: "Materials",
-            weight: product.weight + " lb",
-            image:
-              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206617/images_hqeypc.jpg",
-          };
-        } else if (product.productName === "BRASS") {
-          return {
-            ...product,
-            productId: getProductId(product),
-            category: "Materials",
-            brand: "Materials",
-            weight: product.weight + " lb",
-            image:
-              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206705/brass-metal-components_bxwkyf.jpg",
-          };
-        } else if (product.productName === "LED") {
-          return {
-            ...product,
-            productId: getProductId(product),
-            category: "Materials",
-            brand: "Materials",
-            weight: product.weight + " lb",
-            image:
-              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206775/led-bulb-raw-material-500x500_otjrgh.webp",
-          };
-        } else if (product.productName === "MNIPICKAXES") {
-          return {
-            ...product,
-            productId: getProductId(product),
-            category: "Materials",
-            brand: "Materials",
-            weight: product.weight + " lb",
-            image:
-              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738206885/ImageForArticle_1446_17219052982689037_kgkxpu.webp",
-          };
-        } else if (product.productName === "SITTAPER") {
-          return {
-            ...product,
-            productId: getProductId(product),
-            category: "Materials",
-            brand: "Materials",
-            weight: product.weight + " lb",
-            image:
-              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738207536/images_1_a6hh4a.jpg",
-          };
-        } else if (product.productName === "SULPHUR") {
-          return {
-            ...product,
-            productId: getProductId(product),
-            category: "Materials",
-            brand: "Materials",
-            weight: product.weight + " lb",
-            image:
-              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208651/360_F_85756492_i638LcwoFrymrBj96ZMHP4nL4BOolKfK_ai3zwv.jpg",
-          };
-        } else if (product.productName === "THORIUM") {
-          return {
-            ...product,
-            productId: getProductId(product),
-            category: "Materials",
-            brand: "Materials",
-            weight: product.weight + " lb",
-            image:
-              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208805/b90b79a0-fcb7-40ea-955d-729b1a85e92b_484973f3_wrdyaa.webp",
-          };
-        } else if (product.productName === "TIE") {
-          return {
-            ...product,
-            productId: getProductId(product),
-            category: "Materials",
-            brand: "Materials",
-            weight: product.weight + " lb",
-            productName: "URANIUM",
-            category: "fashion accessories",
-            description:
-              "This is Radioactive element & generates Nuclear Energy",
-            image:
-              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208888/uranium-chemical-element_gojtdh.webp",
-          };
-        } else if (product.productName === "TILE") {
-          return {
-            ...product,
-            productId: getProductId(product),
-            category: "Materials",
-            brand: "Materials",
-            weight: product.weight + " lb",
-            image:
-              "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738208950/1711451520993_ylgnow.jpg",
-          };
-        }
-      });
-
-      allProductsData = await getSapDataDetails();
-      // console.log("updatedDataForDetails",updatedData)
-      // res.status(200).json({success: true, data:updatedData})
-      // res.status(200).json({success: true, data:dataFieldsForSAP})
-    } else {
-      console.error("Failed to fetch data", response.status);
-    }
-    // console.log("AllProductsData",allProductsData)
-    // console.log("AllProductsData1",finalProductList)
-    const allProductsDetails = [...finalProductList, ...allProductsData];
-    // console.log("AllProductsDetails",allProductsDetails, "Successfull!!!")
-    // res.status(200).json(finalProductList);
-    res.status(200).json(allProductsDetails);
+    const enriched = enrichSAPData(sapProducts);
+    sapCache = enriched;
+    lastFetched = now;
+    return enriched;
   } catch (error) {
+    console.warn(
+      "⚠️ SAP Fetch failed, proceeding without SAP data:",
+      error.message
+    );
+    return []; // Fallback to empty list if SAP fails
+  }
+};
+
+const capitalizeId = (id) => id.charAt(0).toUpperCase() + id.slice(1);
+
+const enrichSAPData = (products) => {
+  const meta = {
+    AGRPUMP: {
+      image: "https://res.cloudinary.com/...pyongi.jpg",
+      brand: "Materials",
+    },
+    BENALIUM: {
+      image: "https://res.cloudinary.com/...hqeypc.jpg",
+      brand: "Materials",
+    },
+    BRASS: {
+      image: "https://res.cloudinary.com/...bxwkyf.jpg",
+      brand: "Materials",
+    },
+    LED: {
+      image: "https://res.cloudinary.com/...otjrgh.webp",
+      brand: "Materials",
+    },
+    MNIPICKAXES: {
+      image: "https://res.cloudinary.com/...kgkxpu.webp",
+      brand: "Materials",
+    },
+    SITTAPER: {
+      image: "https://res.cloudinary.com/...a6hh4a.jpg",
+      brand: "Materials",
+    },
+    SULPHUR: {
+      image: "https://res.cloudinary.com/...ai3zwv.jpg",
+      brand: "Materials",
+    },
+    THORIUM: {
+      image: "https://res.cloudinary.com/...wrdyaa.webp",
+      brand: "Materials",
+    },
+    TIE: {
+      image: "https://res.cloudinary.com/...gojtdh.webp",
+      brand: "Materials",
+      category: "fashion accessories",
+      productName: "URANIUM",
+      description: "This is a radioactive element & generates Nuclear Energy",
+    },
+    TILE: {
+      image: "https://res.cloudinary.com/...ylgnow.jpg",
+      brand: "Materials",
+    },
+  };
+
+  return products.map((product) => {
+    const info = meta[product.productName];
+    if (!info) return product;
+
+    return {
+      ...product,
+      ...info,
+    };
+  });
+};
+
+app.post("/api/v1/vendor-agreements", async (req, res) => {
+  const data = new VendorAgreementModel(req.body);
+  await data.save();
+  res.status(201).send(data);
+});
+
+app.get("/api/v1/vendor-agreements", async (req, res) => {
+  const data = await VendorAgreementModel.find();
+  res.send(data);
+});
+
+app.get("/api/v1/vendor-agreements/:id", async (req, res) => {
+  const data = await VendorAgreementModel.findById(req.params.id);
+  res.send(data);
+});
+
+app.put("/api/v1/vendor-agreements/:id", async (req, res) => {
+  const data = await VendorAgreementModel.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+  res.send(data);
+});
+
+// Main Route Handler
+app.get("/api/v1/distributors/products", async (req, res) => {
+  try {
+    const [distributors, products, sapProducts] = await Promise.all([
+      DistributorModel.find().lean(),
+      ProductModel.find().lean(),
+      fetchSAPData(), // will return [] on failure
+    ]);
+
+    const productQuantities = {};
+    distributors.forEach((distributor) => {
+      distributor.warehouses.forEach((warehouse) => {
+        warehouse.inventory.forEach((item) => {
+          productQuantities[item.productId] =
+            (productQuantities[item.productId] || 0) + item.quantity;
+        });
+      });
+    });
+
+    const finalProductList = products
+      .map((product) => ({
+        ...product,
+        quantity: productQuantities[product.productId] || 0,
+      }))
+      .filter((p) => p.quantity > 0);
+
+    const allProducts = [...finalProductList, ...sapProducts];
+    res.status(200).json(allProducts);
+  } catch (error) {
+    console.error("❌ Error fetching products:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
@@ -779,6 +756,35 @@ app.get("/api/v1/allorders", authenticateToken, async (req, res) => {
   }
 });
 
+// GET all BOMs
+app.get("/api/v1/billofmaterial", async (req, res) => {
+  const boms = await BillOfMaterialModel.find();
+  res.json(boms);
+});
+
+// GET single BOM by ID
+app.get("/api/v1/billofmaterial/:id", async (req, res) => {
+  const bom = await BillOfMaterialModel.findById(req.params.id);
+  res.json(bom);
+});
+
+// CREATE BOM
+app.post("/api/v1/billofmaterial", async (req, res) => {
+  const newBom = new BillOfMaterialModel(req.body);
+  await newBom.save();
+  res.json({ message: "BOM created successfully", bom: newBom });
+});
+
+// UPDATE BOM
+app.put("/api/v1/billofmaterial/:id", async (req, res) => {
+  const updated = await BillOfMaterialModel.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+  res.json({ message: "BOM updated", bom: updated });
+});
+
 app.get("/distributors/products", async (req, res) => {
   try {
     const distributors = await DistributorModel.find();
@@ -832,12 +838,12 @@ app.get("/distributors/products", async (req, res) => {
         );
         return product
           ? {
-            ...product.toObject(),
-            quantity: productInfo.quantity,
-            price: `$${productInfo.price || product.price || 0}`,
-            distributorIds: Array.from(productInfo.distributors),
-            warehouseDetails: productInfo.warehouseDetails,
-          }
+              ...product.toObject(),
+              quantity: productInfo.quantity,
+              price: `$${productInfo.price || product.price || 0}`,
+              distributorIds: Array.from(productInfo.distributors),
+              warehouseDetails: productInfo.warehouseDetails,
+            }
           : null;
       })
       .filter((product) => product !== null);
@@ -1812,19 +1818,21 @@ app.get("/api/v1/distributor/details", authenticateToken, async (req, res) => {
 app.get("/products", async (req, res) => {
   try {
     const productCategory = req.query.productCategory;
-    // console.log({ productCategory });
 
     let products = await ProductModel.find({});
 
-    if (productCategory !== "undefined") {
+    if (productCategory) {
       products = products.filter(
         (product) =>
+          product.category &&
           product.category.toLowerCase() === productCategory.toLowerCase()
       );
     }
+
     return res.status(200).json(products);
+    ``;
   } catch (error) {
-    console.error(error);
+    console.error("Error in /products:", error.stack || error);
     return res.status(500).json({ message: "Internal Server Error" });
   }
 });
@@ -1832,7 +1840,6 @@ app.get("/products", async (req, res) => {
 // Get all material IDs
 app.get("/api/v1/getMaterialIds", authenticateToken, async (req, res) => {
   try {
-    console.log("Fetching material IDs...");
     const materials = await MaterialModel.find({}, [
       "sNo",
       "itemNo",
@@ -1851,8 +1858,8 @@ app.get("/api/v1/getMaterialIds", authenticateToken, async (req, res) => {
       "agreement",
       "itemInfoRecord",
       "mpnMaterial",
-      "suppliers"
-    ])
+      "suppliers",
+    ]);
 
     res.status(200).json(materials);
   } catch (error) {
@@ -1860,8 +1867,6 @@ app.get("/api/v1/getMaterialIds", authenticateToken, async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
-
-
 
 app.post("/api/v1/materials", authenticateToken, async (req, res) => {
   try {
@@ -2123,6 +2128,145 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
   }
 });
 
+app.post("/api/v1/goods-issue/", async (req, res) => {
+  try {
+    const goodsIssue = new GoodsIssueModel(req.body);
+    await goodsIssue.save();
+    res.status(201).json(goodsIssue);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// LIST ALL
+app.get("/api/v1/goods-issue/", async (req, res) => {
+  try {
+    const data = await GoodsIssueModel.find().sort({ createdAt: -1 });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// EDIT
+app.put("/api/v1/goods-issue/:id", async (req, res) => {
+  try {
+    const updated = await GoodsIssueModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+      }
+    );
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET BY ID
+app.get("/api/v1/goods-issue/:id", async (req, res) => {
+  try {
+    const data = await GoodsIssueModel.findById(req.params.id);
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Create
+app.post("/api/v1/receipt-orders/", async (req, res) => {
+  try {
+    const receiptOrder = new ReceiptOrderModel(req.body);
+    await receiptOrder.save();
+    res.status(201).json(receiptOrder);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// List
+app.get("/api/v1/receipt-orders/", async (req, res) => {
+  try {
+    const all = await ReceiptOrderModel.find().sort({
+      createdAt: -1,
+    });
+    res.json(all);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get by ID
+app.get("/api/v1/receipt-orders/:id", async (req, res) => {
+  try {
+    const data = await ReceiptOrderModel.findById(req.params.id);
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update
+app.put("/api/v1/receipt-orders/:id", async (req, res) => {
+  try {
+    const updated = await ReceiptOrderModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.post("/api/v1/manufacture-goods-receipt", async (req, res) => {
+  try {
+    const receipt = new ManufactureGoodsReceiptModel(req.body);
+    await receipt.save();
+    res.status(201).json(receipt);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get All
+app.get("/api/v1/manufacture-goods-receipt", async (req, res) => {
+  try {
+    const data = await ManufactureGoodsReceiptModel.find().sort({
+      createdAt: -1,
+    });
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get by ID
+app.get("/api/v1/manufacture-goods-receipt/:id", async (req, res) => {
+  try {
+    const receipt = await ManufactureGoodsReceiptModel.findById(req.params.id);
+    res.json(receipt);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Update
+app.put("/api/v1/manufacture-goods-receipt/:id", async (req, res) => {
+  try {
+    const updated = await ManufactureGoodsReceiptModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // 📌 Create a new Purchase Order
 app.post("/api/v1/purchase-order", authenticateToken, async (req, res) => {
   try {
@@ -2349,49 +2493,49 @@ app.post("/api/v1/item-info-records", authenticateToken, async (req, res) => {
 });
 
 // Update by ID
-app.put("/api/v1/item-info-records/:id", authenticateToken, async (req, res) => {
-  try {
-    const { sourceListOverview, purchOrgData1 } = req.body;
-    const fixedId = sourceListOverview?.fixedItemInfoRecordId;
+app.put(
+  "/api/v1/item-info-records/:id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { sourceListOverview, purchOrgData1 } = req.body;
+      const fixedId = sourceListOverview?.fixedItemInfoRecordId;
 
-    // If this record is choosing another record to be fixed
-    if (fixedId) {
-      // Unset the fixedItemInfoRecordId from all records with the same material
-      await ItemInfoRecordModel.updateMany(
-        {
-          "purchOrgData1.material": purchOrgData1.material,
-        },
-        {
-          $unset: {
-            "sourceListOverview.fixedItemInfoRecordId": "",
+      // If this record is choosing another record to be fixed
+      if (fixedId) {
+        // Unset the fixedItemInfoRecordId from all records with the same material
+        await ItemInfoRecordModel.updateMany(
+          {
+            "purchOrgData1.material": purchOrgData1.material,
           },
-        }
+          {
+            $unset: {
+              "sourceListOverview.fixedItemInfoRecordId": "",
+            },
+          }
+        );
+
+        // Set fixedItemInfoRecordId on the actual fixed record
+        await ItemInfoRecordModel.findByIdAndUpdate(fixedId, {
+          $set: {
+            "sourceListOverview.fixedItemInfoRecordId": fixedId,
+          },
+        });
+      }
+
+      // Now update the current record (the one being edited)
+      const updated = await ItemInfoRecordModel.findByIdAndUpdate(
+        req.params.id,
+        { ...req.body },
+        { new: true }
       );
 
-      // Set fixedItemInfoRecordId on the actual fixed record
-      await ItemInfoRecordModel.findByIdAndUpdate(fixedId, {
-        $set: {
-          "sourceListOverview.fixedItemInfoRecordId": fixedId,
-        },
-      });
+      res.status(200).json(updated);
+    } catch (err) {
+      res.status(500).json({ error: "Failed to update record", details: err });
     }
-
-    // Now update the current record (the one being edited)
-    const updated = await ItemInfoRecordModel.findByIdAndUpdate(
-      req.params.id,
-      { ...req.body },
-      { new: true }
-    );
-
-    res.status(200).json(updated);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to update record", details: err });
   }
-});
-
-
-
-
+);
 
 // Get all or filtered by material
 app.get("/api/v1/item-info-records", authenticateToken, async (req, res) => {
@@ -2402,7 +2546,7 @@ app.get("/api/v1/item-info-records", authenticateToken, async (req, res) => {
 
     // If material is provided, filter by it (stored inside purchOrgData1.material)
     if (material) {
-      query['purchOrgData1.material'] = material;
+      query["purchOrgData1.material"] = material;
     }
 
     const records = await ItemInfoRecordModel.find(query);
@@ -2413,23 +2557,28 @@ app.get("/api/v1/item-info-records", authenticateToken, async (req, res) => {
       .json({ error: "Failed to fetch item info records", details: err });
   }
 });
-app.get("/api/v1/item-info-records/material/:id", authenticateToken, async (req, res) => {
-  try {
-    const materialId = req.params.id; // ✅ From route params
-    const query = {
-      userId: req.user.id,
-      'purchOrgData1.material': materialId
-    };
+app.get(
+  "/api/v1/item-info-records/material/:id",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const materialId = req.params.id; // ✅ From route params
+      const query = {
+        userId: req.user.id,
+        "purchOrgData1.material": materialId,
+      };
 
-    const records = await ItemInfoRecordModel.find(query);
-    res.status(200).json(records);
-  } catch (err) {
-    console.error("Failed to fetch item info records by material", err);
-    res.status(500).json({ error: "Failed to fetch item info records", details: err.message });
+      const records = await ItemInfoRecordModel.find(query);
+      res.status(200).json(records);
+    } catch (err) {
+      console.error("Failed to fetch item info records by material", err);
+      res.status(500).json({
+        error: "Failed to fetch item info records",
+        details: err.message,
+      });
+    }
   }
-});
-
-
+);
 
 // Get by ID
 app.get(
@@ -2446,43 +2595,56 @@ app.get(
   }
 );
 
+app.get(
+  "/api/v1/vendor-name/:supplierId",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { supplierId } = req.params;
 
+      const vendor = await VendorMasterModel.findOne({
+        "vendorAddress.supplierid": supplierId,
+      });
+      if (!vendor || !vendor.vendorAddress?.name) {
+        return res
+          .status(404)
+          .json({ error: "Vendor not found or name missing" });
+      }
 
-app.get("/api/v1/vendor-name/:supplierId", authenticateToken, async (req, res) => {
-  try {
-    const { supplierId } = req.params;
-
-    const vendor = await VendorMasterModel.findOne({
-      "vendorAddress.supplierid": supplierId,
-    });
-    if (!vendor || !vendor.vendorAddress?.name) {
-      return res.status(404).json({ error: "Vendor not found or name missing" });
+      res.status(200).json({ name: vendor.vendorAddress.name });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ error: "Error fetching vendor name", details: err });
     }
-
-    res.status(200).json({ name: vendor.vendorAddress.name });
-  } catch (err) {
-    res.status(500).json({ error: "Error fetching vendor name", details: err });
   }
-});
+);
 
-app.get("/api/v1/supplier-id/:vendorName", authenticateToken, async (req, res) => {
-  try {
-    const { vendorName } = req.params;
+app.get(
+  "/api/v1/supplier-id/:vendorName",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const { vendorName } = req.params;
 
-    const vendor = await VendorMasterModel.findOne({
-      "vendorAddress.name": vendorName,
-    });
+      const vendor = await VendorMasterModel.findOne({
+        "vendorAddress.name": vendorName,
+      });
 
-    if (!vendor || !vendor.vendorAddress?.supplierid) {
-      return res.status(404).json({ error: "Supplier ID not found for this vendor" });
+      if (!vendor || !vendor.vendorAddress?.supplierid) {
+        return res
+          .status(404)
+          .json({ error: "Supplier ID not found for this vendor" });
+      }
+
+      res.status(200).json({ supplierId: vendor.vendorAddress.supplierid });
+    } catch (err) {
+      res
+        .status(500)
+        .json({ error: "Error fetching supplier ID", details: err });
     }
-
-    res.status(200).json({ supplierId: vendor.vendorAddress.supplierid });
-  } catch (err) {
-    res.status(500).json({ error: "Error fetching supplier ID", details: err });
   }
-});
-
+);
 
 // New endpoint (optional optimization)
 app.get("/api/v1/vendors-list", authenticateToken, async (req, res) => {

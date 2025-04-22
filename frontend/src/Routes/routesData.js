@@ -147,6 +147,17 @@ const CreateMaterialList = React.lazy(() =>
 const EditMaterialList = React.lazy(() =>
   import('../components/MaterialList/EditMaterialList.jsx')
 );
+const ManufacturingMaterialList = React.lazy(() =>
+  import('../components/Manufacturing/MaterialList/index.jsx')
+);
+
+const ManufacturingCreateMaterialList = React.lazy(() =>
+  import('../components/Manufacturing/MaterialList/CreateMaterialList.jsx')
+);
+
+const ManufacturingEditMaterialList = React.lazy(() =>
+  import('../components/Manufacturing/MaterialList/EditMaterialList.jsx')
+);
 
 const ItemInfoRecords = React.lazy(() =>
   import('../components/ItemInfoRecords/index.jsx')
@@ -158,6 +169,66 @@ const CreateItemInfoRecords = React.lazy(() =>
 
 const EditItemInfoRecords = React.lazy(() =>
   import('../components/ItemInfoRecords/EditItemInfoRecords.jsx')
+);
+
+const CreateVendorAgreement = React.lazy(() =>
+  import('../components/VendorAgreements/CreateVendorAgreement.jsx')
+);
+const EditVendorAgreement = React.lazy(() =>
+  import('../components/VendorAgreements/EditVendorAgreement.jsx')
+);
+const VendorAgreementList = React.lazy(() =>
+  import('../components/VendorAgreements/VendorAgreementList.jsx')
+);
+const GoodIssueForProcessOrderList = React.lazy(() =>
+  import(
+    '../components/Manufacturing/GoodsIssueProcessOrder/ListGoodsIssue.jsx'
+  )
+);
+const EditGoodIssueForProcessOrder = React.lazy(() =>
+  import(
+    '../components/Manufacturing/GoodsIssueProcessOrder/EditGoodsIssue.jsx'
+  )
+);
+
+const CreateGoodIssueForProcessOrder = React.lazy(() =>
+  import(
+    '../components/Manufacturing/GoodsIssueProcessOrder/CreateGoodsIssue.jsx'
+  )
+);
+const CreateReceiptOrder = React.lazy(() =>
+  import('../components/Manufacturing/RecieptOrder/CreateReceiptOrder.jsx')
+);
+const EditReceiptOrder = React.lazy(() =>
+  import('../components/Manufacturing/RecieptOrder/EditReceiptOrder.jsx')
+);
+const ListReceiptOrders = React.lazy(() =>
+  import('../components/Manufacturing/RecieptOrder/ListReceiptOrders.jsx')
+);
+const CreateGoodsReceiptForTable = React.lazy(() =>
+  import(
+    '../components/Manufacturing/GoodsRecieptForTable/CreateGoodsReceipt.jsx'
+  )
+);
+const EditGoodsReceiptForTable = React.lazy(() =>
+  import(
+    '../components/Manufacturing/GoodsRecieptForTable/EditGoodsReceipt.jsx'
+  )
+);
+const ListGoodsReceiptForTable = React.lazy(() =>
+  import(
+    '../components/Manufacturing/GoodsRecieptForTable/ListGoodsReceipts.jsx'
+  )
+);
+
+const BillOfMaterial = React.lazy(() =>
+  import('../components/Manufacturing/BillOfMaterial/BillOfMaterialList.jsx')
+);
+const CreateBillOfMaterial = React.lazy(() =>
+  import('../components/Manufacturing/BillOfMaterial/CreateBillOfMaterial.jsx')
+);
+const EditBillOfMaterial = React.lazy(() =>
+  import('../components/Manufacturing/BillOfMaterial/EditBillOfMaterial.jsx')
 );
 
 import {
@@ -376,6 +447,80 @@ export const privateRoutes = [
   {
     path: '/sourcing/item-info-records/edit/:id',
     element: EditItemInfoRecords,
+  },
+
+  {
+    path: '/manufacturing/goods-issue/create',
+    element: CreateGoodIssueForProcessOrder,
+  },
+  {
+    path: '/manufacturing/goods-issue',
+    element: GoodIssueForProcessOrderList,
+  },
+  {
+    path: '/manufacturing/goods-issue/edit/:id',
+    element: EditGoodIssueForProcessOrder,
+  },
+  {
+    path: '/manufacturing/receipt-orders',
+    element: ListReceiptOrders,
+  },
+  {
+    path: '/manufacturing/receipt-orders/create',
+    element: CreateReceiptOrder,
+  },
+  {
+    path: '/manufacturing/receipt-orders/edit/:id',
+    element: EditReceiptOrder,
+  },
+  {
+    path: '/manufacturing/goods-receipt',
+    element: ListGoodsReceiptForTable,
+  },
+  {
+    path: '/manufacturing/goods-receipt/create',
+    element: CreateGoodsReceiptForTable,
+  },
+  {
+    path: '/manufacturing/goods-receipt/edit/:id',
+    element: EditGoodsReceiptForTable,
+  },
+
+  {
+    path: '/sourcing/vendor-agreements/create',
+    element: CreateVendorAgreement,
+  },
+  {
+    path: '/sourcing/vendor-agreements',
+    element: VendorAgreementList,
+  },
+  {
+    path: '/sourcing/vendor-agreements/edit/:id',
+    element: EditVendorAgreement,
+  },
+  {
+    path: '/manufacturing/product-master',
+    element: ManufacturingMaterialList,
+  },
+  {
+    path: '/manufacturing/product-master/create',
+    element: ManufacturingCreateMaterialList,
+  },
+  {
+    path: '/manufacturing/product-master/edit/:id',
+    element: ManufacturingEditMaterialList,
+  },
+  {
+    path: '/manufacturing/bill-of-material',
+    element: BillOfMaterial,
+  },
+  {
+    path: '/manufacturing/bill-of-material/create',
+    element: CreateBillOfMaterial,
+  },
+  {
+    path: '/manufacturing/bill-of-material/edit/:id',
+    element: EditBillOfMaterial,
   },
 ];
 

@@ -11,18 +11,21 @@ const Products = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await axios.get(`${server_Url}/api/v1/distributors/products`);
-        setProducts(response.data);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
+  const fetchProducts = async () => {
+    console.time("Fetch Products Time");
+    try {
+      const response = await axios.get(`${server_Url}/api/v1/distributors/products`);
+      setProducts(response.data);
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+      console.timeEnd("Fetch Products Time");
+    }
+  };
+  fetchProducts();
+}, []);
+
 
 
   if (loading) return <p>Loading products...</p>;

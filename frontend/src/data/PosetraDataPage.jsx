@@ -53,6 +53,44 @@ export const SourcingData = [
     path: '/sourcing/vendor-agreements',
   },
 ];
+export const ManufacturingData = [
+  {
+    title: 'Product Master',
+    path: '/manufacturing/product-master',
+  },
+  {
+    title: 'Bill of Material',
+    path: '/manufacturing/bill-of-material',
+  },
+  {
+    title: 'Recipe',
+    path: '/manufacturing/recipe',
+  },
+  {
+    title: 'Production Plan',
+    path: '/manufacturing/production-plan',
+  },
+  {
+    title: 'MRP',
+    path: '/manufacturing/mrp',
+  },
+  {
+    title: 'Process Order',
+    path: '/manufacturing/receipt-orders',
+  },
+  {
+    title: 'Good Issue For Process Order',
+    path: '/manufacturing/goods-issue',
+  },
+  {
+    title: 'Goods Receipt For The Production Order',
+    path: '/manufacturing/goods-receipt',
+  },
+  {
+    title: 'Production Order Settlement',
+    path: '/manufacturing/production-order-settlement',
+  },
+];
 export const pricingData = [
   'List Price',
   'Discounts',

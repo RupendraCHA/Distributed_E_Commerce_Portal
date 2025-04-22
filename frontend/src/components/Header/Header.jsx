@@ -11,7 +11,7 @@ import {
   MenuItem,
 } from '@mui/material'; // MUI components
 import { useSelector, useDispatch } from 'react-redux';
-import { DashboardsData, SourcingData } from '../../data/PosetraDataPage';
+import { DashboardsData, SourcingData, ManufacturingData  } from '../../data/PosetraDataPage';
 import { setCartItems } from '../../store/cartSlice'; // Import the setCartItems action
 import axios from 'axios';
 
@@ -25,6 +25,7 @@ const Header = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [anchorElForSourcing, setAnchorElForSourcing] = useState(null);
+  const [anchorElForManufacturing, setAnchorElForManufacturing] = useState(null);
   const [distributorAnchorEl, setDistributorAnchorEl] = useState(null);
   const [text, setText] = useState('');
   // Distribution routes
@@ -84,6 +85,9 @@ const Header = () => {
   const handleSouricng = (event) => {
     setAnchorElForSourcing(anchorElForSourcing ? null : event.currentTarget);
   };
+  const handleManufacturing = (event) => {
+    setAnchorElForManufacturing(anchorElForManufacturing ? null : event.currentTarget);
+  };
 
   const handleDistributorClick = (event) => {
     setDistributorAnchorEl(distributorAnchorEl ? null : event.currentTarget);
@@ -94,6 +98,11 @@ const Header = () => {
   const handleSourcingPopperClose = (path) => {
     navigate(path);
     setAnchorElForSourcing(null);
+    setAnchorEl(null);
+  };
+  const handleManufacturingPopperClose = (path) => {
+    navigate(path);
+    setAnchorElForManufacturing(null);
     setAnchorEl(null);
   };
 
@@ -134,7 +143,8 @@ const Header = () => {
                   <li className="">
                     <Link
                       // to="/products"
-                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                      className="text-whiteColor cursor-pointer"
+                      onClick={handleManufacturing}
                     >
                       Manufacturing
                     </Link>
@@ -169,6 +179,44 @@ const Header = () => {
                               <MenuItem
                                 className="text-blue-500"
                                 onClick={() => handleSourcingPopperClose(path)}
+                              >
+                                {title}
+                              </MenuItem>
+                            );
+                          })}
+                        </MenuList>
+                      </Paper>
+                    </ClickAwayListener>
+                  </Popper>
+                  <Popper
+                    open={Boolean(anchorElForManufacturing)}
+                    anchorEl={anchorElForManufacturing}
+                    placement="bottom-start"
+                    modifiers={[
+                      {
+                        name: 'offset',
+                        options: {
+                          offset: [0, 10],
+                        },
+                      },
+                    ]}
+                    sx={{
+                      ":root":{
+                        zIndex:1000
+                      }
+                    }}
+                  >
+                    <ClickAwayListener onClickAway={handleManufacturingPopperClose}>
+                      <Paper >
+                        <MenuList
+                          autoFocusItem={Boolean(anchorElForManufacturing)}
+                          id="menu-list-grow"
+                        >
+                          {ManufacturingData.map(({ title, path }) => {
+                            return (
+                              <MenuItem
+                                className="text-blue-500"
+                                onClick={() => handleManufacturingPopperClose(path)}
                               >
                                 {title}
                               </MenuItem>
