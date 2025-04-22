@@ -6,21 +6,21 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Typography,
   Paper,
   TableContainer,
-  Typography,
-  Button,
   IconButton,
   Tooltip,
+  Button,
 } from '@mui/material';
 import { Edit } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const BillOfMaterialList = () => {
+  const [boms, setBoms] = useState([]);
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
   const token = localStorage.getItem('token');
-  const [boms, setBoms] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const BillOfMaterialList = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setBoms(res.data))
-      .catch((err) => console.error('Error fetching BOMs:', err));
+      .catch((err) => console.error('Failed to fetch BOMs:', err));
   }, []);
 
   const headers = [
@@ -37,33 +37,27 @@ const BillOfMaterialList = () => {
     'Material Code',
     'Plant',
     'Alternative BOM',
-    'BOM Usage',
-    'Base Quantity',
-    'Unit',
-    'Validity Start',
-    'Validity End',
-    'Status',
     'Component Count',
     'Actions',
   ];
 
   return (
     <Container>
-      <Typography variant="h5" gutterBottom sx={{ mt: 2, fontWeight: 'bold' }}>
+      <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', mt: 2 }}>
         Bill of Materials
       </Typography>
 
       <Button
         variant="contained"
         color="primary"
-        style={{ float: 'right', marginBottom: '20px' }}
+        sx={{ float: 'right', mb: 2 }}
         onClick={() => navigate('/manufacturing/bill-of-material/create')}
       >
-        Create
+        Create BOM
       </Button>
 
-      <TableContainer component={Paper} sx={{ mt: 2 }}>
-        <Table stickyHeader>
+      <TableContainer component={Paper}>
+        <Table>
           <TableHead>
             <TableRow>
               {headers.map((header) => (
@@ -80,12 +74,6 @@ const BillOfMaterialList = () => {
                 <TableCell>{bom.materialCode}</TableCell>
                 <TableCell>{bom.plant}</TableCell>
                 <TableCell>{bom.alternativeBOM}</TableCell>
-                <TableCell>{bom.bomUsage}</TableCell>
-                <TableCell>{bom.baseQuantity}</TableCell>
-                <TableCell>{bom.unit}</TableCell>
-                <TableCell>{bom.validityStart}</TableCell>
-                <TableCell>{bom.validityEnd}</TableCell>
-                <TableCell>{bom.status}</TableCell>
                 <TableCell>{bom.components?.length || 0}</TableCell>
                 <TableCell>
                   <Tooltip title="Edit">

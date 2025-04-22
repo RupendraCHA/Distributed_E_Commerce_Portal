@@ -11,6 +11,7 @@ import {
   TableCell,
   TableBody,
   IconButton,
+  Box,
 } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -26,18 +27,6 @@ const EditBillOfMaterial = () => {
     materialCode: '',
     plant: '',
     alternativeBOM: '',
-    bomUsage: '',
-    baseQuantity: '',
-    unit: '',
-    validityStart: '',
-    validityEnd: '',
-    status: '',
-    lotSize: '',
-    revisionLevel: '',
-    headerText: '',
-    group: '',
-    groupCounter: '',
-    itemCategory: '',
     components: [],
   });
 
@@ -91,90 +80,104 @@ const EditBillOfMaterial = () => {
             disabled
           />
         </Grid>
-
-        {[
-          'plant',
-          'alternativeBOM',
-          'bomUsage',
-          'baseQuantity',
-          'unit',
-          'validityStart',
-          'validityEnd',
-          'status',
-          'lotSize',
-          'revisionLevel',
-          'headerText',
-          'group',
-          'groupCounter',
-          'itemCategory',
-        ].map((key) => (
-          <Grid item xs={12} sm={6} key={key}>
-            <TextField
-              name={key}
-              label={key.replace(/([A-Z])/g, ' $1')}
-              value={form[key]}
-              onChange={handleFormChange}
-              fullWidth
-              type={key.toLowerCase().includes('date') ? 'date' : 'text'}
-              InputLabelProps={
-                key.toLowerCase().includes('date') ? { shrink: true } : {}
-              }
-            />
-          </Grid>
-        ))}
+        <Grid item xs={12} sm={6}>
+          <TextField
+            name="plant"
+            label="Plant"
+            value={form.plant}
+            onChange={handleFormChange}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            name="alternativeBOM"
+            label="Alternative BOM"
+            value={form.alternativeBOM}
+            onChange={handleFormChange}
+            fullWidth
+          />
+        </Grid>
       </Grid>
 
       <Typography variant="h6" sx={{ mt: 4 }}>
         Components
       </Typography>
-
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Component</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>Quantity</TableCell>
-            <TableCell>Unit</TableCell>
-            <TableCell>Item Text</TableCell>
-            <TableCell>Scrap</TableCell>
-            <TableCell>Operation</TableCell>
-            <TableCell>Action</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {form.components.map((comp, index) => (
-            <TableRow key={index}>
+      <Box sx={{ overflowX: 'auto' }}>
+        <Table>
+          <TableHead>
+            <TableRow>
               {[
-                'component',
-                'componentDescription',
-                'quantity',
-                'compUnit',
-                'itemText',
-                'scrap',
-                'operation',
-              ].map((field) => (
-                <TableCell key={field}>
-                  <TextField
-                    fullWidth
-                    value={comp[field]}
-                    onChange={(e) =>
-                      handleComponentChange(index, field, e.target.value)
-                    }
-                  />
+                'Item',
+                'ICT',
+                'Component',
+                'Component Description',
+                'Quantity',
+                'Unit',
+                'Valid From',
+                'Valid To',
+                'Change No.',
+                'Sort String',
+                'Item ID',
+                'Chg No. To',
+                'Action',
+              ].map((header) => (
+                <TableCell key={header} sx={{ fontWeight: 'bold' }}>
+                  {header}
                 </TableCell>
               ))}
-              <TableCell>
-                <IconButton
-                  onClick={() => handleRemoveComponent(index)}
-                  color="error"
-                >
-                  <Delete />
-                </IconButton>
-              </TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHead>
+
+          <TableBody>
+            {form.components.map((comp, index) => (
+              <TableRow key={index}>
+                {[
+                  'item',
+                  'ict',
+                  'component',
+                  'componentDescription',
+                  'quantity',
+                  'unit',
+                  'validFrom',
+                  'validTo',
+                  'changeNumber',
+                  'sortString',
+                  'itemId',
+                  'changeNoTo',
+                ].map((field) => (
+                  <TableCell key={field}>
+                    <TextField
+                      fullWidth
+                      sx={{ minWidth: '140px' }}
+                      type={
+                        field.toLowerCase().includes('date') ? 'date' : 'text'
+                      }
+                      value={comp[field]}
+                      onChange={(e) =>
+                        handleComponentChange(index, field, e.target.value)
+                      }
+                      InputLabelProps={
+                        field.toLowerCase().includes('date')
+                          ? { shrink: true }
+                          : {}
+                      }
+                    />
+                  </TableCell>
+                ))}
+                <TableCell>
+                  <IconButton
+                    onClick={() => handleRemoveComponent(index)}
+                    color="error"
+                  >
+                    <Delete />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Box>
 
       <Button
         variant="contained"
@@ -182,7 +185,7 @@ const EditBillOfMaterial = () => {
         sx={{ mt: 4 }}
         onClick={handleSubmit}
       >
-        Save Changes
+        Update BOM
       </Button>
     </Container>
   );
