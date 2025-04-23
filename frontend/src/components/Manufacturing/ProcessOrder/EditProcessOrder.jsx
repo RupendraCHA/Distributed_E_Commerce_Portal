@@ -54,7 +54,7 @@ const EditReceiptOrder = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        navigate('/manufacturing/receipt-orders');
+        navigate('/manufacturing/process-orders');
       })
       .catch((err) => {
         console.error('Error updating receipt order:', err);
@@ -64,7 +64,7 @@ const EditReceiptOrder = () => {
   return (
     <Container maxWidth="md">
       <h2 style={{ margin: '20px 0px', fontWeight: 'bold' }}>
-        Edit Receipt Order
+        Edit Process Order
       </h2>
 
       <Grid container spacing={2}>
@@ -156,7 +156,7 @@ const EditReceiptOrder = () => {
               !form.quantity
             }
           >
-            Update Receipt Order
+            Update Process Order
           </Button>
         </Grid>
       </Grid>

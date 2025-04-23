@@ -47,7 +47,7 @@ const CreateReceiptOrder = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        navigate('/manufacturing/receipt-orders');
+        navigate('/manufacturing/process-orders');
       })
       .catch((err) => {
         console.error('Error creating receipt order:', err);
@@ -57,7 +57,7 @@ const CreateReceiptOrder = () => {
   return (
     <Container maxWidth="md">
       <h2 style={{ margin: '20px 0px', fontWeight: 'bold' }}>
-        Create Receipt Order
+        Create Process Order
       </h2>
 
       <Grid container spacing={2}>
@@ -129,7 +129,7 @@ const CreateReceiptOrder = () => {
             onClick={handleCreateReceipt}
             disabled={!materialId || !plant || !storageLocation || !quantity}
           >
-            Create Receipt Order
+            Create Process Order
           </Button>
         </Grid>
       </Grid>

@@ -196,14 +196,14 @@ const CreateGoodIssueForProcessOrder = React.lazy(() =>
     '../components/Manufacturing/GoodsIssueProcessOrder/CreateGoodsIssue.jsx'
   )
 );
-const CreateReceiptOrder = React.lazy(() =>
-  import('../components/Manufacturing/RecieptOrder/CreateReceiptOrder.jsx')
+const CreateProcessOrder = React.lazy(() =>
+  import('../components/Manufacturing/ProcessOrder/CreateProcessOrder.jsx')
 );
-const EditReceiptOrder = React.lazy(() =>
-  import('../components/Manufacturing/RecieptOrder/EditReceiptOrder.jsx')
+const EditProcessOrder = React.lazy(() =>
+  import('../components/Manufacturing/ProcessOrder/EditProcessOrder.jsx')
 );
-const ListReceiptOrders = React.lazy(() =>
-  import('../components/Manufacturing/RecieptOrder/ListReceiptOrders.jsx')
+const ListProcessOrders = React.lazy(() =>
+  import('../components/Manufacturing/ProcessOrder/ListProcessOrders.jsx')
 );
 const CreateGoodsReceiptForTable = React.lazy(() =>
   import(
@@ -462,16 +462,16 @@ export const privateRoutes = [
     element: EditGoodIssueForProcessOrder,
   },
   {
-    path: '/manufacturing/receipt-orders',
-    element: ListReceiptOrders,
+    path: '/manufacturing/process-orders',
+    element: ListProcessOrders,
   },
   {
-    path: '/manufacturing/receipt-orders/create',
-    element: CreateReceiptOrder,
+    path: '/manufacturing/process-orders/create',
+    element: CreateProcessOrder,
   },
   {
-    path: '/manufacturing/receipt-orders/edit/:id',
-    element: EditReceiptOrder,
+    path: '/manufacturing/process-orders/edit/:id',
+    element: EditProcessOrder,
   },
   {
     path: '/manufacturing/goods-receipt',
