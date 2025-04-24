@@ -205,6 +205,9 @@ const EditProcessOrder = React.lazy(() =>
 const ListProcessOrders = React.lazy(() =>
   import('../components/Manufacturing/ProcessOrder/ListProcessOrders.jsx')
 );
+const ProcessOrderDetails = React.lazy(() =>
+  import('../components/Manufacturing/ProcessOrder/ProcessOrderDetails.jsx')
+);
 const CreateGoodsReceiptForTable = React.lazy(() =>
   import(
     '../components/Manufacturing/GoodsRecieptForTable/CreateGoodsReceipt.jsx'
@@ -464,6 +467,10 @@ export const privateRoutes = [
   {
     path: '/manufacturing/process-orders',
     element: ListProcessOrders,
+  },
+  {
+    path: '/manufacturing/process-orders/create/details',
+    element: ProcessOrderDetails,
   },
   {
     path: '/manufacturing/process-orders/create',

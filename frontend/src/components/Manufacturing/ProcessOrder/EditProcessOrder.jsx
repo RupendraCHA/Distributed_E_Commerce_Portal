@@ -8,6 +8,7 @@ import {
 } from '@mui/material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom';
 
 const EditReceiptOrder = () => {
   const { id } = useParams();
@@ -21,45 +22,44 @@ const EditReceiptOrder = () => {
     storageLocation: '',
     quantity: '',
     unit: '',
-    purchaseOrderRef: '',
+    processOrderType: '',
+    processOrder: '',
   });
+
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state) {
+      setForm((prev) => ({
+        ...prev,
+        ...location.state,
+      }));
+    } else {
+      // fallback to fetch
+      const token = localStorage.getItem('token');
+      axios
+        .get(`${server_Url}/api/v1/receipt-orders/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((res) => setForm(res.data));
+    }
+  }, [id, location.state]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
 
-    // Fetch all material options
     axios
       .get(`${server_Url}/api/v1/getMaterialIds`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setMaterialOptions(res.data));
 
-    // Fetch receipt order by ID
     axios
       .get(`${server_Url}/api/v1/receipt-orders/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setForm(res.data));
   }, [id]);
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
-
-  const handleUpdate = () => {
-    const token = localStorage.getItem('token');
-
-    axios
-      .put(`${server_Url}/api/v1/receipt-orders/${id}`, form, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => {
-        navigate('/manufacturing/process-orders');
-      })
-      .catch((err) => {
-        console.error('Error updating receipt order:', err);
-      });
-  };
 
   return (
     <Container maxWidth="md">
@@ -92,54 +92,43 @@ const EditReceiptOrder = () => {
           />
         </Grid>
 
+        {/* Just show fields for reference */}
         <Grid item xs={6}>
-          <TextField
-            label="Plant"
-            name="plant"
-            value={form.plant}
-            onChange={handleChange}
-            fullWidth
-          />
+          <TextField label="Plant" value={form.plant} fullWidth disabled />
         </Grid>
-
         <Grid item xs={6}>
           <TextField
             label="Storage Location"
-            name="storageLocation"
             value={form.storageLocation}
-            onChange={handleChange}
             fullWidth
+            disabled
           />
         </Grid>
-
         <Grid item xs={6}>
           <TextField
             label="Quantity"
-            name="quantity"
-            type="number"
             value={form.quantity}
-            onChange={handleChange}
             fullWidth
+            disabled
           />
         </Grid>
-
+        <Grid item xs={6}>
+          <TextField label="Unit" value={form.unit} fullWidth disabled />
+        </Grid>
         <Grid item xs={6}>
           <TextField
-            label="Unit"
-            name="unit"
-            value={form.unit}
-            onChange={handleChange}
+            label="Process Order Type"
+            value={form.processOrderType}
             fullWidth
+            disabled
           />
         </Grid>
-
-        <Grid item xs={12}>
+        <Grid item xs={6}>
           <TextField
-            label="Purchase Order Reference"
-            name="purchaseOrderRef"
-            value={form.purchaseOrderRef}
-            onChange={handleChange}
+            label="Process Order"
+            value={form.processOrder}
             fullWidth
+            disabled
           />
         </Grid>
 
@@ -148,15 +137,13 @@ const EditReceiptOrder = () => {
             variant="contained"
             color="primary"
             fullWidth
-            onClick={handleUpdate}
-            disabled={
-              !form.materialId ||
-              !form.plant ||
-              !form.storageLocation ||
-              !form.quantity
+            onClick={() =>
+              navigate('/manufacturing/process-orders/create/details', {
+                state: form,
+              })
             }
           >
-            Update Process Order
+            Continue
           </Button>
         </Grid>
       </Grid>

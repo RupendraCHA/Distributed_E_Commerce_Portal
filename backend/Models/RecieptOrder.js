@@ -7,10 +7,15 @@ const ReceiptOrderSchema = new mongoose.Schema(
     storageLocation: { type: String, required: true },
     quantity: { type: Number, required: true },
     unit: { type: String, required: true },
-    purchaseOrderRef: { type: String },
+    processOrderType: { type: String },
+    processOrder: { type: String },
   },
-  { timestamps: true }
+  {
+    strict: false,
+    timestamps: true,
+  }
 );
+
 const ReceiptOrderModel = mongoose.model("ReceiptOrder", ReceiptOrderSchema);
 
 module.exports = ReceiptOrderModel;

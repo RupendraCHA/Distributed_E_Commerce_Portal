@@ -7,7 +7,7 @@ import {
   Grid,
 } from '@mui/material';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const CreateReceiptOrder = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
@@ -19,7 +19,30 @@ const CreateReceiptOrder = () => {
   const [storageLocation, setStorageLocation] = useState('');
   const [quantity, setQuantity] = useState('');
   const [unit, setUnit] = useState('');
-  const [purchaseOrderRef, setPurchaseOrderRef] = useState('');
+  const [processOrderType, setProcessOrderType] = useState('');
+  const [processOrder, setProcessOrder] = useState('');
+  const location = useLocation();
+  useEffect(() => {
+    console.log('Location state:', location.state);
+    if (location.state) {
+      const {
+        materialId = '',
+        plant = '',
+        storageLocation = '',
+        quantity = '',
+        unit = '',
+        processOrderType = '',
+        processOrder = '',
+      } = location.state;
+      setMaterialId(materialId);
+      setPlant(plant);
+      setStorageLocation(storageLocation);
+      setQuantity(quantity);
+      setUnit(unit);
+      setProcessOrderType(processOrderType);
+      setProcessOrder(processOrder);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -39,7 +62,8 @@ const CreateReceiptOrder = () => {
       storageLocation,
       quantity,
       unit,
-      purchaseOrderRef,
+      processOrderType,
+      processOrder,
     };
 
     axios
@@ -66,6 +90,10 @@ const CreateReceiptOrder = () => {
             options={materialOptions}
             getOptionLabel={(option) =>
               `${option.materialName} (${option.materialId})`
+            }
+            value={
+              materialOptions.find((opt) => opt.materialId === materialId) ||
+              null
             }
             onChange={(e, newValue) => {
               setMaterialId(newValue?.materialId || '');
@@ -112,11 +140,19 @@ const CreateReceiptOrder = () => {
             fullWidth
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={6}>
           <TextField
-            label="Purchase Order Reference"
-            value={purchaseOrderRef}
-            onChange={(e) => setPurchaseOrderRef(e.target.value)}
+            label="Process Order Type"
+            value={processOrderType}
+            onChange={(e) => setProcessOrderType(e.target.value)}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            label="Process Order"
+            value={processOrder}
+            onChange={(e) => setProcessOrder(e.target.value)}
             fullWidth
           />
         </Grid>
@@ -126,10 +162,22 @@ const CreateReceiptOrder = () => {
             variant="contained"
             color="primary"
             fullWidth
-            onClick={handleCreateReceipt}
+            onClick={() =>
+              navigate('/manufacturing/process-orders/create/details', {
+                state: {
+                  materialId,
+                  plant,
+                  storageLocation,
+                  quantity,
+                  unit,
+                  processOrderType,
+                  processOrder,
+                },
+              })
+            }
             disabled={!materialId || !plant || !storageLocation || !quantity}
           >
-            Create Process Order
+            Continue
           </Button>
         </Grid>
       </Grid>

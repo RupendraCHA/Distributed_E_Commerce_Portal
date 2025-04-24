@@ -56,7 +56,7 @@ const PORT = process.env.PORT;
 
 // const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com" // Visionsoft
 // const checkoutURLs = "https://distributed-e-commerce-portal-frontend.onrender.com";
-const checkoutURLs = "http://localhost:5173"; 
+const checkoutURLs = "http://localhost:5173";
 
 const connectDB = async () => {
   try {
@@ -2174,7 +2174,7 @@ app.get("/api/v1/goods-issue/:id", async (req, res) => {
 });
 
 // Create
-app.post("/api/v1/receipt-orders/", async (req, res) => {
+app.post("/api/v1/receipt-orders", async (req, res) => {
   try {
     const receiptOrder = new ReceiptOrderModel(req.body);
     await receiptOrder.save();
@@ -2185,7 +2185,7 @@ app.post("/api/v1/receipt-orders/", async (req, res) => {
 });
 
 // List
-app.get("/api/v1/receipt-orders/", async (req, res) => {
+app.get("/api/v1/receipt-orders", async (req, res) => {
   try {
     const all = await ReceiptOrderModel.find().sort({
       createdAt: -1,

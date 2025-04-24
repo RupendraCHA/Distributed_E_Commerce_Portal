@@ -52,7 +52,8 @@ const ListReceiptOrders = () => {
             <TableCell>Storage Location</TableCell>
             <TableCell>Quantity</TableCell>
             <TableCell>Unit</TableCell>
-            <TableCell>PO Ref</TableCell>
+            <TableCell>Process Order Type</TableCell>
+            <TableCell>Process Order</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
@@ -64,7 +65,8 @@ const ListReceiptOrders = () => {
               <TableCell>{row.storageLocation}</TableCell>
               <TableCell>{row.quantity}</TableCell>
               <TableCell>{row.unit}</TableCell>
-              <TableCell>{row.purchaseOrderRef}</TableCell>
+              <TableCell>{row.processOrderType}</TableCell>
+              <TableCell>{row.processOrder}</TableCell>
               <TableCell>
                 <Button
                   onClick={() =>

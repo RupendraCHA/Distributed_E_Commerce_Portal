@@ -151,14 +151,16 @@ const EditBillOfMaterial = () => {
                       fullWidth
                       sx={{ minWidth: '140px' }}
                       type={
-                        field.toLowerCase().includes('date') ? 'date' : 'text'
+                        field === 'validFrom' || field === 'validTo'
+                          ? 'date'
+                          : 'text'
                       }
                       value={comp[field]}
                       onChange={(e) =>
                         handleComponentChange(index, field, e.target.value)
                       }
                       InputLabelProps={
-                        field.toLowerCase().includes('date')
+                        field === 'validFrom' || field === 'validTo'
                           ? { shrink: true }
                           : {}
                       }
