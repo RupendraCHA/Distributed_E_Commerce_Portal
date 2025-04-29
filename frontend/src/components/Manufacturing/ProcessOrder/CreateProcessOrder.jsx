@@ -15,6 +15,7 @@ const CreateReceiptOrder = () => {
 
   const [materialOptions, setMaterialOptions] = useState([]);
   const [materialId, setMaterialId] = useState('');
+  const [materialName, setMaterialName] = useState('');
   const [plant, setPlant] = useState('');
   const [storageLocation, setStorageLocation] = useState('');
   const [quantity, setQuantity] = useState('');
@@ -97,6 +98,7 @@ const CreateReceiptOrder = () => {
             }
             onChange={(e, newValue) => {
               setMaterialId(newValue?.materialId || '');
+              setMaterialName(newValue?.materialName || ''); // Add this line to set materialName
               setPlant(newValue?.plant || '');
               setStorageLocation(newValue?.storageLocation || '');
               setUnit(newValue?.unit || '');
@@ -166,6 +168,7 @@ const CreateReceiptOrder = () => {
               navigate('/manufacturing/process-orders/create/details', {
                 state: {
                   materialId,
+                  materialName,
                   plant,
                   storageLocation,
                   quantity,

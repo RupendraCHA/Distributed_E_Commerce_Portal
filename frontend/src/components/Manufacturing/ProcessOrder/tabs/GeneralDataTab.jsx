@@ -1,5 +1,5 @@
 import React from 'react';
-import { Grid, TextField } from '@mui/material';
+import { Grid, TextField, MenuItem, Typography } from '@mui/material';
 
 const GeneralDataTab = ({ formData, setFormData }) => {
   const handleChange = (field) => (e) => {
@@ -11,6 +11,12 @@ const GeneralDataTab = ({ formData, setFormData }) => {
 
   return (
     <Grid container spacing={2}>
+      {/* General Information */}
+      <Grid item xs={12}>
+        <Typography variant="h6" gutterBottom>
+          General Information
+        </Typography>
+      </Grid>
       <Grid item xs={4}>
         <TextField
           label="Material"
@@ -35,7 +41,6 @@ const GeneralDataTab = ({ formData, setFormData }) => {
           fullWidth
         />
       </Grid>
-
       <Grid item xs={4}>
         <TextField
           label="System Status"
@@ -62,6 +67,11 @@ const GeneralDataTab = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Quantities */}
+      <Grid item xs={12}>
+        <Typography variant="h6" gutterBottom>
+          Quantities
+        </Typography>
+      </Grid>
       <Grid item xs={4}>
         <TextField
           label="Total Qty"
@@ -90,6 +100,11 @@ const GeneralDataTab = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Dates */}
+      <Grid item xs={12}>
+        <Typography variant="h6" gutterBottom>
+          Dates
+        </Typography>
+      </Grid>
       <Grid item xs={4}>
         <TextField
           label="Start Date"
@@ -122,6 +137,11 @@ const GeneralDataTab = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Scheduled */}
+      <Grid item xs={12}>
+        <Typography variant="h6" gutterBottom>
+          Scheduled
+        </Typography>
+      </Grid>
       <Grid item xs={4}>
         <TextField
           label="Scheduled Start"
@@ -144,6 +164,11 @@ const GeneralDataTab = ({ formData, setFormData }) => {
       </Grid>
 
       {/* Confirmed */}
+      <Grid item xs={12}>
+        <Typography variant="h6" gutterBottom>
+          Confirmed
+        </Typography>
+      </Grid>
       <Grid item xs={4}>
         <TextField
           label="Confirmed Start"
@@ -162,6 +187,83 @@ const GeneralDataTab = ({ formData, setFormData }) => {
           onChange={handleChange('confirmedEnd')}
           fullWidth
           InputLabelProps={{ shrink: true }}
+        />
+      </Grid>
+
+      {/* Scheduling */}
+      <Grid item xs={12}>
+        <Typography variant="h6" gutterBottom>
+          Scheduling
+        </Typography>
+      </Grid>
+      <Grid item xs={4}>
+        <TextField
+          label="Scheduling Type"
+          select
+          value={formData.schedulingType || ''}
+          onChange={handleChange('schedulingType')}
+          fullWidth
+        >
+          <MenuItem value="Forwards">Forwards</MenuItem>
+          <MenuItem value="Backwards">Backwards</MenuItem>
+        </TextField>
+      </Grid>
+      <Grid item xs={4}>
+        <TextField
+          label="Reduction"
+          value={formData.reduction || ''}
+          onChange={handleChange('reduction')}
+          fullWidth
+        />
+      </Grid>
+      <Grid item xs={4}>
+        <TextField
+          label="Priority"
+          value={formData.priority || ''}
+          onChange={handleChange('priority')}
+          fullWidth
+        />
+      </Grid>
+
+      {/* Floats */}
+      <Grid item xs={12}>
+        <Typography variant="h6" gutterBottom>
+          Floats
+        </Typography>
+      </Grid>
+      <Grid item xs={4}>
+        <TextField
+          label="Sched. Margin Key"
+          value={formData.schedMarginKey || ''}
+          onChange={handleChange('schedMarginKey')}
+          fullWidth
+        />
+      </Grid>
+      <Grid item xs={4}>
+        <TextField
+          label="Float Before Prod."
+          value={formData.floatBeforeProd || ''}
+          onChange={handleChange('floatBeforeProd')}
+          type="number"
+          fullWidth
+        />
+      </Grid>
+      <Grid item xs={4}>
+        <TextField
+          label="Float After Prod."
+          value={formData.floatAfterProd || ''}
+          onChange={handleChange('floatAfterProd')}
+          type="number"
+          fullWidth
+        />
+      </Grid>
+      <Grid item xs={4}>
+        <TextField
+          label="Release Period"
+          value={formData.releasePeriod || ''}
+          onChange={handleChange('releasePeriod')}
+          type="number"
+          fullWidth
         />
       </Grid>
     </Grid>
