@@ -6,7 +6,11 @@ import {
   Grid,
   Autocomplete,
   IconButton,
-  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import axios from 'axios';
@@ -96,7 +100,9 @@ const CreateGoodsIssueWithTable = () => {
 
   return (
     <Container>
-      <h2>Create Goods Issue</h2>
+      <h2 style={{ fontSize: '15px', fontWeight: 'bold', margin: '10px 0px' }}>
+        Create Goods Issue
+      </h2>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Autocomplete
@@ -153,116 +159,136 @@ const CreateGoodsIssueWithTable = () => {
       </Grid>
 
       <h4 style={{ marginTop: '30px' }}>Line Items</h4>
-      {items.map((item, index) => (
-        <Paper
-          key={index}
-          sx={{
-            padding: 2,
-            marginBottom: 2,
-            background: '#f9f9f9',
-            border: '1px solid #ccc',
-          }}
-        >
-          <Grid container spacing={2}>
-            <Grid item xs={2}>
-              <TextField
-                label="Mat. Short Text"
-                value={item.matShortText}
-                onChange={(e) =>
-                  handleItemChange(index, 'matShortText', e.target.value)
-                }
-                fullWidth
-              />
-            </Grid>
 
-            <Grid item xs={1.5}>
-              <TextField
-                label="Qty"
-                type="number"
-                value={item.quantity}
-                onChange={(e) =>
-                  handleItemChange(index, 'quantity', e.target.value)
-                }
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={1.5}>
-              <TextField
-                label="EUN"
-                value={item.eun}
-                onChange={(e) => handleItemChange(index, 'eun', e.target.value)}
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
-                label="Storage Loc"
-                value={item.storageLocation}
-                onChange={(e) =>
-                  handleItemChange(index, 'storageLocation', e.target.value)
-                }
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={1.5}>
-              <TextField
-                label="Batch"
-                value={item.batch}
-                onChange={(e) =>
-                  handleItemChange(index, 'batch', e.target.value)
-                }
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={1.5}>
-              <TextField
-                label="Val Type"
-                value={item.valuationType}
-                onChange={(e) =>
-                  handleItemChange(index, 'valuationType', e.target.value)
-                }
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
-                label="Stock Type"
-                value={item.stockType}
-                onChange={(e) =>
-                  handleItemChange(index, 'stockType', e.target.value)
-                }
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
-                label="Plant"
-                value={item.plant}
-                onChange={(e) =>
-                  handleItemChange(index, 'plant', e.target.value)
-                }
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
-                label="Stock Segment"
-                value={item.stockSegment}
-                onChange={(e) =>
-                  handleItemChange(index, 'stockSegment', e.target.value)
-                }
-                fullWidth
-              />
-            </Grid>
-            <Grid item xs={1}>
-              <IconButton onClick={() => handleRemoveRow(index)}>
-                <Delete />
-              </IconButton>
-            </Grid>
-          </Grid>
-        </Paper>
-      ))}
-      <Button onClick={handleAddRow} startIcon={<Add />} sx={{ mb: 2 }}>
+      <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+        <Table style={{ minWidth: '1800px' }}>
+          <TableHead>
+            <TableRow>
+              {[
+                'Mat. Short Text',
+                'Qty',
+                'EUN',
+                'Storage Loc',
+                'Batch',
+                'Val Type',
+                'Stock Type',
+                'Plant',
+                'Stock Segment',
+                'Action',
+              ].map((header) => (
+                <TableCell key={header} style={{ fontWeight: 'bold' }}>
+                  {header}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {items.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell>
+                  <TextField
+                    value={item.matShortText}
+                    onChange={(e) =>
+                      handleItemChange(index, 'matShortText', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="number"
+                    value={item.quantity}
+                    onChange={(e) =>
+                      handleItemChange(index, 'quantity', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={item.eun}
+                    onChange={(e) =>
+                      handleItemChange(index, 'eun', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={item.storageLocation}
+                    onChange={(e) =>
+                      handleItemChange(index, 'storageLocation', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={item.batch}
+                    onChange={(e) =>
+                      handleItemChange(index, 'batch', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={item.valuationType}
+                    onChange={(e) =>
+                      handleItemChange(index, 'valuationType', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={item.stockType}
+                    onChange={(e) =>
+                      handleItemChange(index, 'stockType', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={item.plant}
+                    onChange={(e) =>
+                      handleItemChange(index, 'plant', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={item.stockSegment}
+                    onChange={(e) =>
+                      handleItemChange(index, 'stockSegment', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <IconButton
+                    color="secondary"
+                    onClick={() => handleRemoveRow(index)}
+                    disabled={items.length === 1}
+                  >
+                    <Delete />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <Button
+        startIcon={<Add />}
+        onClick={handleAddRow}
+        variant="outlined"
+        color="primary"
+        style={{ marginTop: '10px' }}
+      >
         Add Row
       </Button>
 

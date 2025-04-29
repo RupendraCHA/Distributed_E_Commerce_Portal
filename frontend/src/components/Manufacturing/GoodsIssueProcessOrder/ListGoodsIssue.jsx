@@ -34,7 +34,11 @@ const ListGoodsIssue = () => {
         alignItems="center"
         my={2}
       >
-        <h2>Goods Issue Records</h2>
+        <h2
+          style={{ fontSize: '15px', fontWeight: 'bold', margin: '10px 0px' }}
+        >
+          Goods Issue Records
+        </h2>
         <Button
           variant="contained"
           color="primary"
