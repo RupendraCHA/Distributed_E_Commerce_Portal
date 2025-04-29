@@ -119,16 +119,20 @@ const EditReceiptOrder = () => {
           <TextField
             label="Process Order Type"
             value={form.processOrderType}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, processOrderType: e.target.value }))
+            }
             fullWidth
-            disabled
           />
         </Grid>
         <Grid item xs={6}>
           <TextField
             label="Process Order"
             value={form.processOrder}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, processOrder: e.target.value }))
+            }
             fullWidth
-            disabled
           />
         </Grid>
 

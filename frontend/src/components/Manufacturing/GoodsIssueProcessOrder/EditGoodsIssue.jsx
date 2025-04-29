@@ -1,200 +1,255 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
 import {
   Container,
   TextField,
   Button,
-  Autocomplete,
   Grid,
+  IconButton,
+  Paper,
+  Autocomplete,
 } from '@mui/material';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Add, Delete } from '@mui/icons-material';
 import axios from 'axios';
 
-const EditGoodsIssue = () => {
+const EditGoodsIssueWithTable = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
 
-  const [materialOptions, setMaterialOptions] = useState([]);
-  const [receiptOrders, setReceiptOrders] = useState([]);
-  const [form, setForm] = useState({
-    processOrder: '',
-    receiptOrderId: '',
-    material: '',
-    quantity: '',
-    storageLocation: '',
-    postingDate: '',
-    documentDate: '',
-  });
+  const [processOrder, setProcessOrder] = useState('');
+  const [documentDate, setDocumentDate] = useState('');
+  const [postingDate, setPostingDate] = useState('');
+  const [items, setItems] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
 
     axios
-      .get(`${server_Url}/api/v1/materials`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setMaterialOptions(res.data));
-
-    axios
-      .get(`${server_Url}/api/v1/receipt-orders`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setReceiptOrders(res.data));
-
-    axios
       .get(`${server_Url}/api/v1/goods-issue/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      .then((res) => setForm(res.data));
+      .then((res) => {
+        const { processOrder, documentDate, postingDate, items } = res.data;
+        setProcessOrder(processOrder);
+        setDocumentDate(documentDate?.slice(0, 10));
+        setPostingDate(postingDate?.slice(0, 10));
+        setItems(items);
+      });
   }, [id]);
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleItemChange = (index, field, value) => {
+    const updatedItems = [...items];
+    updatedItems[index][field] = value;
+    setItems(updatedItems);
   };
 
-  const handleReceiptSelect = (receiptOrder) => {
-    if (!receiptOrder) return;
-    setForm({
-      ...form,
-      receiptOrderId: receiptOrder._id,
-      material: receiptOrder.materialId,
-      quantity: receiptOrder.quantity,
-      storageLocation: receiptOrder.storageLocation,
-      processOrder: `PO-${receiptOrder._id}`,
-    });
+  const handleAddRow = () => {
+    setItems([
+      ...items,
+      {
+        matShortText: '',
+        quantity: '',
+        eun: '',
+        storageLocation: '',
+        batch: '',
+        valuationType: '',
+        stockType: '',
+        plant: '',
+        stockSegment: '',
+      },
+    ]);
   };
 
-  const handleUpdate = () => {
+  const handleRemoveRow = (index) => {
+    const updated = [...items];
+    updated.splice(index, 1);
+    setItems(updated);
+  };
+
+  const handleSubmit = () => {
     const token = localStorage.getItem('token');
     axios
-      .put(`${server_Url}/api/v1/goods-issue/${id}`, form, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .put(
+        `${server_Url}/api/v1/goods-issue/${id}`,
+        {
+          processOrder,
+          documentDate,
+          postingDate,
+          items,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
       .then(() => {
         navigate('/manufacturing/goods-issue');
       })
-      .catch((err) => {
-        console.error('Error updating Goods Issue:', err);
-      });
+      .catch((err) => console.error('Update error', err));
   };
 
   return (
-    <Container maxWidth="md">
-      <h2 style={{ margin: '20px 0px', fontWeight: 'bold' }}>
-        Edit Goods Issue
-      </h2>
+    <Container>
+      <h2>Edit Goods Issue</h2>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Autocomplete
-            options={receiptOrders}
-            getOptionLabel={(order) =>
-              `${order.materialId} (${order.purchaseOrderRef || 'N/A'})`
-            }
-            value={
-              receiptOrders.find(
-                (order) => order._id === form.receiptOrderId
-              ) || null
-            }
-            onChange={(e, value) => handleReceiptSelect(value)}
-            renderInput={(params) => (
-              <TextField {...params} label="Select Receipt Order" fullWidth />
-            )}
-          />
-        </Grid>
-
-        <Grid item xs={12}>
+        <Grid item xs={6}>
           <TextField
             label="Process Order"
-            name="processOrder"
-            value={form.processOrder}
-            onChange={handleChange}
+            value={processOrder}
+            onChange={(e) => setProcessOrder(e.target.value)}
             fullWidth
           />
         </Grid>
-
-        <Grid item xs={12}>
-          <Autocomplete
-            options={materialOptions}
-            getOptionLabel={(opt) => opt.materialName || opt.materialNumber}
-            value={
-              materialOptions.find(
-                (opt) => opt.materialNumber === form.material
-              ) || null
-            }
-            onChange={(e, newValue) => {
-              if (!form.receiptOrderId) {
-                setForm({ ...form, material: newValue?.materialNumber || '' });
-              }
-            }}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Material"
-                fullWidth
-                disabled={!!form.receiptOrderId} // lock if receipt order exists
-              />
-            )}
-          />
-        </Grid>
-
-        <Grid item xs={6}>
-          <TextField
-            label="Quantity"
-            name="quantity"
-            type="number"
-            value={form.quantity}
-            onChange={handleChange}
-            fullWidth
-          />
-        </Grid>
-
-        <Grid item xs={6}>
-          <TextField
-            label="Storage Location"
-            name="storageLocation"
-            value={form.storageLocation}
-            onChange={handleChange}
-            fullWidth
-          />
-        </Grid>
-
-        <Grid item xs={6}>
-          <TextField
-            label="Posting Date"
-            name="postingDate"
-            type="date"
-            value={form.postingDate?.slice(0, 10)}
-            onChange={handleChange}
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-          />
-        </Grid>
-
-        <Grid item xs={6}>
+        <Grid item xs={3}>
           <TextField
             label="Document Date"
-            name="documentDate"
             type="date"
-            value={form.documentDate?.slice(0, 10)}
-            onChange={handleChange}
+            value={documentDate}
+            required
+            onChange={(e) => setDocumentDate(e.target.value)}
             InputLabelProps={{ shrink: true }}
             fullWidth
           />
         </Grid>
-
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
-            color="primary"
+        <Grid item xs={3}>
+          <TextField
+            label="Posting Date"
+            type="date"
+            required
+            value={postingDate}
+            onChange={(e) => setPostingDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
             fullWidth
-            onClick={handleUpdate}
-          >
-            Update Goods Issue
-          </Button>
+          />
         </Grid>
       </Grid>
+
+      <h4 style={{ marginTop: '30px' }}>Line Items</h4>
+      {items.map((item, index) => (
+        <Paper
+          key={index}
+          sx={{
+            padding: 2,
+            marginBottom: 2,
+            background: '#f9f9f9',
+            border: '1px solid #ccc',
+          }}
+        >
+          <Grid container spacing={2}>
+            <Grid item xs={2}>
+              <TextField
+                label="Mat. Short Text"
+                value={item.matShortText}
+                onChange={(e) =>
+                  handleItemChange(index, 'matShortText', e.target.value)
+                }
+                fullWidth
+              />
+            </Grid>
+
+            <Grid item xs={1.5}>
+              <TextField
+                label="Qty"
+                type="number"
+                value={item.quantity}
+                onChange={(e) =>
+                  handleItemChange(index, 'quantity', e.target.value)
+                }
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={1.5}>
+              <TextField
+                label="EUN"
+                value={item.eun}
+                onChange={(e) => handleItemChange(index, 'eun', e.target.value)}
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={2}>
+              <TextField
+                label="Storage Loc"
+                value={item.storageLocation}
+                onChange={(e) =>
+                  handleItemChange(index, 'storageLocation', e.target.value)
+                }
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={1.5}>
+              <TextField
+                label="Batch"
+                value={item.batch}
+                onChange={(e) =>
+                  handleItemChange(index, 'batch', e.target.value)
+                }
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={1.5}>
+              <TextField
+                label="Val Type"
+                value={item.valuationType}
+                onChange={(e) =>
+                  handleItemChange(index, 'valuationType', e.target.value)
+                }
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={2}>
+              <TextField
+                label="Stock Type"
+                value={item.stockType}
+                onChange={(e) =>
+                  handleItemChange(index, 'stockType', e.target.value)
+                }
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={2}>
+              <TextField
+                label="Plant"
+                value={item.plant}
+                onChange={(e) =>
+                  handleItemChange(index, 'plant', e.target.value)
+                }
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={2}>
+              <TextField
+                label="Stock Segment"
+                value={item.stockSegment}
+                onChange={(e) =>
+                  handleItemChange(index, 'stockSegment', e.target.value)
+                }
+                fullWidth
+              />
+            </Grid>
+            <Grid item xs={1}>
+              <IconButton onClick={() => handleRemoveRow(index)}>
+                <Delete />
+              </IconButton>
+            </Grid>
+          </Grid>
+        </Paper>
+      ))}
+
+      <Button onClick={handleAddRow} startIcon={<Add />} sx={{ mb: 2 }}>
+        Add Row
+      </Button>
+
+      <Button
+        variant="contained"
+        color="primary"
+        fullWidth
+        onClick={handleSubmit}
+        disabled={!processOrder || items.length === 0}
+      >
+        Update Goods Issue
+      </Button>
     </Container>
   );
 };
 
-export default EditGoodsIssue;
+export default EditGoodsIssueWithTable;
