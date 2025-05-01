@@ -248,6 +248,18 @@ const MaterialListScreen = React.lazy(() =>
   import('../components/Manufacturing/MRP/MaterialListScreen.jsx')
 );
 
+const ProductionOrder = React.lazy(() =>
+  import('../components/Manufacturing/ProductionOrder/ProductionOrder.jsx')
+);
+const CreateProductionOrder = React.lazy(() =>
+  import(
+    '../components/Manufacturing/ProductionOrder/CreateProductionOrder.jsx'
+  )
+);
+const EditProductionOrder = React.lazy(() =>
+  import('../components/Manufacturing/ProductionOrder/EditProductionOrder.jsx')
+);
+
 import {
   productsData,
   solutionsData,
@@ -562,6 +574,18 @@ export const privateRoutes = [
   {
     path: '/manufacturing/mrp/edit/:id/details',
     element: MaterialListScreen,
+  },
+  {
+    path: '/manufacturing/product-orders',
+    element: ProductionOrder,
+  },
+  {
+    path: '/manufacturing/product-orders/create',
+    element: CreateProductionOrder,
+  },
+  {
+    path: '/manufacturing/product-orders/edit/:id',
+    element: EditProductionOrder,
   },
 ];
 
