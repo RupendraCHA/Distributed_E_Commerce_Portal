@@ -234,6 +234,20 @@ const EditBillOfMaterial = React.lazy(() =>
   import('../components/Manufacturing/BillOfMaterial/EditBillOfMaterial.jsx')
 );
 
+const ListMRPScreen = React.lazy(() =>
+  import('../components/Manufacturing/MRP/ListMRPScreen.jsx')
+);
+
+const CreateSetupScreen = React.lazy(() =>
+  import('../components/Manufacturing/MRP/CreateSetupScreen.jsx')
+);
+const EditMRPScreen = React.lazy(() =>
+  import('../components/Manufacturing/MRP/EditMRPScreen.jsx')
+);
+const MaterialListScreen = React.lazy(() =>
+  import('../components/Manufacturing/MRP/MaterialListScreen.jsx')
+);
+
 import {
   productsData,
   solutionsData,
@@ -528,6 +542,26 @@ export const privateRoutes = [
   {
     path: '/manufacturing/bill-of-material/edit/:id',
     element: EditBillOfMaterial,
+  },
+  {
+    path: '/manufacturing/mrp',
+    element: ListMRPScreen,
+  },
+  {
+    path: '/manufacturing/mrp/create',
+    element: CreateSetupScreen,
+  },
+  {
+    path: '/manufacturing/mrp/edit/:id',
+    element: EditMRPScreen,
+  },
+  {
+    path: '/manufacturing/mrp/create/details',
+    element: MaterialListScreen,
+  },
+  {
+    path: '/manufacturing/mrp/edit/:id/details',
+    element: MaterialListScreen,
   },
 ];
 

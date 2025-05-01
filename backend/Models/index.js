@@ -15,6 +15,7 @@ const GoodsIssueModel = require("./GoodsIssue");
 const ManufactureGoodsReceiptModel = require("./GoodsReceipt");
 const RecieptOrderModel = require("./RecieptOrder");
 const BillOfMaterialModel = require("./BillOfMaterial.js");
+const MRPModel = require("./MRP.js");
 module.exports = {
   EmployeeModel,
   AddressModel,
@@ -33,4 +34,5 @@ module.exports = {
   RecieptOrderModel,
   ManufactureGoodsReceiptModel,
   BillOfMaterialModel,
+  MRPModel,
 };
