@@ -76,10 +76,14 @@ export const ManufacturingData = [
   },
   {
     title: 'Process Order',
-    path: '/manufacturing/receipt-orders',
+    path: '/manufacturing/process-orders',
   },
   {
-    title: 'Good Issue For Process Order',
+    title: 'Production Order',
+    path: '/manufacturing/product-orders',
+  },
+  {
+    title: 'Goods Issue For Process Order',
     path: '/manufacturing/goods-issue',
   },
   {

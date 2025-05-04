@@ -3,27 +3,40 @@ import {
   Container,
   TextField,
   Button,
-  Autocomplete,
   Grid,
+  Autocomplete,
+  IconButton,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
 } from '@mui/material';
+import { Add, Delete } from '@mui/icons-material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-const CreateGoodsIssue = () => {
+const CreateGoodsIssueWithTable = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
-  const navigate = useNavigate();
-
   const [receiptOrders, setReceiptOrders] = useState([]);
-  const [materialOptions, setMaterialOptions] = useState([]);
-  const [form, setForm] = useState({
-    processOrder: '',
-    receiptOrderId: '',
-    material: '',
-    quantity: '',
-    storageLocation: '',
-    postingDate: '',
-    documentDate: '',
-  });
+  const [processOrder, setProcessOrder] = useState('');
+  const [documentDate, setDocumentDate] = useState('');
+  const [postingDate, setPostingDate] = useState('');
+  const [items, setItems] = useState([
+    {
+      material: '',
+      quantity: '',
+      eun: '',
+      storageLocation: '',
+      batch: '',
+      valuationType: '',
+      stockType: '',
+      plant: '',
+      stockSegment: '',
+    },
+  ]);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -33,97 +46,81 @@ const CreateGoodsIssue = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then((res) => setReceiptOrders(res.data));
-
-    axios
-      .get(`${server_Url}/api/v1/getMaterialIds`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setMaterialOptions(res.data));
   }, []);
 
-  const handleReceiptSelect = (receiptOrder) => {
-    if (!receiptOrder) return;
-    setForm({
-      ...form,
-      receiptOrderId: receiptOrder._id,
-      material: receiptOrder.materialId,
-      quantity: receiptOrder.quantity,
-      storageLocation: receiptOrder.storageLocation,
-      processOrder: `PO-${receiptOrder._id}`,
-    });
+  const handleItemChange = (index, field, value) => {
+    const updatedItems = [...items];
+    updatedItems[index][field] = value;
+    setItems(updatedItems);
   };
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleAddRow = () => {
+    setItems([
+      ...items,
+      {
+        matShortText: '',
+        quantity: '',
+        eun: '',
+        storageLocation: '',
+        batch: '',
+        valuationType: '',
+        stockType: '',
+        plant: '',
+        stockSegment: '',
+      },
+    ]);
   };
 
-  const handleCreate = () => {
+  const handleRemoveRow = (index) => {
+    const updated = [...items];
+    updated.splice(index, 1);
+    setItems(updated);
+  };
+
+  const handleSubmit = () => {
     const token = localStorage.getItem('token');
     axios
-      .post(`${server_Url}/api/v1/goods-issue`, form, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .post(
+        `${server_Url}/api/v1/goods-issue`,
+        {
+          processOrder,
+          documentDate,
+          postingDate,
+          items,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      )
       .then(() => {
         navigate('/manufacturing/goods-issue');
       })
-      .catch((err) => {
-        console.error('Error creating Goods Issue:', err);
-      });
+      .catch((err) => console.error('Failed to create Goods Issue', err));
   };
 
   return (
-    <Container maxWidth="md">
-      <h2 style={{ margin: '20px 0px', fontWeight: 'bold' }}>
-        Create Goods Issue for Process Order
+    <Container>
+      <h2 style={{ fontSize: '15px', fontWeight: 'bold', margin: '10px 0px' }}>
+        Create Goods Issue
       </h2>
-      <Grid container spacing={2} sx={{ marginTop: 2 }}>
+      <Grid container spacing={2}>
         <Grid item xs={12}>
           <Autocomplete
             options={receiptOrders}
             getOptionLabel={(order) =>
-              `${order.materialId} (${order.purchaseOrderRef || 'N/A'})`
+              `${order.materialId} (${order.processOrderType || 'N/A'})`
             }
-            onChange={(e, value) => handleReceiptSelect(value)}
-            renderInput={(params) => (
-              <TextField {...params} label="Select Receipt Order" fullWidth />
-            )}
-          />
-        </Grid>
-
-        <Grid item xs={12}>
-          <TextField
-            label="Process Order"
-            name="processOrder"
-            value={form.processOrder}
-            onChange={handleChange}
-            fullWidth
-          />
-        </Grid>
-
-        <Grid item xs={12}>
-          <Autocomplete
-            disabled
-            options={materialOptions}
-            getOptionLabel={(opt) => opt.materialName || opt.materialNumber}
-            value={
-              materialOptions.find(
-                (opt) =>
-                  opt.materialId === form.material ||
-                  opt.materialNumber === form.material
-              ) || null
-            }
-            onChange={(e, newValue) => {
-              // Only allow material selection if no receiptOrder is selected
-              if (!form.receiptOrderId) {
-                setForm({ ...form, material: newValue?.materialNumber || '' });
+            onChange={(e, value) => {
+              if (value) {
+                setProcessOrder(`PO-${value._id}`);
               }
             }}
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Material"
+                label="Select Receipt Order"
                 fullWidth
-                disabled={!!form.receiptOrderId} // 🔒 Lock after selecting Receipt Order
+                required
               />
             )}
           />
@@ -131,62 +128,181 @@ const CreateGoodsIssue = () => {
 
         <Grid item xs={6}>
           <TextField
-            label="Quantity"
-            name="quantity"
-            type="number"
-            value={form.quantity}
-            onChange={handleChange}
+            label="Process Order"
             fullWidth
+            value={processOrder}
+            onChange={(e) => setProcessOrder(e.target.value)}
           />
         </Grid>
-
-        <Grid item xs={6}>
-          <TextField
-            label="Storage Location"
-            name="storageLocation"
-            value={form.storageLocation}
-            onChange={handleChange}
-            fullWidth
-          />
-        </Grid>
-
-        <Grid item xs={6}>
-          <TextField
-            label="Posting Date"
-            name="postingDate"
-            type="date"
-            value={form.postingDate}
-            onChange={handleChange}
-            InputLabelProps={{ shrink: true }}
-            fullWidth
-          />
-        </Grid>
-
-        <Grid item xs={6}>
+        <Grid item xs={3}>
           <TextField
             label="Document Date"
-            name="documentDate"
             type="date"
-            value={form.documentDate}
-            onChange={handleChange}
+            required
+            value={documentDate}
+            onChange={(e) => setDocumentDate(e.target.value)}
             InputLabelProps={{ shrink: true }}
             fullWidth
           />
         </Grid>
-
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
+        <Grid item xs={3}>
+          <TextField
+            label="Posting Date"
+            type="date"
+            required
+            value={postingDate}
+            onChange={(e) => setPostingDate(e.target.value)}
+            InputLabelProps={{ shrink: true }}
             fullWidth
-            onClick={handleCreate}
-            disabled={!form.material || !form.quantity || !form.processOrder}
-          >
-            Create Goods Issue
-          </Button>
+          />
         </Grid>
       </Grid>
+
+      <h4 style={{ marginTop: '30px' }}>Line Items</h4>
+
+      <div style={{ overflowX: 'auto', maxWidth: '100%' }}>
+        <Table style={{ minWidth: '1800px' }}>
+          <TableHead>
+            <TableRow>
+              {[
+                'Mat. Short Text',
+                'Qty',
+                'EUN',
+                'Storage Loc',
+                'Batch',
+                'Val Type',
+                'Stock Type',
+                'Plant',
+                'Stock Segment',
+                'Action',
+              ].map((header) => (
+                <TableCell key={header} style={{ fontWeight: 'bold' }}>
+                  {header}
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {items.map((item, index) => (
+              <TableRow key={index}>
+                <TableCell>
+                  <TextField
+                    value={item.matShortText}
+                    onChange={(e) =>
+                      handleItemChange(index, 'matShortText', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    type="number"
+                    value={item.quantity}
+                    onChange={(e) =>
+                      handleItemChange(index, 'quantity', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={item.eun}
+                    onChange={(e) =>
+                      handleItemChange(index, 'eun', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={item.storageLocation}
+                    onChange={(e) =>
+                      handleItemChange(index, 'storageLocation', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={item.batch}
+                    onChange={(e) =>
+                      handleItemChange(index, 'batch', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={item.valuationType}
+                    onChange={(e) =>
+                      handleItemChange(index, 'valuationType', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={item.stockType}
+                    onChange={(e) =>
+                      handleItemChange(index, 'stockType', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={item.plant}
+                    onChange={(e) =>
+                      handleItemChange(index, 'plant', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <TextField
+                    value={item.stockSegment}
+                    onChange={(e) =>
+                      handleItemChange(index, 'stockSegment', e.target.value)
+                    }
+                    fullWidth
+                  />
+                </TableCell>
+                <TableCell>
+                  <IconButton
+                    color="secondary"
+                    onClick={() => handleRemoveRow(index)}
+                    disabled={items.length === 1}
+                  >
+                    <Delete />
+                  </IconButton>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      <Button
+        startIcon={<Add />}
+        onClick={handleAddRow}
+        variant="outlined"
+        color="primary"
+        style={{ marginTop: '10px' }}
+      >
+        Add Row
+      </Button>
+
+      <Button
+        variant="contained"
+        color="primary"
+        fullWidth
+        onClick={handleSubmit}
+        disabled={!processOrder || items.length === 0}
+      >
+        Submit Goods Issue
+      </Button>
     </Container>
   );
 };
 
-export default CreateGoodsIssue;
+export default CreateGoodsIssueWithTable;

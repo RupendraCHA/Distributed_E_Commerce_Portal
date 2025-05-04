@@ -11,7 +11,11 @@ import {
   MenuItem,
 } from '@mui/material'; // MUI components
 import { useSelector, useDispatch } from 'react-redux';
-import { DashboardsData, SourcingData, ManufacturingData  } from '../../data/PosetraDataPage';
+import {
+  DashboardsData,
+  SourcingData,
+  ManufacturingData,
+} from '../../data/PosetraDataPage';
 import { setCartItems } from '../../store/cartSlice'; // Import the setCartItems action
 import axios from 'axios';
 
@@ -25,7 +29,8 @@ const Header = () => {
 
   const [anchorEl, setAnchorEl] = useState(null);
   const [anchorElForSourcing, setAnchorElForSourcing] = useState(null);
-  const [anchorElForManufacturing, setAnchorElForManufacturing] = useState(null);
+  const [anchorElForManufacturing, setAnchorElForManufacturing] =
+    useState(null);
   const [distributorAnchorEl, setDistributorAnchorEl] = useState(null);
   const [text, setText] = useState('');
   // Distribution routes
@@ -86,7 +91,9 @@ const Header = () => {
     setAnchorElForSourcing(anchorElForSourcing ? null : event.currentTarget);
   };
   const handleManufacturing = (event) => {
-    setAnchorElForManufacturing(anchorElForManufacturing ? null : event.currentTarget);
+    setAnchorElForManufacturing(
+      anchorElForManufacturing ? null : event.currentTarget
+    );
   };
 
   const handleDistributorClick = (event) => {
@@ -159,6 +166,7 @@ const Header = () => {
                     open={Boolean(anchorElForSourcing)}
                     anchorEl={anchorElForSourcing}
                     placement="bottom-start"
+                    disablePortal={false}
                     modifiers={[
                       {
                         name: 'offset',
@@ -167,6 +175,9 @@ const Header = () => {
                         },
                       },
                     ]}
+                    sx={{
+                      zIndex: 10000,
+                    }}
                   >
                     <ClickAwayListener onClickAway={handleSourcingPopperClose}>
                       <Paper>
@@ -192,6 +203,7 @@ const Header = () => {
                     open={Boolean(anchorElForManufacturing)}
                     anchorEl={anchorElForManufacturing}
                     placement="bottom-start"
+                    disablePortal={false}
                     modifiers={[
                       {
                         name: 'offset',
@@ -201,13 +213,13 @@ const Header = () => {
                       },
                     ]}
                     sx={{
-                      ":root":{
-                        zIndex:1000
-                      }
+                      zIndex: 10000,
                     }}
                   >
-                    <ClickAwayListener onClickAway={handleManufacturingPopperClose}>
-                      <Paper >
+                    <ClickAwayListener
+                      onClickAway={handleManufacturingPopperClose}
+                    >
+                      <Paper>
                         <MenuList
                           autoFocusItem={Boolean(anchorElForManufacturing)}
                           id="menu-list-grow"
@@ -216,7 +228,9 @@ const Header = () => {
                             return (
                               <MenuItem
                                 className="text-blue-500"
-                                onClick={() => handleManufacturingPopperClose(path)}
+                                onClick={() =>
+                                  handleManufacturingPopperClose(path)
+                                }
                               >
                                 {title}
                               </MenuItem>
@@ -390,7 +404,7 @@ const Header = () => {
                     marginLeft: '10px',
                   }}
                 >
-                  {user.name}
+                  {user?.name}
                 </div>
 
                 <Popper

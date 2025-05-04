@@ -34,11 +34,11 @@ const ListReceiptOrders = () => {
         alignItems="center"
         my={2}
       >
-        <h2>Receipt Orders</h2>
+        <h2>Process Orders</h2>
         <Button
           variant="contained"
           color="primary"
-          onClick={() => navigate('/manufacturing/receipt-orders/create')}
+          onClick={() => navigate('/manufacturing/process-orders/create')}
         >
           Create New
         </Button>
@@ -52,7 +52,8 @@ const ListReceiptOrders = () => {
             <TableCell>Storage Location</TableCell>
             <TableCell>Quantity</TableCell>
             <TableCell>Unit</TableCell>
-            <TableCell>PO Ref</TableCell>
+            <TableCell>Process Order Type</TableCell>
+            <TableCell>Process Order</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
@@ -64,11 +65,12 @@ const ListReceiptOrders = () => {
               <TableCell>{row.storageLocation}</TableCell>
               <TableCell>{row.quantity}</TableCell>
               <TableCell>{row.unit}</TableCell>
-              <TableCell>{row.purchaseOrderRef}</TableCell>
+              <TableCell>{row.processOrderType}</TableCell>
+              <TableCell>{row.processOrder}</TableCell>
               <TableCell>
                 <Button
                   onClick={() =>
-                    navigate(`/manufacturing/receipt-orders/edit/${row._id}`)
+                    navigate(`/manufacturing/process-orders/edit/${row._id}`)
                   }
                 >
                   Edit

@@ -7,7 +7,7 @@ import {
   Grid,
 } from '@mui/material';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const CreateReceiptOrder = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
@@ -15,11 +15,35 @@ const CreateReceiptOrder = () => {
 
   const [materialOptions, setMaterialOptions] = useState([]);
   const [materialId, setMaterialId] = useState('');
+  const [materialName, setMaterialName] = useState('');
   const [plant, setPlant] = useState('');
   const [storageLocation, setStorageLocation] = useState('');
   const [quantity, setQuantity] = useState('');
   const [unit, setUnit] = useState('');
-  const [purchaseOrderRef, setPurchaseOrderRef] = useState('');
+  const [processOrderType, setProcessOrderType] = useState('');
+  const [processOrder, setProcessOrder] = useState('');
+  const location = useLocation();
+  useEffect(() => {
+    console.log('Location state:', location.state);
+    if (location.state) {
+      const {
+        materialId = '',
+        plant = '',
+        storageLocation = '',
+        quantity = '',
+        unit = '',
+        processOrderType = '',
+        processOrder = '',
+      } = location.state;
+      setMaterialId(materialId);
+      setPlant(plant);
+      setStorageLocation(storageLocation);
+      setQuantity(quantity);
+      setUnit(unit);
+      setProcessOrderType(processOrderType);
+      setProcessOrder(processOrder);
+    }
+  }, [location.state]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -39,7 +63,8 @@ const CreateReceiptOrder = () => {
       storageLocation,
       quantity,
       unit,
-      purchaseOrderRef,
+      processOrderType,
+      processOrder,
     };
 
     axios
@@ -47,7 +72,7 @@ const CreateReceiptOrder = () => {
         headers: { Authorization: `Bearer ${token}` },
       })
       .then(() => {
-        navigate('/manufacturing/receipt-orders');
+        navigate('/manufacturing/process-orders');
       })
       .catch((err) => {
         console.error('Error creating receipt order:', err);
@@ -57,7 +82,7 @@ const CreateReceiptOrder = () => {
   return (
     <Container maxWidth="md">
       <h2 style={{ margin: '20px 0px', fontWeight: 'bold' }}>
-        Create Receipt Order
+        Create Process Order
       </h2>
 
       <Grid container spacing={2}>
@@ -67,8 +92,13 @@ const CreateReceiptOrder = () => {
             getOptionLabel={(option) =>
               `${option.materialName} (${option.materialId})`
             }
+            value={
+              materialOptions.find((opt) => opt.materialId === materialId) ||
+              null
+            }
             onChange={(e, newValue) => {
               setMaterialId(newValue?.materialId || '');
+              setMaterialName(newValue?.materialName || ''); // Add this line to set materialName
               setPlant(newValue?.plant || '');
               setStorageLocation(newValue?.storageLocation || '');
               setUnit(newValue?.unit || '');
@@ -112,11 +142,19 @@ const CreateReceiptOrder = () => {
             fullWidth
           />
         </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={6}>
           <TextField
-            label="Purchase Order Reference"
-            value={purchaseOrderRef}
-            onChange={(e) => setPurchaseOrderRef(e.target.value)}
+            label="Process Order Type"
+            value={processOrderType}
+            onChange={(e) => setProcessOrderType(e.target.value)}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            label="Process Order"
+            value={processOrder}
+            onChange={(e) => setProcessOrder(e.target.value)}
             fullWidth
           />
         </Grid>
@@ -126,10 +164,23 @@ const CreateReceiptOrder = () => {
             variant="contained"
             color="primary"
             fullWidth
-            onClick={handleCreateReceipt}
+            onClick={() =>
+              navigate('/manufacturing/process-orders/create/details', {
+                state: {
+                  materialId,
+                  materialName,
+                  plant,
+                  storageLocation,
+                  quantity,
+                  unit,
+                  processOrderType,
+                  processOrder,
+                },
+              })
+            }
             disabled={!materialId || !plant || !storageLocation || !quantity}
           >
-            Create Receipt Order
+            Continue
           </Button>
         </Grid>
       </Grid>

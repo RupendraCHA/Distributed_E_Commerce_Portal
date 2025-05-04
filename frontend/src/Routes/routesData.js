@@ -196,14 +196,17 @@ const CreateGoodIssueForProcessOrder = React.lazy(() =>
     '../components/Manufacturing/GoodsIssueProcessOrder/CreateGoodsIssue.jsx'
   )
 );
-const CreateReceiptOrder = React.lazy(() =>
-  import('../components/Manufacturing/RecieptOrder/CreateReceiptOrder.jsx')
+const CreateProcessOrder = React.lazy(() =>
+  import('../components/Manufacturing/ProcessOrder/CreateProcessOrder.jsx')
 );
-const EditReceiptOrder = React.lazy(() =>
-  import('../components/Manufacturing/RecieptOrder/EditReceiptOrder.jsx')
+const EditProcessOrder = React.lazy(() =>
+  import('../components/Manufacturing/ProcessOrder/EditProcessOrder.jsx')
 );
-const ListReceiptOrders = React.lazy(() =>
-  import('../components/Manufacturing/RecieptOrder/ListReceiptOrders.jsx')
+const ListProcessOrders = React.lazy(() =>
+  import('../components/Manufacturing/ProcessOrder/ListProcessOrders.jsx')
+);
+const ProcessOrderDetails = React.lazy(() =>
+  import('../components/Manufacturing/ProcessOrder/ProcessOrderDetails.jsx')
 );
 const CreateGoodsReceiptForTable = React.lazy(() =>
   import(
@@ -229,6 +232,32 @@ const CreateBillOfMaterial = React.lazy(() =>
 );
 const EditBillOfMaterial = React.lazy(() =>
   import('../components/Manufacturing/BillOfMaterial/EditBillOfMaterial.jsx')
+);
+
+const ListMRPScreen = React.lazy(() =>
+  import('../components/Manufacturing/MRP/ListMRPScreen.jsx')
+);
+
+const CreateSetupScreen = React.lazy(() =>
+  import('../components/Manufacturing/MRP/CreateSetupScreen.jsx')
+);
+const EditMRPScreen = React.lazy(() =>
+  import('../components/Manufacturing/MRP/EditMRPScreen.jsx')
+);
+const MaterialListScreen = React.lazy(() =>
+  import('../components/Manufacturing/MRP/MaterialListScreen.jsx')
+);
+
+const ProductionOrder = React.lazy(() =>
+  import('../components/Manufacturing/ProductionOrder/ProductionOrder.jsx')
+);
+const CreateProductionOrder = React.lazy(() =>
+  import(
+    '../components/Manufacturing/ProductionOrder/CreateProductionOrder.jsx'
+  )
+);
+const EditProductionOrder = React.lazy(() =>
+  import('../components/Manufacturing/ProductionOrder/EditProductionOrder.jsx')
 );
 
 import {
@@ -462,16 +491,20 @@ export const privateRoutes = [
     element: EditGoodIssueForProcessOrder,
   },
   {
-    path: '/manufacturing/receipt-orders',
-    element: ListReceiptOrders,
+    path: '/manufacturing/process-orders',
+    element: ListProcessOrders,
   },
   {
-    path: '/manufacturing/receipt-orders/create',
-    element: CreateReceiptOrder,
+    path: '/manufacturing/process-orders/create/details',
+    element: ProcessOrderDetails,
   },
   {
-    path: '/manufacturing/receipt-orders/edit/:id',
-    element: EditReceiptOrder,
+    path: '/manufacturing/process-orders/create',
+    element: CreateProcessOrder,
+  },
+  {
+    path: '/manufacturing/process-orders/edit/:id',
+    element: EditProcessOrder,
   },
   {
     path: '/manufacturing/goods-receipt',
@@ -521,6 +554,38 @@ export const privateRoutes = [
   {
     path: '/manufacturing/bill-of-material/edit/:id',
     element: EditBillOfMaterial,
+  },
+  {
+    path: '/manufacturing/mrp',
+    element: ListMRPScreen,
+  },
+  {
+    path: '/manufacturing/mrp/create',
+    element: CreateSetupScreen,
+  },
+  {
+    path: '/manufacturing/mrp/edit/:id',
+    element: EditMRPScreen,
+  },
+  {
+    path: '/manufacturing/mrp/create/details',
+    element: MaterialListScreen,
+  },
+  {
+    path: '/manufacturing/mrp/edit/:id/details',
+    element: MaterialListScreen,
+  },
+  {
+    path: '/manufacturing/product-orders',
+    element: ProductionOrder,
+  },
+  {
+    path: '/manufacturing/product-orders/create',
+    element: CreateProductionOrder,
+  },
+  {
+    path: '/manufacturing/product-orders/edit/:id',
+    element: EditProductionOrder,
   },
 ];
 

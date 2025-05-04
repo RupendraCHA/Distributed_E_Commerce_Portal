@@ -34,7 +34,11 @@ const ListGoodsIssue = () => {
         alignItems="center"
         my={2}
       >
-        <h2>Goods Issue Records</h2>
+        <h2
+          style={{ fontSize: '15px', fontWeight: 'bold', margin: '10px 0px' }}
+        >
+          Goods Issue Records
+        </h2>
         <Button
           variant="contained"
           color="primary"
@@ -43,11 +47,12 @@ const ListGoodsIssue = () => {
           Create New
         </Button>
       </Box>
+
       <Table>
         <TableHead>
           <TableRow>
             <TableCell>Process Order</TableCell>
-            <TableCell>Material</TableCell>
+            <TableCell>Mat. Short Text</TableCell>
             <TableCell>Quantity</TableCell>
             <TableCell>Storage Location</TableCell>
             <TableCell>Posting Date</TableCell>
@@ -56,25 +61,31 @@ const ListGoodsIssue = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {goodsIssues.map((row) => (
-            <TableRow key={row._id}>
-              <TableCell>{row.processOrder}</TableCell>
-              <TableCell>{row.material}</TableCell>
-              <TableCell>{row.quantity}</TableCell>
-              <TableCell>{row.storageLocation}</TableCell>
-              <TableCell>{row.postingDate?.slice(0, 10)}</TableCell>
-              <TableCell>{row.documentDate?.slice(0, 10)}</TableCell>
-              <TableCell>
-                <Button
-                  onClick={() =>
-                    navigate(`/manufacturing/goods-issue/edit/${row._id}`)
-                  }
-                >
-                  Edit
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))}
+          {goodsIssues.map((issue) =>
+            issue.items.map((item, index) => (
+              <TableRow key={`${issue._id}-${index}`}>
+                <TableCell>{issue.processOrder}</TableCell>
+                <TableCell>{item.matShortText}</TableCell>
+                <TableCell>{item.quantity}</TableCell>
+                <TableCell>{item.storageLocation}</TableCell>
+                <TableCell>
+                  {new Date(issue.postingDate).toISOString().slice(0, 10)}
+                </TableCell>
+                <TableCell>
+                  {new Date(issue.documentDate).toISOString().slice(0, 10)}
+                </TableCell>
+                <TableCell>
+                  <Button
+                    onClick={() =>
+                      navigate(`/manufacturing/goods-issue/edit/${issue._id}`)
+                    }
+                  >
+                    Edit
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))
+          )}
         </TableBody>
       </Table>
     </Container>

@@ -26,6 +26,7 @@ const {
   GoodsIssueModel,
   ManufactureGoodsReceiptModel,
   BillOfMaterialModel,
+  MRPModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -54,9 +55,9 @@ const Stripe_Key = process.env.Stripe_Key;
 const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = process.env.PORT;
 
-const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com" // Visionsoft
-// const checkoutURLs = "https://distributed-e-commerce-portal-frontend.onrender.com"; origin1
-// const checkoutURLs = "http://localhost:5173"; 
+// const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com" // Visionsoft
+// const checkoutURLs = "https://distributed-e-commerce-portal-frontend.onrender.com";
+const checkoutURLs = "http://localhost:5173";
 
 const connectDB = async () => {
   try {
@@ -2127,6 +2128,44 @@ app.put("/api/v1/requisition/:id", authenticateToken, async (req, res) => {
   }
 });
 
+// Create
+app.post("/api/v1/mrp", authenticateToken, async (req, res) => {
+  try {
+    const mrp = new MRPModel(req.body);
+    await mrp.save();
+    res.status(201).json(mrp);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// Read All
+app.get("/api/v1/mrp", authenticateToken, async (req, res) => {
+  const data = await MRPModel.find();
+  res.json(data);
+});
+
+// Read by ID
+app.get("/api/v1/mrp/:id", authenticateToken, async (req, res) => {
+  const mrp = await MRPModel.findById(req.params.id);
+  if (!mrp) return res.status(404).send("Not found");
+  res.json(mrp);
+});
+
+// Update
+app.put("/api/v1/mrp/:id", authenticateToken, async (req, res) => {
+  const mrp = await MRPModel.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+  });
+  res.json(mrp);
+});
+
+// Delete
+app.delete("/api/v1/mrp/:id", authenticateToken, async (req, res) => {
+  await MRPModel.findByIdAndDelete(req.params.id);
+  res.sendStatus(204);
+});
+
 app.post("/api/v1/goods-issue/", async (req, res) => {
   try {
     const goodsIssue = new GoodsIssueModel(req.body);
@@ -2174,7 +2213,7 @@ app.get("/api/v1/goods-issue/:id", async (req, res) => {
 });
 
 // Create
-app.post("/api/v1/receipt-orders/", async (req, res) => {
+app.post("/api/v1/receipt-orders", async (req, res) => {
   try {
     const receiptOrder = new ReceiptOrderModel(req.body);
     await receiptOrder.save();
@@ -2185,7 +2224,7 @@ app.post("/api/v1/receipt-orders/", async (req, res) => {
 });
 
 // List
-app.get("/api/v1/receipt-orders/", async (req, res) => {
+app.get("/api/v1/receipt-orders", async (req, res) => {
   try {
     const all = await ReceiptOrderModel.find().sort({
       createdAt: -1,
