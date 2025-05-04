@@ -90,7 +90,11 @@ const CreateProductionOrder = () => {
           </Grid>
           <Grid item xs={12}>
             <Box display="flex" gap={2}>
-              <Button type="submit" variant="contained" color="primary">
+              <Button
+                // type="submit"
+                variant="contained"
+                color="primary"
+              >
                 Create
               </Button>
               <Button

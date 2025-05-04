@@ -38,7 +38,7 @@ const ProductionOrder = () => {
         <Button
           variant="contained"
           color="primary"
-          //   onClick={() => navigate('/manufacturing/product-orders/create')}
+          onClick={() => navigate('/manufacturing/product-orders/create')}
         >
           Create Production Order
         </Button>
@@ -49,20 +49,20 @@ const ProductionOrder = () => {
             <TableCell>Order</TableCell>
             <TableCell>Material</TableCell>
             <TableCell>Production Plant</TableCell>
-            {/* <TableCell>Planning Plant</TableCell>
+            <TableCell>Planning Plant</TableCell>
             <TableCell>Order Type</TableCell>
-            <TableCell>Actions</TableCell> */}
+            {/* <TableCell>Actions</TableCell> */}
           </TableRow>
         </TableHead>
         <TableBody>
-          {/* {mockOrders.map((order) => (
+          {mockOrders.map((order) => (
             <TableRow key={order.id}>
               <TableCell>{order.order}</TableCell>
               <TableCell>{order.material}</TableCell>
               <TableCell>{order.productionPlant}</TableCell>
               <TableCell>{order.planningPlant}</TableCell>
               <TableCell>{order.orderType}</TableCell>
-              <TableCell>
+              {/* <TableCell>
                 <Button
                   variant="outlined"
                   onClick={() =>
@@ -71,9 +71,9 @@ const ProductionOrder = () => {
                 >
                   Edit
                 </Button>
-              </TableCell>
+              </TableCell> */}
             </TableRow>
-          ))} */}
+          ))}
         </TableBody>
       </Table>
     </Container>
