@@ -51,7 +51,7 @@ const ProductionOrder = () => {
             <TableCell>Production Plant</TableCell>
             <TableCell>Planning Plant</TableCell>
             <TableCell>Order Type</TableCell>
-            {/* <TableCell>Actions</TableCell> */}
+            <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -62,7 +62,7 @@ const ProductionOrder = () => {
               <TableCell>{order.productionPlant}</TableCell>
               <TableCell>{order.planningPlant}</TableCell>
               <TableCell>{order.orderType}</TableCell>
-              {/* <TableCell>
+              <TableCell>
                 <Button
                   variant="outlined"
                   onClick={() =>
@@ -71,7 +71,7 @@ const ProductionOrder = () => {
                 >
                   Edit
                 </Button>
-              </TableCell> */}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
