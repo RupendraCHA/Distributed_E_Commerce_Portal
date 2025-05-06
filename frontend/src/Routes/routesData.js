@@ -260,6 +260,10 @@ const EditProductionOrder = React.lazy(() =>
   import('../components/Manufacturing/ProductionOrder/EditProductionOrder.jsx')
 );
 
+const ProductionOrderDetails = React.lazy(() =>
+  import('../components/Manufacturing/ProductionOrder/ProductionOrderTabs.jsx')
+);
+
 import {
   productsData,
   solutionsData,
@@ -586,6 +590,10 @@ export const privateRoutes = [
   {
     path: '/manufacturing/product-orders/edit/:id',
     element: EditProductionOrder,
+  },
+  {
+    path: '/manufacturing/product-orders/details',
+    element: ProductionOrderDetails,
   },
 ];
 

@@ -27,6 +27,7 @@ const {
   ManufactureGoodsReceiptModel,
   BillOfMaterialModel,
   MRPModel,
+  ProductionOrderModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -3186,6 +3187,62 @@ app.post(
     }
   }
 );
+
+// CREATE Production Order
+app.post("/api/v1/production-orders/", async (req, res) => {
+  try {
+    const newOrder = new ProductionOrderModel(req.body);
+    await newOrder.save();
+    res.status(201).json(newOrder);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// GET all Production Orders (List View)
+app.get("/api/v1/production-orders/", async (req, res) => {
+  try {
+    const orders = await ProductionOrderModel.find().sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET Production Order by ID (for Edit Screen)
+app.get("/api/v1/production-orders/:id", async (req, res) => {
+  try {
+    const order = await ProductionOrderModel.findById(req.params.id);
+    if (!order) return res.status(404).json({ error: "Order not found" });
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// UPDATE Production Order by ID
+app.put("/api/v1/production-orders/:id", async (req, res) => {
+  try {
+    const updated = await ProductionOrderModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updated);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// DELETE Production Order by ID (Optional)
+app.delete("/api/v1/production-orders/:id", async (req, res) => {
+  try {
+    await ProductionOrderModel.findByIdAndDelete(req.params.id);
+    res.json({ message: "Production Order deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 app.get("/api/v1/inventories", authenticateToken, async (req, res) => {
   try {

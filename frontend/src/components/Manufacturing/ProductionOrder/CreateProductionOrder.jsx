@@ -1,115 +1,146 @@
-import React, { useState } from 'react';
-import { Container, TextField, Button, Grid, Box } from '@mui/material';
+import React, { useState, useEffect } from 'react';
+import {
+  Container,
+  Grid,
+  TextField,
+  Button,
+  Typography,
+  Autocomplete,
+} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-const CreateProductionOrder = () => {
-  const [form, setForm] = useState({
-    material: '',
-    productionPlant: '',
-    planningPlant: '',
-    orderType: '',
-    order: '',
-    copyFromOrder: '',
-  });
+const CreateProductionOrderInitial = () => {
+  const server_Url = import.meta.env.VITE_API_SERVER_URL;
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-  };
+  const [materialOptions, setMaterialOptions] = useState([]);
+  const [materialId, setMaterialId] = useState('');
+  const [materialName, setMaterialName] = useState('');
+  const [productionPlant, setProductionPlant] = useState('');
+  const [planningPlant, setPlanningPlant] = useState('');
+  const [orderType, setOrderType] = useState('');
+  const [order, setOrder] = useState('');
+  const [copyFromOrder, setCopyFromOrder] = useState('');
+  const [unit, setUnit] = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Submit logic here
-    navigate('/manufacturing/product-orders');
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    axios
+      .get(`${server_Url}/api/v1/getMaterialIds`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((res) => setMaterialOptions(res.data))
+      .catch((err) => console.error('Error fetching materials:', err));
+  }, []);
+
+  const handleContinue = () => {
+    navigate('/manufacturing/product-orders/details', {
+      state: {
+        form: {
+          material: materialId,
+          materialName,
+          productionPlant,
+          planningPlant,
+          orderType,
+          order,
+          copyFromOrder,
+          unit,
+        },
+        mode: 'create',
+      },
+    });
   };
 
   return (
     <Container maxWidth="md">
-      <h2 style={{ margin: '20px 0px', fontWeight: 'bold' }}>
-        Create Production Order
-      </h2>
-      <form onSubmit={handleSubmit}>
-        <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Material"
-              name="material"
-              value={form.material}
-              onChange={handleChange}
-              required
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Production Plant"
-              name="productionPlant"
-              value={form.productionPlant}
-              onChange={handleChange}
-              required
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Planning Plant"
-              name="planningPlant"
-              value={form.planningPlant}
-              onChange={handleChange}
-              required
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Order Type"
-              name="orderType"
-              value={form.orderType}
-              onChange={handleChange}
-              required
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Order"
-              name="order"
-              value={form.order}
-              onChange={handleChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              label="Copy from Order"
-              name="copyFromOrder"
-              value={form.copyFromOrder}
-              onChange={handleChange}
-              fullWidth
-            />
-          </Grid>
-          <Grid item xs={12}>
-            <Box display="flex" gap={2}>
-              <Button
-                // type="submit"
-                variant="contained"
-                color="primary"
-              >
-                Create
-              </Button>
-              <Button
-                type="button"
-                variant="outlined"
-                onClick={() => navigate('/manufacturing/product-orders')}
-              >
-                Cancel
-              </Button>
-            </Box>
-          </Grid>
+      <Typography variant="h5" sx={{ mt: 4, mb: 3, fontWeight: 'bold' }}>
+        Create Production Order – Initial Screen
+      </Typography>
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Autocomplete
+            options={materialOptions}
+            getOptionLabel={(option) =>
+              `${option.materialName} (${option.materialId})`
+            }
+            value={
+              materialOptions.find((opt) => opt.materialId === materialId) ||
+              null
+            }
+            onChange={(e, newValue) => {
+              setMaterialId(newValue?.materialId || '');
+              setMaterialName(newValue?.materialName || '');
+              setProductionPlant(newValue?.plant || '');
+              setPlanningPlant(newValue?.plant || '');
+              setUnit(newValue?.unit || '');
+            }}
+            renderInput={(params) => (
+              <TextField {...params} label="Material" required fullWidth />
+            )}
+          />
         </Grid>
-      </form>
+
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="Production Plant"
+            value={productionPlant}
+            onChange={(e) => setProductionPlant(e.target.value)}
+            fullWidth
+            required
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="Planning Plant"
+            value={planningPlant}
+            onChange={(e) => setPlanningPlant(e.target.value)}
+            fullWidth
+            required
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="Order Type"
+            value={orderType}
+            onChange={(e) => setOrderType(e.target.value)}
+            fullWidth
+            required
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="Order (Optional)"
+            value={order}
+            onChange={(e) => setOrder(e.target.value)}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="Copy From Order (Optional)"
+            value={copyFromOrder}
+            onChange={(e) => setCopyFromOrder(e.target.value)}
+            fullWidth
+          />
+        </Grid>
+        <Grid item xs={12}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleContinue}
+            fullWidth
+            sx={{ mt: 2 }}
+            disabled={
+              !materialId || !productionPlant || !planningPlant || !orderType
+            }
+          >
+            Continue
+          </Button>
+        </Grid>
+      </Grid>
     </Container>
   );
 };
 
-export default CreateProductionOrder;
+export default CreateProductionOrderInitial;
