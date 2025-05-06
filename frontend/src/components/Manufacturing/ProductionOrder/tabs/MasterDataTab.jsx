@@ -12,16 +12,21 @@ const MasterDataTab = ({ form, onChange }) => (
         fullWidth
       />
     </Grid>
-    <Grid item xs={6}>
+
+    <Grid item xs={12}>
+      <h4>Routing</h4>
+    </Grid>
+
+    <Grid item xs={12} sm={6}>
       <TextField
-        label="Routing Group"
+        label="Group"
         name="routing.group"
         value={form.routing?.group || ''}
         onChange={onChange}
         fullWidth
       />
     </Grid>
-    <Grid item xs={6}>
+    <Grid item xs={12} sm={6}>
       <TextField
         label="Group Counter"
         name="routing.groupCounter"
@@ -32,27 +37,9 @@ const MasterDataTab = ({ form, onChange }) => (
     </Grid>
     <Grid item xs={6}>
       <TextField
-        label="Valid From"
-        name="routing.validFrom"
-        value={form.routing?.validFrom || ''}
-        onChange={onChange}
-        fullWidth
-      />
-    </Grid>
-    <Grid item xs={6}>
-      <TextField
-        label="Valid To"
-        name="routing.validTo"
-        value={form.routing?.validTo || ''}
-        onChange={onChange}
-        fullWidth
-      />
-    </Grid>
-    <Grid item xs={6}>
-      <TextField
-        label="Explosion Date"
-        name="routing.explosionDate"
-        value={form.routing?.explosionDate || ''}
+        label="TL Type"
+        name="routing.tlType"
+        value={form.routing?.tlType || ''}
         onChange={onChange}
         fullWidth
       />
@@ -63,6 +50,28 @@ const MasterDataTab = ({ form, onChange }) => (
         name="routing.plannerGroup"
         value={form.routing?.plannerGroup || ''}
         onChange={onChange}
+        fullWidth
+      />
+    </Grid>
+    <Grid item xs={6}>
+      <TextField
+        label="Valid From"
+        name="routing.validFrom"
+        value={form.routing?.validFrom || ''}
+        onChange={onChange}
+        type="date"
+        InputLabelProps={{ shrink: true }}
+        fullWidth
+      />
+    </Grid>
+    <Grid item xs={6}>
+      <TextField
+        label="Valid To"
+        name="routing.validTo"
+        value={form.routing?.validTo || ''}
+        onChange={onChange}
+        type="date"
+        InputLabelProps={{ shrink: true }}
         fullWidth
       />
     </Grid>
@@ -81,6 +90,17 @@ const MasterDataTab = ({ form, onChange }) => (
         name="routing.lotSizeTo"
         value={form.routing?.lotSizeTo || ''}
         onChange={onChange}
+        fullWidth
+      />
+    </Grid>
+    <Grid item xs={12}>
+      <TextField
+        label="Explosion Date"
+        name="routing.explosionDate"
+        value={form.routing?.explosionDate || ''}
+        onChange={onChange}
+        type="date"
+        InputLabelProps={{ shrink: true }}
         fullWidth
       />
     </Grid>

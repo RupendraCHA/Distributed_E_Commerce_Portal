@@ -3,7 +3,7 @@ import { Grid, TextField } from '@mui/material';
 
 const AdministrationTab = ({ form, onChange }) => (
   <Grid container spacing={2}>
-    <Grid item xs={6}>
+    <Grid item xs={12} sm={6}>
       <TextField
         label="Created By"
         name="createdBy"
@@ -12,16 +12,20 @@ const AdministrationTab = ({ form, onChange }) => (
         fullWidth
       />
     </Grid>
-    <Grid item xs={6}>
+
+    <Grid item xs={12} sm={6}>
       <TextField
         label="Created At"
         name="createdAt"
         value={form.createdAt || ''}
         onChange={onChange}
+        type="datetime-local"
+        InputLabelProps={{ shrink: true }}
         fullWidth
       />
     </Grid>
-    <Grid item xs={6}>
+
+    <Grid item xs={12} sm={6}>
       <TextField
         label="Change Indicator"
         name="changeIndicator"
@@ -30,7 +34,8 @@ const AdministrationTab = ({ form, onChange }) => (
         fullWidth
       />
     </Grid>
-    <Grid item xs={6}>
+
+    <Grid item xs={12} sm={6}>
       <TextField
         label="Change Process Type"
         name="changeProcessType"
