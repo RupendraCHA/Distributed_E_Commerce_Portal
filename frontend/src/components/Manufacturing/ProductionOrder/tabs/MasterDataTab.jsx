@@ -3,6 +3,10 @@ import { Grid, TextField } from '@mui/material';
 
 const MasterDataTab = ({ form, onChange }) => (
   <Grid container spacing={2}>
+    {/* Production Version */}
+    <Grid item xs={12}>
+      <h4>Production Version</h4>
+    </Grid>
     <Grid item xs={12} sm={6}>
       <TextField
         label="Production Version"
@@ -13,10 +17,10 @@ const MasterDataTab = ({ form, onChange }) => (
       />
     </Grid>
 
+    {/* Routing Section */}
     <Grid item xs={12}>
       <h4>Routing</h4>
     </Grid>
-
     <Grid item xs={12} sm={6}>
       <TextField
         label="Group"
@@ -93,7 +97,7 @@ const MasterDataTab = ({ form, onChange }) => (
         fullWidth
       />
     </Grid>
-    <Grid item xs={12}>
+    <Grid item xs={6}>
       <TextField
         label="Explosion Date"
         name="routing.explosionDate"
@@ -103,6 +107,70 @@ const MasterDataTab = ({ form, onChange }) => (
         InputLabelProps={{ shrink: true }}
         fullWidth
       />
+    </Grid>
+    <Grid item xs={6}>
+      <TextField
+        label="Change No."
+        name="routing.changeNumber"
+        value={form.routing?.changeNumber || ''}
+        onChange={onChange}
+        fullWidth
+      />
+    </Grid>
+    <Grid item xs={6}>
+      <TextField
+        label="Line Hierarchy"
+        name="routing.lineHierarchy"
+        value={form.routing?.lineHierarchy || ''}
+        onChange={onChange}
+        fullWidth
+      />
+    </Grid>
+    <Grid item xs={6}>
+      <TextField
+        label="TL UoM"
+        name="routing.tlUom"
+        value={form.routing?.tlUom || ''}
+        onChange={onChange}
+        fullWidth
+      />
+    </Grid>
+
+    {/* SAP ME Routing Section */}
+    <Grid item xs={12}>
+      <h4>SAP ME Routing</h4>
+    </Grid>
+    <Grid item xs={12} sm={4}>
+      <TextField
+        label="Production Site"
+        name="sapMe.productionSite"
+        value={form.sapMe?.productionSite || ''}
+        onChange={onChange}
+        fullWidth
+      />
+    </Grid>
+    <Grid item xs={12} sm={4}>
+      <TextField
+        label="Routing"
+        name="sapMe.routing"
+        value={form.sapMe?.routing || ''}
+        onChange={onChange}
+        fullWidth
+      />
+    </Grid>
+    <Grid item xs={12} sm={4}>
+      <TextField
+        label="Version"
+        name="sapMe.version"
+        value={form.sapMe?.version || ''}
+        onChange={onChange}
+        fullWidth
+      />
+    </Grid>
+
+    {/* Bill of Material Section (just heading as per screenshot) */}
+    <Grid item xs={12}>
+      <h4>Bill of Material</h4>
     </Grid>
   </Grid>
 );

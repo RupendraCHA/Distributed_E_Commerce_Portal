@@ -4,6 +4,8 @@ import { Grid, TextField } from '@mui/material';
 const GeneralTab = ({ form, onChange }) => {
   const quantities = form.quantities || {};
   const basicDates = form.basicDates || {};
+  const scheduledDates = form.scheduledDates || {};
+  const confirmedDates = form.confirmedDates || {};
   const floats = form.floats || {};
   const scheduling = form.scheduling || {};
 
@@ -18,7 +20,7 @@ const GeneralTab = ({ form, onChange }) => {
       <Grid item xs={12}>
         <h4>Quantities</h4>
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={3}>
         <TextField
           label="Total Qty"
           value={quantities.order || ''}
@@ -28,9 +30,9 @@ const GeneralTab = ({ form, onChange }) => {
           fullWidth
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={3}>
         <TextField
-          label="Scrap Portion"
+          label="Scrap Portion (%)"
           value={quantities.scrap || ''}
           onChange={(e) =>
             handleNestedChange('quantities', 'scrap', e.target.value)
@@ -38,12 +40,22 @@ const GeneralTab = ({ form, onChange }) => {
           fullWidth
         />
       </Grid>
-      <Grid item xs={12} sm={6}>
+      <Grid item xs={12} sm={3}>
         <TextField
           label="Delivered"
           value={quantities.delivered || ''}
           onChange={(e) =>
             handleNestedChange('quantities', 'delivered', e.target.value)
+          }
+          fullWidth
+        />
+      </Grid>
+      <Grid item xs={12} sm={3}>
+        <TextField
+          label="Short/Exc. Rcpt"
+          value={quantities.shortExcRcpt || ''}
+          onChange={(e) =>
+            handleNestedChange('quantities', 'shortExcRcpt', e.target.value)
           }
           fullWidth
         />
@@ -69,7 +81,40 @@ const GeneralTab = ({ form, onChange }) => {
           />
         </Grid>
       ))}
+      {['start', 'end'].map((field) => (
+        <Grid item xs={12} sm={6} key={`scheduled-${field}`}>
+          <TextField
+            label={`Scheduled ${
+              field.charAt(0).toUpperCase() + field.slice(1)
+            }`}
+            type="datetime-local"
+            InputLabelProps={{ shrink: true }}
+            value={scheduledDates[field] || ''}
+            onChange={(e) =>
+              handleNestedChange('scheduledDates', field, e.target.value)
+            }
+            fullWidth
+          />
+        </Grid>
+      ))}
+      {['start', 'end'].map((field) => (
+        <Grid item xs={12} sm={6} key={`confirmed-${field}`}>
+          <TextField
+            label={`Confirmed ${
+              field.charAt(0).toUpperCase() + field.slice(1)
+            }`}
+            type="datetime-local"
+            InputLabelProps={{ shrink: true }}
+            value={confirmedDates[field] || ''}
+            onChange={(e) =>
+              handleNestedChange('confirmedDates', field, e.target.value)
+            }
+            fullWidth
+          />
+        </Grid>
+      ))}
 
+      {/* Scheduling */}
       <Grid item xs={12}>
         <h4>Scheduling</h4>
       </Grid>

@@ -1,26 +1,32 @@
 const mongoose = require("mongoose");
 
-const ManufactureGoodsReceiptSchema = new mongoose.Schema(
+const ItemSchema = new mongoose.Schema({
+  lineNo: Number,
+  material: String,
+  shortText: String,
+  quantity: Number,
+  unit: String,
+  storageLocation: String,
+  stockSegment: String,
+  batch: String,
+  valuationType: String,
+  movementType: { type: String, default: "101" },
+  stockType: { type: String, default: "+ Quality Insp." },
+  plant: String,
+  jitCallNo: String,
+  wOk: { type: Boolean, default: false },
+});
+
+const GoodsReceiptSchema = new mongoose.Schema(
   {
-    material: { type: String, required: true },
-    quantity: { type: Number, required: true },
-    storageLocation: { type: String, required: true },
-    documentDate: { type: Date, required: true },
-    postingDate: { type: Date, required: true },
-    deliveryNote: { type: String },
-    docHeaderText: { type: String },
-    batch: { type: String },
-    valuationType: { type: String },
-    movementType: { type: String },
-    stockType: { type: String },
-    plant: { type: String, required: true },
-    stockSegment: { type: String },
+    orderNumber: String,
+    documentDate: Date,
+    postingDate: Date,
+    deliveryNote: String,
+    headerText: String,
+    items: [ItemSchema],
   },
   { timestamps: true }
 );
 
-const ManufactureGoodsReceiptModel = mongoose.model(
-  "ManufactureGoodsReceipt",
-  ManufactureGoodsReceiptSchema
-);
-module.exports = ManufactureGoodsReceiptModel;
+module.exports = mongoose.model("ManufactureGoodsReceipt", GoodsReceiptSchema);

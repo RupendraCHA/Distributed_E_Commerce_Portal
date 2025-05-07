@@ -2260,50 +2260,32 @@ app.put("/api/v1/receipt-orders/:id", async (req, res) => {
   }
 });
 
-app.post("/api/v1/manufacture-goods-receipt", async (req, res) => {
-  try {
-    const receipt = new ManufactureGoodsReceiptModel(req.body);
-    await receipt.save();
-    res.status(201).json(receipt);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+app.post("/api/v1/manufacture-goods-receipt/", async (req, res) => {
+  const doc = new ManufactureGoodsReceiptModel(req.body);
+  const saved = await doc.save();
+  res.status(201).json(saved);
 });
 
-// Get All
-app.get("/api/v1/manufacture-goods-receipt", async (req, res) => {
-  try {
-    const data = await ManufactureGoodsReceiptModel.find().sort({
-      createdAt: -1,
-    });
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+// List
+app.get("/api/v1/manufacture-goods-receipt/", async (req, res) => {
+  const all = await ManufactureGoodsReceiptModel.find();
+  res.json(all);
 });
 
 // Get by ID
 app.get("/api/v1/manufacture-goods-receipt/:id", async (req, res) => {
-  try {
-    const receipt = await ManufactureGoodsReceiptModel.findById(req.params.id);
-    res.json(receipt);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  const doc = await ManufactureGoodsReceiptModel.findById(req.params.id);
+  res.json(doc);
 });
 
 // Update
 app.put("/api/v1/manufacture-goods-receipt/:id", async (req, res) => {
-  try {
-    const updated = await ManufactureGoodsReceiptModel.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    res.json(updated);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  const updated = await ManufactureGoodsReceiptModel.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+  res.json(updated);
 });
 
 // 📌 Create a new Purchase Order

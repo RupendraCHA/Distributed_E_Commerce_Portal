@@ -1,129 +1,287 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
   Container,
-  TextField,
   Grid,
+  TextField,
   Button,
-  Autocomplete,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  IconButton,
+  Checkbox,
 } from '@mui/material';
+import { Add, Delete } from '@mui/icons-material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const CreateGoodsReceipt = () => {
-  const server_Url = import.meta.env.VITE_API_SERVER_URL;
   const navigate = useNavigate();
-
-  const [materialOptions, setMaterialOptions] = useState([]);
   const [form, setForm] = useState({
-    material: '',
-    quantity: '',
-    storageLocation: '',
+    orderNumber: '',
     documentDate: '',
     postingDate: '',
     deliveryNote: '',
-    docHeaderText: '',
-    batch: '',
-    valuationType: '',
-    movementType: '101',
-    stockType: '',
-    plant: '',
-    stockSegment: '',
+    headerText: '',
+    items: [],
   });
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    axios
-      .get(`${server_Url}/api/v1/getMaterialIds`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setMaterialOptions(res.data))
-      .catch((err) => console.error('Error fetching materials:', err));
-  }, []);
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleItemChange = (index, field, value) => {
+    const updated = [...form.items];
+    updated[index][field] = field === 'wOk' ? value.target.checked : value;
+    setForm({ ...form, items: updated });
   };
 
-  const handleCreate = () => {
-    const token = localStorage.getItem('token');
-    axios
-      .post(`${server_Url}/api/v1/manufacture-goods-receipt`, form, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then(() => {
-        navigate('/manufacturing/goods-receipt');
-      })
-      .catch((err) => console.error('Error creating goods receipt:', err));
+  const handleAddItem = () => {
+    setForm({
+      ...form,
+      items: [
+        ...form.items,
+        {
+          lineNo: form.items.length + 1,
+          material: '',
+          shortText: '',
+          quantity: 0,
+          unit: '',
+          storageLocation: '',
+          stockSegment: '',
+          batch: '',
+          valuationType: '',
+          movementType: '101',
+          stockType: '+ Quality Insp.',
+          plant: '',
+          jitCallNo: '',
+          wOk: false,
+        },
+      ],
+    });
+  };
+
+  const handleRemoveItem = (index) => {
+    const updated = form.items.filter((_, i) => i !== index);
+    setForm({ ...form, items: updated });
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.post(
+        `${
+          import.meta.env.VITE_API_SERVER_URL
+        }/api/v1/manufacture-goods-receipt`,
+        form,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      navigate('/manufacturing/goods-receipt');
+    } catch (err) {
+      console.error(err);
+      alert('Error creating goods receipt');
+    }
   };
 
   return (
-    <Container maxWidth="md">
-      <h2 style={{ margin: '20px 0px', fontWeight: 'bold' }}>
-        Create Goods Receipt
-      </h2>
+    <Container>
+      <h2>Create Goods Receipt for Production Order</h2>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Autocomplete
-            options={materialOptions}
-            getOptionLabel={(option) =>
-              option.materialName
-                ? `${option.materialName} (${option.materialId})`
-                : option.materialId
-            }
-            onChange={(e, newValue) => {
-              setForm({
-                ...form,
-                material: newValue?.materialId || '',
-                plant: newValue?.plant || '',
-                storageLocation: newValue?.storageLocation || '',
-                valuationType: newValue?.valuationType || '',
-              });
-            }}
-            renderInput={(params) => (
-              <TextField {...params} label="Material" fullWidth />
-            )}
+        <Grid item xs={4}>
+          <TextField
+            fullWidth
+            label="Order Number"
+            value={form.orderNumber}
+            onChange={(e) => setForm({ ...form, orderNumber: e.target.value })}
           />
         </Grid>
-
-        {[
-          ['Document Date', 'documentDate', 'date'],
-          ['Posting Date', 'postingDate', 'date'],
-          ['Delivery Note', 'deliveryNote'],
-          ['Doc Header Text', 'docHeaderText'],
-          ['Quantity', 'quantity', 'number'],
-          ['Storage Location', 'storageLocation'],
-          ['Batch', 'batch'],
-          ['Valuation Type', 'valuationType'],
-          ['Movement Type', 'movementType'],
-          ['Stock Type', 'stockType'],
-          ['Plant', 'plant'],
-          ['Stock Segment', 'stockSegment'],
-        ].map(([label, name, type = 'text']) => (
-          <Grid item xs={6} key={name}>
-            <TextField
-              label={label}
-              name={name}
-              type={type}
-              value={form[name]}
-              onChange={handleChange}
-              InputLabelProps={type === 'date' ? { shrink: true } : {}}
-              fullWidth
-            />
-          </Grid>
-        ))}
-
-        <Grid item xs={12}>
-          <Button
-            variant="contained"
-            color="primary"
+        <Grid item xs={4}>
+          <TextField
             fullWidth
-            onClick={handleCreate}
-            disabled={!form.material || !form.quantity || !form.plant}
-          >
-            Create Goods Receipt
-          </Button>
+            type="date"
+            label="Document Date"
+            InputLabelProps={{ shrink: true }}
+            value={form.documentDate}
+            onChange={(e) => setForm({ ...form, documentDate: e.target.value })}
+          />
+        </Grid>
+        <Grid item xs={4}>
+          <TextField
+            fullWidth
+            type="date"
+            label="Posting Date"
+            InputLabelProps={{ shrink: true }}
+            value={form.postingDate}
+            onChange={(e) => setForm({ ...form, postingDate: e.target.value })}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            fullWidth
+            label="Delivery Note"
+            value={form.deliveryNote}
+            onChange={(e) => setForm({ ...form, deliveryNote: e.target.value })}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            fullWidth
+            label="Header Text"
+            value={form.headerText}
+            onChange={(e) => setForm({ ...form, headerText: e.target.value })}
+          />
         </Grid>
       </Grid>
+
+      <h3>Line Items</h3>
+      <Table size="small">
+        <TableHead>
+          <TableRow>
+            <TableCell>Line</TableCell>
+            <TableCell>Material</TableCell>
+            <TableCell>Short Text</TableCell>
+            <TableCell>Qty</TableCell>
+            <TableCell>Unit</TableCell>
+            <TableCell>SLoc</TableCell>
+            <TableCell>Stock Segment</TableCell>
+            <TableCell>Batch</TableCell>
+            <TableCell>Val. Type</TableCell>
+            <TableCell>Movement</TableCell>
+            <TableCell>Stock Type</TableCell>
+            <TableCell>Plant</TableCell>
+            <TableCell>JIT Call No</TableCell>
+            <TableCell>W/OK</TableCell>
+            <TableCell>Action</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {form.items.map((item, index) => (
+            <TableRow key={index}>
+              <TableCell>{item.lineNo}</TableCell>
+              <TableCell>
+                <TextField
+                  value={item.material}
+                  onChange={(e) =>
+                    handleItemChange(index, 'material', e.target.value)
+                  }
+                />
+              </TableCell>
+              <TableCell>
+                <TextField
+                  value={item.shortText}
+                  onChange={(e) =>
+                    handleItemChange(index, 'shortText', e.target.value)
+                  }
+                />
+              </TableCell>
+              <TableCell>
+                <TextField
+                  type="number"
+                  value={item.quantity}
+                  onChange={(e) =>
+                    handleItemChange(index, 'quantity', e.target.value)
+                  }
+                />
+              </TableCell>
+              <TableCell>
+                <TextField
+                  value={item.unit}
+                  onChange={(e) =>
+                    handleItemChange(index, 'unit', e.target.value)
+                  }
+                />
+              </TableCell>
+              <TableCell>
+                <TextField
+                  value={item.storageLocation}
+                  onChange={(e) =>
+                    handleItemChange(index, 'storageLocation', e.target.value)
+                  }
+                />
+              </TableCell>
+              <TableCell>
+                <TextField
+                  value={item.stockSegment}
+                  onChange={(e) =>
+                    handleItemChange(index, 'stockSegment', e.target.value)
+                  }
+                />
+              </TableCell>
+              <TableCell>
+                <TextField
+                  value={item.batch}
+                  onChange={(e) =>
+                    handleItemChange(index, 'batch', e.target.value)
+                  }
+                />
+              </TableCell>
+              <TableCell>
+                <TextField
+                  value={item.valuationType}
+                  onChange={(e) =>
+                    handleItemChange(index, 'valuationType', e.target.value)
+                  }
+                />
+              </TableCell>
+              <TableCell>
+                <TextField
+                  value={item.movementType}
+                  onChange={(e) =>
+                    handleItemChange(index, 'movementType', e.target.value)
+                  }
+                />
+              </TableCell>
+              <TableCell>
+                <TextField
+                  value={item.stockType}
+                  onChange={(e) =>
+                    handleItemChange(index, 'stockType', e.target.value)
+                  }
+                />
+              </TableCell>
+              <TableCell>
+                <TextField
+                  value={item.plant}
+                  onChange={(e) =>
+                    handleItemChange(index, 'plant', e.target.value)
+                  }
+                />
+              </TableCell>
+              <TableCell>
+                <TextField
+                  value={item.jitCallNo}
+                  onChange={(e) =>
+                    handleItemChange(index, 'jitCallNo', e.target.value)
+                  }
+                />
+              </TableCell>
+              <TableCell>
+                <Checkbox
+                  checked={item.wOk}
+                  onChange={(e) => handleItemChange(index, 'wOk', e)}
+                />
+              </TableCell>
+              <TableCell>
+                <IconButton onClick={() => handleRemoveItem(index)}>
+                  <Delete />
+                </IconButton>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+
+      <Button
+        variant="outlined"
+        startIcon={<Add />}
+        onClick={handleAddItem}
+        sx={{ my: 2 }}
+      >
+        Add Item
+      </Button>
+      <br />
+      <Button variant="contained" onClick={handleSubmit}>
+        Submit
+      </Button>
     </Container>
   );
 };
