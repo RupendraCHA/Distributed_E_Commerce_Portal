@@ -23,7 +23,19 @@ const EditProductionPlan = () => {
           `${import.meta.env.VITE_API_SERVER_URL}/api/v1/production-plans/${id}`
         );
         const data = await res.json();
-        setForm(data);
+
+        // Format dates to YYYY-MM-DD
+        const formattedData = {
+          ...data,
+          planningHorizonFrom: data.planningHorizonFrom
+            ? new Date(data.planningHorizonFrom).toISOString().split('T')[0]
+            : '',
+          planningHorizonTo: data.planningHorizonTo
+            ? new Date(data.planningHorizonTo).toISOString().split('T')[0]
+            : '',
+        };
+
+        setForm(formattedData);
       } catch (err) {
         console.error('Failed to load production plan:', err);
       }
