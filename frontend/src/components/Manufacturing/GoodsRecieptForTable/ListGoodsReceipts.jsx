@@ -43,7 +43,15 @@ const ListGoodsReceipt = () => {
         alignItems="center"
         my={2}
       >
-        <h2>Goods Receipt Records</h2>
+        <h1
+          style={{
+            fontSize: '22px',
+            fontWeight: 'bold',
+            margin: '10px 0px 20px 0px',
+          }}
+        >
+          Goods Receipt Records
+        </h1>
         <Button
           variant="contained"
           onClick={() => navigate('/manufacturing/goods-receipt/create')}

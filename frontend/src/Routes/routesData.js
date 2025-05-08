@@ -264,6 +264,21 @@ const ProductionOrderDetails = React.lazy(() =>
   import('../components/Manufacturing/ProductionOrder/ProductionOrderTabs.jsx')
 );
 
+const CreateProductionPlan = React.lazy(() =>
+  import('../components/Manufacturing/ProductionPlan/CreateProductionPlan.jsx')
+);
+const EditProductionPlan = React.lazy(() =>
+  import('../components/Manufacturing/ProductionPlan/EditProductionPlan.jsx')
+);
+const ProductionPlanList = React.lazy(() =>
+  import('../components/Manufacturing/ProductionPlan/ListProductionPlan.jsx')
+);
+const ProductionPlanTabs = React.lazy(() =>
+  import(
+    '../components/Manufacturing/ProductionPlan/CreateProductionPlanDetails.jsx'
+  )
+);
+
 import {
   productsData,
   solutionsData,
@@ -594,6 +609,22 @@ export const privateRoutes = [
   {
     path: '/manufacturing/product-orders/details',
     element: ProductionOrderDetails,
+  },
+  {
+    path: '/manufacturing/production-plan',
+    element: ProductionPlanList,
+  },
+  {
+    path: '/manufacturing/production-plan/create',
+    element: CreateProductionPlan,
+  },
+  {
+    path: '/manufacturing/production-plan/edit/:id',
+    element: EditProductionPlan,
+  },
+  {
+    path: '/manufacturing/production-plan/details',
+    element: ProductionPlanTabs,
   },
 ];
 

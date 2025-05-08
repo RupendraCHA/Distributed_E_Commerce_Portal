@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Container,
   Grid,
@@ -11,6 +11,7 @@ import {
   TableBody,
   IconButton,
   Checkbox,
+  Autocomplete,
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import axios from 'axios';
@@ -18,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 
 const CreateGoodsReceipt = () => {
   const navigate = useNavigate();
+  const [orders, setOrders] = useState([]);
   const [form, setForm] = useState({
     orderNumber: '',
     documentDate: '',
@@ -26,6 +28,20 @@ const CreateGoodsReceipt = () => {
     headerText: '',
     items: [],
   });
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_SERVER_URL}/api/v1/production-orders`
+        );
+        setOrders(res.data);
+      } catch (error) {
+        console.error('Error fetching production orders:', error);
+      }
+    };
+    fetchOrders();
+  }, []);
 
   const handleItemChange = (index, field, value) => {
     const updated = [...form.items];
@@ -66,14 +82,12 @@ const CreateGoodsReceipt = () => {
   const handleSubmit = async () => {
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.post(
+      await axios.post(
         `${
           import.meta.env.VITE_API_SERVER_URL
         }/api/v1/manufacture-goods-receipt`,
         form,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       navigate('/manufacturing/goods-receipt');
     } catch (err) {
@@ -84,14 +98,27 @@ const CreateGoodsReceipt = () => {
 
   return (
     <Container>
-      <h2>Create Goods Receipt for Production Order</h2>
+      <h1
+        style={{ fontSize: '22px', fontWeight: 'bold', margin: '10px 0 20px' }}
+      >
+        Create Goods Receipt for Production Order
+      </h1>
+
       <Grid container spacing={2}>
         <Grid item xs={4}>
-          <TextField
+          <Autocomplete
             fullWidth
-            label="Order Number"
-            value={form.orderNumber}
-            onChange={(e) => setForm({ ...form, orderNumber: e.target.value })}
+            options={orders}
+            getOptionLabel={(option) => option.order || ''}
+            renderInput={(params) => (
+              <TextField {...params} label="Order Number" />
+            )}
+            onChange={(_, newValue) =>
+              setForm({ ...form, orderNumber: newValue?.order || '' })
+            }
+            value={
+              orders.find((order) => order.order === form.orderNumber) || null
+            }
           />
         </Grid>
         <Grid item xs={4}>

@@ -95,7 +95,15 @@ const EditGoodsReceipt = () => {
 
   return (
     <Container>
-      <h2>Edit Goods Receipt</h2>
+      <h1
+        style={{
+          fontSize: '22px',
+          fontWeight: 'bold',
+          margin: '10px 0px 20px 0px',
+        }}
+      >
+        Edit Goods Receipt
+      </h1>
       <Grid container spacing={2}>
         <Grid item xs={4}>
           <TextField

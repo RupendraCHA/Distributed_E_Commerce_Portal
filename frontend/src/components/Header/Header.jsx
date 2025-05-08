@@ -15,6 +15,7 @@ import {
   DashboardsData,
   SourcingData,
   ManufacturingData,
+  AccountingData,
 } from '../../data/PosetraDataPage';
 import { setCartItems } from '../../store/cartSlice'; // Import the setCartItems action
 import axios from 'axios';
@@ -28,6 +29,7 @@ const Header = () => {
   const dispatch = useDispatch();
 
   const [anchorEl, setAnchorEl] = useState(null);
+  const [anchorElForAccounting, setAnchorElForAccounting] = useState(null);
   const [anchorElForSourcing, setAnchorElForSourcing] = useState(null);
   const [anchorElForManufacturing, setAnchorElForManufacturing] =
     useState(null);
@@ -90,6 +92,11 @@ const Header = () => {
   const handleSouricng = (event) => {
     setAnchorElForSourcing(anchorElForSourcing ? null : event.currentTarget);
   };
+  const handleAccounting = (event) => {
+    setAnchorElForAccounting(
+      anchorElForAccounting ? null : event.currentTarget
+    );
+  };
   const handleManufacturing = (event) => {
     setAnchorElForManufacturing(
       anchorElForManufacturing ? null : event.currentTarget
@@ -106,6 +113,12 @@ const Header = () => {
     navigate(path);
     setAnchorElForSourcing(null);
     setAnchorEl(null);
+  };
+  const handleAccountingPopperClose = (path) => {
+    navigate(path);
+    setAnchorElForAccounting(null);
+    setAnchorEl(null);
+    setAnchorElForSourcing(null);
   };
   const handleManufacturingPopperClose = (path) => {
     navigate(path);
@@ -143,10 +156,52 @@ const Header = () => {
                     <Link
                       // to="/products"
                       className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                      onClick={handleAccounting}
                     >
                       Accounting
                     </Link>
                   </li>
+                  <Popper
+                    open={Boolean(anchorElForAccounting)}
+                    anchorEl={anchorElForAccounting}
+                    placement="bottom-start"
+                    disablePortal={false}
+                    modifiers={[
+                      {
+                        name: 'offset',
+                        options: {
+                          offset: [0, 10],
+                        },
+                      },
+                    ]}
+                    sx={{
+                      zIndex: 10000,
+                    }}
+                  >
+                    <ClickAwayListener
+                      onClickAway={handleAccountingPopperClose}
+                    >
+                      <Paper>
+                        <MenuList
+                          autoFocusItem={Boolean(anchorElForAccounting)}
+                          id="menu-list-grow"
+                        >
+                          {AccountingData.map(({ title, path }) => {
+                            return (
+                              <MenuItem
+                                className="text-blue-500"
+                                onClick={() =>
+                                  handleAccountingPopperClose(path)
+                                }
+                              >
+                                {title}
+                              </MenuItem>
+                            );
+                          })}
+                        </MenuList>
+                      </Paper>
+                    </ClickAwayListener>
+                  </Popper>
                   <li className="">
                     <Link
                       // to="/products"

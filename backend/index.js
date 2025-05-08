@@ -28,6 +28,7 @@ const {
   BillOfMaterialModel,
   MRPModel,
   ProductionOrderModel,
+  ProductionPlanModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -3221,6 +3222,63 @@ app.delete("/api/v1/production-orders/:id", async (req, res) => {
   try {
     await ProductionOrderModel.findByIdAndDelete(req.params.id);
     res.json({ message: "Production Order deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// CREATE Production Plan
+app.post("/api/v1/production-plans/", async (req, res) => {
+  try {
+    const newPlan = new ProductionPlanModel(req.body);
+    await newPlan.save();
+    res.status(201).json(newPlan);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// GET all Production Plans (List View)
+app.get("/api/v1/production-plans/", async (req, res) => {
+  try {
+    const plans = await ProductionPlanModel.find().sort({ createdAt: -1 });
+    res.json(plans);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET Production Plan by ID (for Edit Screen)
+app.get("/api/v1/production-plans/:id", async (req, res) => {
+  try {
+    const plan = await ProductionPlanModel.findById(req.params.id);
+    if (!plan)
+      return res.status(404).json({ error: "Production Plan not found" });
+    res.json(plan);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// UPDATE Production Plan by ID
+app.put("/api/v1/production-plans/:id", async (req, res) => {
+  try {
+    const updated = await ProductionPlanModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updated);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// DELETE Production Plan by ID (Optional)
+app.delete("/api/v1/production-plans/:id", async (req, res) => {
+  try {
+    await ProductionPlanModel.findByIdAndDelete(req.params.id);
+    res.json({ message: "Production Plan deleted successfully" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
