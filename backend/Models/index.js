@@ -18,6 +18,8 @@ const BillOfMaterialModel = require("./BillOfMaterial.js");
 const MRPModel = require("./MRP.js");
 const ProductionOrderModel = require("./ProductionOrder.js");
 const ProductionPlanModel = require("./ProductionPlan.js");
+const RecipeModel = require("./Recipe.js");
+const ProductionOrderSettlementModel = require("./ProductionOrderSettlement.js");
 module.exports = {
   EmployeeModel,
   AddressModel,
@@ -39,4 +41,6 @@ module.exports = {
   MRPModel,
   ProductionOrderModel,
   ProductionPlanModel,
+  RecipeModel,
+  ProductionOrderSettlementModel,
 };
