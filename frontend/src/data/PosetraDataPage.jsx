@@ -15,6 +15,20 @@ export const productsData = [
   // 'Posetra',
 ];
 export const solutionsData = ['Industry', 'Use Case'];
+export const AccountingData = [
+  {
+    title: 'Accounts Receivable',
+    path: 'accounting/accounts-receivable',
+  },
+  {
+    title: 'Accounts Payable',
+    path: 'accounting/accounts-payable',
+  },
+  {
+    title: 'General Ledger',
+    path: 'accounting/general-ledger',
+  },
+];
 export const SourcingData = [
   {
     title: 'Purchase Requisition',

@@ -27,6 +27,10 @@ const {
   ManufactureGoodsReceiptModel,
   BillOfMaterialModel,
   MRPModel,
+  ProductionOrderModel,
+  ProductionPlanModel,
+  RecipeModel,
+  ProductionOrderSettlementModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -2259,50 +2263,32 @@ app.put("/api/v1/receipt-orders/:id", async (req, res) => {
   }
 });
 
-app.post("/api/v1/manufacture-goods-receipt", async (req, res) => {
-  try {
-    const receipt = new ManufactureGoodsReceiptModel(req.body);
-    await receipt.save();
-    res.status(201).json(receipt);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+app.post("/api/v1/manufacture-goods-receipt/", async (req, res) => {
+  const doc = new ManufactureGoodsReceiptModel(req.body);
+  const saved = await doc.save();
+  res.status(201).json(saved);
 });
 
-// Get All
-app.get("/api/v1/manufacture-goods-receipt", async (req, res) => {
-  try {
-    const data = await ManufactureGoodsReceiptModel.find().sort({
-      createdAt: -1,
-    });
-    res.json(data);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+// List
+app.get("/api/v1/manufacture-goods-receipt/", async (req, res) => {
+  const all = await ManufactureGoodsReceiptModel.find();
+  res.json(all);
 });
 
 // Get by ID
 app.get("/api/v1/manufacture-goods-receipt/:id", async (req, res) => {
-  try {
-    const receipt = await ManufactureGoodsReceiptModel.findById(req.params.id);
-    res.json(receipt);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  const doc = await ManufactureGoodsReceiptModel.findById(req.params.id);
+  res.json(doc);
 });
 
 // Update
 app.put("/api/v1/manufacture-goods-receipt/:id", async (req, res) => {
-  try {
-    const updated = await ManufactureGoodsReceiptModel.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    res.json(updated);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+  const updated = await ManufactureGoodsReceiptModel.findByIdAndUpdate(
+    req.params.id,
+    req.body,
+    { new: true }
+  );
+  res.json(updated);
 });
 
 // 📌 Create a new Purchase Order
@@ -3186,6 +3172,237 @@ app.post(
     }
   }
 );
+
+// CREATE Recipe
+app.post("/api/v1/recipes/", async (req, res) => {
+  try {
+    const newRecipe = new RecipeModel(req.body);
+    await newRecipe.save();
+    res.status(201).json(newRecipe);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// GET all Recipes (List View)
+app.get("/api/v1/recipes/", async (req, res) => {
+  try {
+    const recipes = await RecipeModel.find().sort({ createdAt: -1 });
+    res.json(recipes);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET Recipe by ID (for Edit Screen)
+app.get("/api/v1/recipes/:id", async (req, res) => {
+  try {
+    const recipe = await RecipeModel.findById(req.params.id);
+    if (!recipe) return res.status(404).json({ error: "Recipe not found" });
+    res.json(recipe);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// UPDATE Recipe by ID
+app.put("/api/v1/recipes/:id", async (req, res) => {
+  try {
+    const updatedRecipe = await RecipeModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updatedRecipe);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// DELETE Recipe by ID (Optional)
+app.delete("/api/v1/recipes/:id", async (req, res) => {
+  try {
+    await RecipeModel.findByIdAndDelete(req.params.id);
+    res.json({ message: "Recipe deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post("/api/v1/settlements", async (req, res) => {
+  try {
+    const newRule = new ProductionOrderSettlementModel(req.body);
+    await newRule.save();
+    res.status(201).json(newRule);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// GET ALL
+app.get("/api/v1/settlements", async (req, res) => {
+  try {
+    const rules = await ProductionOrderSettlementModel.find().sort({
+      createdAt: -1,
+    });
+    res.json(rules);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// GET BY ID
+app.get("/api/v1/settlements/:id", async (req, res) => {
+  try {
+    const rule = await ProductionOrderSettlementModel.findById(req.params.id);
+    if (!rule)
+      return res
+        .status(404)
+        .json({ error: "ProductionOrderSettlementModel rule not found" });
+    res.json(rule);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// UPDATE
+app.put("/api/v1/settlements/:id", async (req, res) => {
+  try {
+    const updated = await ProductionOrderSettlementModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// DELETE
+app.delete("/api/v1/settlements/:id", async (req, res) => {
+  try {
+    await ProductionOrderSettlementModel.findByIdAndDelete(req.params.id);
+    res.json({
+      message: "ProductionOrderSettlementModel rule deleted successfully",
+    });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// CREATE Production Order
+app.post("/api/v1/production-orders/", async (req, res) => {
+  try {
+    const newOrder = new ProductionOrderModel(req.body);
+    await newOrder.save();
+    res.status(201).json(newOrder);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// GET all Production Orders (List View)
+app.get("/api/v1/production-orders/", async (req, res) => {
+  try {
+    const orders = await ProductionOrderModel.find().sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET Production Order by ID (for Edit Screen)
+app.get("/api/v1/production-orders/:id", async (req, res) => {
+  try {
+    const order = await ProductionOrderModel.findById(req.params.id);
+    if (!order) return res.status(404).json({ error: "Order not found" });
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// UPDATE Production Order by ID
+app.put("/api/v1/production-orders/:id", async (req, res) => {
+  try {
+    const updated = await ProductionOrderModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updated);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// DELETE Production Order by ID (Optional)
+app.delete("/api/v1/production-orders/:id", async (req, res) => {
+  try {
+    await ProductionOrderModel.findByIdAndDelete(req.params.id);
+    res.json({ message: "Production Order deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// CREATE Production Plan
+app.post("/api/v1/production-plans/", async (req, res) => {
+  try {
+    const newPlan = new ProductionPlanModel(req.body);
+    await newPlan.save();
+    res.status(201).json(newPlan);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// GET all Production Plans (List View)
+app.get("/api/v1/production-plans/", async (req, res) => {
+  try {
+    const plans = await ProductionPlanModel.find().sort({ createdAt: -1 });
+    res.json(plans);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// GET Production Plan by ID (for Edit Screen)
+app.get("/api/v1/production-plans/:id", async (req, res) => {
+  try {
+    const plan = await ProductionPlanModel.findById(req.params.id);
+    if (!plan)
+      return res.status(404).json({ error: "Production Plan not found" });
+    res.json(plan);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// UPDATE Production Plan by ID
+app.put("/api/v1/production-plans/:id", async (req, res) => {
+  try {
+    const updated = await ProductionPlanModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.json(updated);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+// DELETE Production Plan by ID (Optional)
+app.delete("/api/v1/production-plans/:id", async (req, res) => {
+  try {
+    await ProductionPlanModel.findByIdAndDelete(req.params.id);
+    res.json({ message: "Production Plan deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
 
 app.get("/api/v1/inventories", authenticateToken, async (req, res) => {
   try {

@@ -260,6 +260,59 @@ const EditProductionOrder = React.lazy(() =>
   import('../components/Manufacturing/ProductionOrder/EditProductionOrder.jsx')
 );
 
+const ProductionOrderDetails = React.lazy(() =>
+  import('../components/Manufacturing/ProductionOrder/ProductionOrderTabs.jsx')
+);
+
+const CreateProductionPlan = React.lazy(() =>
+  import('../components/Manufacturing/ProductionPlan/CreateProductionPlan.jsx')
+);
+const EditProductionPlan = React.lazy(() =>
+  import('../components/Manufacturing/ProductionPlan/EditProductionPlan.jsx')
+);
+const ProductionPlanList = React.lazy(() =>
+  import('../components/Manufacturing/ProductionPlan/ListProductionPlan.jsx')
+);
+const ProductionPlanTabs = React.lazy(() =>
+  import(
+    '../components/Manufacturing/ProductionPlan/CreateProductionPlanDetails.jsx'
+  )
+);
+
+const CreateRecipeInitial = React.lazy(() =>
+  import('../components/Manufacturing/Recipe/CreateRecipeInitial.jsx')
+);
+
+const CreateRecipeDetails = React.lazy(() =>
+  import('../components/Manufacturing/Recipe/RecipeTabs.jsx')
+);
+
+const RecipeList = React.lazy(() =>
+  import('../components/Manufacturing/Recipe/RecipeList.jsx')
+);
+
+const EditRecipeInitial = React.lazy(() =>
+  import('../components/Manufacturing/Recipe/EditRecipeInitial.jsx')
+);
+
+const CreateProductionOrderSettlement = React.lazy(() =>
+  import(
+    '../components/Manufacturing/ProductionOrderSettlement/CreateProductionOrderSettlement.jsx'
+  )
+);
+
+const EditProductionOrderSettlement = React.lazy(() =>
+  import(
+    '../components/Manufacturing/ProductionOrderSettlement/EditProductionOrderSettlement.jsx'
+  )
+);
+
+const ProductionOrderSettlementList = React.lazy(() =>
+  import(
+    '../components/Manufacturing/ProductionOrderSettlement/ProductionOrderSettlementList.jsx'
+  )
+);
+
 import {
   productsData,
   solutionsData,
@@ -586,6 +639,54 @@ export const privateRoutes = [
   {
     path: '/manufacturing/product-orders/edit/:id',
     element: EditProductionOrder,
+  },
+  {
+    path: '/manufacturing/product-orders/details',
+    element: ProductionOrderDetails,
+  },
+  {
+    path: '/manufacturing/production-plan',
+    element: ProductionPlanList,
+  },
+  {
+    path: '/manufacturing/production-plan/create',
+    element: CreateProductionPlan,
+  },
+  {
+    path: '/manufacturing/production-plan/edit/:id',
+    element: EditProductionPlan,
+  },
+  {
+    path: '/manufacturing/production-plan/details',
+    element: ProductionPlanTabs,
+  },
+  {
+    path: '/manufacturing/recipe/create',
+    element: CreateRecipeInitial,
+  },
+  {
+    path: '/manufacturing/recipe',
+    element: RecipeList,
+  },
+  {
+    path: '/manufacturing/recipe/edit/:id',
+    element: EditRecipeInitial,
+  },
+  {
+    path: '/manufacturing/recipe/details',
+    element: CreateRecipeDetails,
+  },
+  {
+    path: '/manufacturing/production-order-settlement',
+    element: ProductionOrderSettlementList,
+  },
+  {
+    path: '/manufacturing/production-order-settlement/create',
+    element: CreateProductionOrderSettlement,
+  },
+  {
+    path: '/manufacturing/production-order-settlement/edit/:id',
+    element: EditProductionOrderSettlement,
   },
 ];
 

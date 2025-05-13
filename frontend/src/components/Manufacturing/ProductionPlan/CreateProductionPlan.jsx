@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Container,
   Grid,
@@ -10,19 +10,18 @@ import {
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-const CreateProductionOrderInitial = () => {
+const CreateProductionPlanInitial = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
   const navigate = useNavigate();
 
   const [materialOptions, setMaterialOptions] = useState([]);
   const [materialId, setMaterialId] = useState('');
   const [materialName, setMaterialName] = useState('');
-  const [productionPlant, setProductionPlant] = useState('');
-  const [planningPlant, setPlanningPlant] = useState('');
-  const [orderType, setOrderType] = useState('');
-  const [order, setOrder] = useState('');
-  const [copyFromOrder, setCopyFromOrder] = useState('');
+  const [plant, setPlant] = useState('');
   const [unit, setUnit] = useState('');
+  const [version, setVersion] = useState('00');
+  const [planningHorizonFrom, setPlanningHorizonFrom] = useState('');
+  const [planningHorizonTo, setPlanningHorizonTo] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -35,17 +34,17 @@ const CreateProductionOrderInitial = () => {
   }, []);
 
   const handleContinue = () => {
-    navigate('/manufacturing/product-orders/details', {
+    navigate('/manufacturing/production-plan/details', {
       state: {
         form: {
           material: materialId,
           materialName,
-          productionPlant,
-          planningPlant,
-          orderType,
-          order,
-          copyFromOrder,
+          plant,
           unit,
+          version,
+          planningHorizonFrom,
+          planningHorizonTo,
+          scheduleLines: [],
         },
         mode: 'create',
       },
@@ -55,7 +54,7 @@ const CreateProductionOrderInitial = () => {
   return (
     <Container maxWidth="md">
       <Typography variant="h5" sx={{ mt: 4, mb: 3, fontWeight: 'bold' }}>
-        Create Production Order – Initial Screen
+        Create Production Plan – Initial Screen
       </Typography>
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -71,8 +70,7 @@ const CreateProductionOrderInitial = () => {
             onChange={(e, newValue) => {
               setMaterialId(newValue?.materialId || '');
               setMaterialName(newValue?.materialName || '');
-              setProductionPlant(newValue?.plant || '');
-              setPlanningPlant(newValue?.plant || '');
+              setPlant(newValue?.plant || '');
               setUnit(newValue?.unit || '');
             }}
             renderInput={(params) => (
@@ -83,45 +81,42 @@ const CreateProductionOrderInitial = () => {
 
         <Grid item xs={12} sm={6}>
           <TextField
-            label="Production Plant"
-            value={productionPlant}
-            onChange={(e) => setProductionPlant(e.target.value)}
+            label="Plant"
+            value={plant}
+            onChange={(e) => setPlant(e.target.value)}
             fullWidth
             required
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
-            label="Planning Plant"
-            value={planningPlant}
-            onChange={(e) => setPlanningPlant(e.target.value)}
+            label="Version"
+            value={version}
+            onChange={(e) => setVersion(e.target.value)}
             fullWidth
             required
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
-            label="Order Type"
-            value={orderType}
-            onChange={(e) => setOrderType(e.target.value)}
+            type="date"
+            label="Planning Horizon From"
+            InputLabelProps={{ shrink: true }}
+            value={planningHorizonFrom}
+            onChange={(e) => setPlanningHorizonFrom(e.target.value)}
             fullWidth
             required
           />
         </Grid>
         <Grid item xs={12} sm={6}>
           <TextField
-            label="Order (Optional)"
-            value={order}
-            onChange={(e) => setOrder(e.target.value)}
+            type="date"
+            label="Planning Horizon To"
+            InputLabelProps={{ shrink: true }}
+            value={planningHorizonTo}
+            onChange={(e) => setPlanningHorizonTo(e.target.value)}
             fullWidth
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            label="Copy From Order (Optional)"
-            value={copyFromOrder}
-            onChange={(e) => setCopyFromOrder(e.target.value)}
-            fullWidth
+            required
           />
         </Grid>
         <Grid item xs={12}>
@@ -132,7 +127,11 @@ const CreateProductionOrderInitial = () => {
             fullWidth
             sx={{ mt: 2 }}
             disabled={
-              !materialId || !productionPlant || !planningPlant || !orderType
+              !materialId ||
+              !plant ||
+              !version ||
+              !planningHorizonFrom ||
+              !planningHorizonTo
             }
           >
             Continue
@@ -143,4 +142,4 @@ const CreateProductionOrderInitial = () => {
   );
 };
 
-export default CreateProductionOrderInitial;
+export default CreateProductionPlanInitial;

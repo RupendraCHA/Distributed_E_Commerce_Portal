@@ -8,28 +8,50 @@ import {
   TableBody,
   Button,
   Box,
+  IconButton,
 } from '@mui/material';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { Edit } from '@mui/icons-material';
+import axios from 'axios';
 
-const ListGoodsReceipts = () => {
-  const [data, setData] = useState([]);
+const ListGoodsReceipt = () => {
+  const [goodsReceipts, setGoodsReceipts] = useState([]);
   const navigate = useNavigate();
-  const server_Url = import.meta.env.VITE_API_SERVER_URL;
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    axios
-      .get(`${server_Url}/api/v1/manufacture-goods-receipt`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((res) => setData(res.data));
+    const fetchData = async () => {
+      try {
+        const res = await axios.get(
+          `${
+            import.meta.env.VITE_API_SERVER_URL
+          }/api/v1/manufacture-goods-receipt`
+        );
+        setGoodsReceipts(res.data);
+      } catch (err) {
+        console.error('Error fetching goods receipts:', err);
+      }
+    };
+
+    fetchData();
   }, []);
 
   return (
     <Container>
-      <Box display="flex" justifyContent="space-between" my={2}>
-        <h2>Goods Receipts</h2>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        my={2}
+      >
+        <h1
+          style={{
+            fontSize: '22px',
+            fontWeight: 'bold',
+            margin: '10px 0px 20px 0px',
+          }}
+        >
+          Goods Receipt Records
+        </h1>
         <Button
           variant="contained"
           onClick={() => navigate('/manufacturing/goods-receipt/create')}
@@ -37,33 +59,39 @@ const ListGoodsReceipts = () => {
           Create New
         </Button>
       </Box>
-      <Table>
+
+      <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Material</TableCell>
-            <TableCell>Quantity</TableCell>
-            <TableCell>Plant</TableCell>
-            <TableCell>Posting Date</TableCell>
+            <TableCell>#</TableCell>
+            <TableCell>Order Number</TableCell>
             <TableCell>Document Date</TableCell>
+            <TableCell>Posting Date</TableCell>
+            <TableCell>Delivery Note</TableCell>
+            <TableCell>Header Text</TableCell>
+            <TableCell>Total Items</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {data.map((row) => (
-            <TableRow key={row._id}>
-              <TableCell>{row.material}</TableCell>
-              <TableCell>{row.quantity}</TableCell>
-              <TableCell>{row.plant}</TableCell>
-              <TableCell>{row.postingDate?.slice(0, 10)}</TableCell>
-              <TableCell>{row.documentDate?.slice(0, 10)}</TableCell>
+          {goodsReceipts.map((receipt, index) => (
+            <TableRow key={receipt._id}>
+              <TableCell>{index + 1}</TableCell>
+              <TableCell>{receipt.orderNumber}</TableCell>
+              <TableCell>{receipt.documentDate?.substring(0, 10)}</TableCell>
+              <TableCell>{receipt.postingDate?.substring(0, 10)}</TableCell>
+              <TableCell>{receipt.deliveryNote}</TableCell>
+              <TableCell>{receipt.headerText}</TableCell>
+              <TableCell>{receipt.items?.length}</TableCell>
               <TableCell>
-                <Button
+                <IconButton
+                  color="primary"
                   onClick={() =>
-                    navigate(`/manufacturing/goods-receipt/edit/${row._id}`)
+                    navigate(`/manufacturing/goods-receipt/edit/${receipt._id}`)
                   }
                 >
-                  Edit
-                </Button>
+                  <Edit />
+                </IconButton>
               </TableCell>
             </TableRow>
           ))}
@@ -73,4 +101,4 @@ const ListGoodsReceipts = () => {
   );
 };
 
-export default ListGoodsReceipts;
+export default ListGoodsReceipt;
