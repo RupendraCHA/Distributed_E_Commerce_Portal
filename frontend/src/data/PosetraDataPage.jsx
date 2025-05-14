@@ -18,15 +18,15 @@ export const solutionsData = ['Industry', 'Use Case'];
 export const AccountingData = [
   {
     title: 'Accounts Receivable',
-    path: 'accounting/accounts-receivable',
+    path: '/accounting/accounts-receivable',
   },
   {
     title: 'Accounts Payable',
-    path: 'accounting/accounts-payable',
+    path: '/accounting/accounts-payable',
   },
   {
     title: 'General Ledger',
-    path: 'accounting/general-ledger',
+    path: '/accounting/gldocuments',
   },
 ];
 export const SourcingData = [
