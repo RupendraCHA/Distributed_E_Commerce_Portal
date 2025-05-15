@@ -325,6 +325,15 @@ const GeneralLedgerList = React.lazy(() =>
   import('../components/Accounting/GeneralLedger/GeneralLedgerList.jsx')
 );
 
+const AccountPayableList = React.lazy(() =>
+  import('../components/Accounting/AccountsPayable/AccountsPayable.jsx')
+);
+
+const AccountReceivableList = React.lazy(() =>
+  import(
+    '../components/Accounting/AccountsReceivable/AccountsReceivableList.jsx'
+  )
+);
 import {
   productsData,
   solutionsData,
@@ -711,6 +720,14 @@ export const privateRoutes = [
   {
     path: '/accounting/gldocuments/edit/:id',
     element: EditGeneralLedger,
+  },
+  {
+    path: '/accounting/accounts-payable',
+    element: AccountPayableList,
+  },
+  {
+    path: '/accounting/accounts-receivable',
+    element: AccountReceivableList,
   },
 ];
 

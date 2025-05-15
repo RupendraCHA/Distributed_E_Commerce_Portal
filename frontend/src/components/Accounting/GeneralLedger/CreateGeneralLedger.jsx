@@ -7,6 +7,12 @@ import {
   Typography,
   IconButton,
   Autocomplete,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  MenuItem,
 } from '@mui/material';
 import { Add, Delete } from '@mui/icons-material';
 import axios from 'axios';
@@ -152,63 +158,162 @@ const CreateGLDocument = ({
       </Typography>
 
       {glDataLoaded ? (
-        form.items.map((item, index) => (
-          <Grid container spacing={2} key={index} alignItems="center">
-            {Object.keys(item).map((field) => (
-              <Grid item xs={3} key={field}>
-                {field === 'glAccount' ? (
-                  <Autocomplete
-                    fullWidth
-                    options={glMasterData}
-                    getOptionLabel={(option) =>
-                      `${option.G_L_Account} - ${option.shortText || ''}`
-                    }
-                    value={
-                      glMasterData.find(
-                        (gl) => `${gl.G_L_Account}` === `${item.glAccount}`
-                      ) || null
-                    }
-                    onChange={(_, value) => {
-                      if (!value) return;
-                      const updatedItem = {
-                        ...item,
-                        glAccount: value.G_L_Account,
-                        shortText: value.shortText || item.shortText,
-                        taxJurisdictionCode:
-                          value.taxJurisdictionCode ||
-                          item.taxJurisdictionCode ||
-                          '',
-                        assignment: value.assignment || item.assignment || '',
-                      };
-                      const updatedItems = [...form.items];
-                      updatedItems[index] = updatedItem;
-                      const updatedForm = { ...form, items: updatedItems };
-                      setForm(updatedForm);
-                      if (setExternalForm) setExternalForm(updatedForm);
-                    }}
-                    renderInput={(params) => (
-                      <TextField {...params} label="GL Account" />
-                    )}
-                  />
-                ) : (
-                  <TextField
-                    fullWidth
-                    label={field}
-                    value={item[field]}
-                    onChange={(e) =>
-                      handleItemChange(index, field, e.target.value)
-                    }
-                  />
-                )}
-              </Grid>
-            ))}
-            <Grid item xs={1}>
-              <IconButton onClick={() => removeItem(index)}>
-                <Delete />
-              </IconButton>
-            </Grid>
-          </Grid>
-        ))
+        <>
+          <Table sx={{ mt: 2 }} size="small">
+            <TableHead>
+              <TableRow>
+                <TableCell>GL Account</TableCell>
+                <TableCell>Short Text</TableCell>
+                <TableCell>Debit/Credit</TableCell>
+                <TableCell>Amount in Doc Currency</TableCell>
+                <TableCell>Local Currency Amount</TableCell>
+                <TableCell>Tax Jurisdiction Code</TableCell>
+                <TableCell>Assignment</TableCell>
+                <TableCell>Action</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {form.items.map((item, index) => (
+                <TableRow key={index}>
+                  <TableCell sx={{ minWidth: 200 }}>
+                    <Autocomplete
+                      fullWidth
+                      options={glMasterData}
+                      getOptionLabel={(option) =>
+                        `${option.G_L_Account} - ${option.shortText || ''}`
+                      }
+                      value={
+                        glMasterData.find(
+                          (gl) => `${gl.G_L_Account}` === `${item.glAccount}`
+                        ) || null
+                      }
+                      onChange={(_, value) => {
+                        if (!value) return;
+                        const updatedItem = {
+                          ...item,
+                          glAccount: value.G_L_Account,
+                          shortText: value.shortText || item.shortText,
+                          taxJurisdictionCode:
+                            value.taxJurisdictionCode ||
+                            item.taxJurisdictionCode ||
+                            '',
+                          assignment: value.assignment || item.assignment || '',
+                        };
+                        const updatedItems = [...form.items];
+                        updatedItems[index] = updatedItem;
+                        const updatedForm = { ...form, items: updatedItems };
+                        setForm(updatedForm);
+                        if (setExternalForm) setExternalForm(updatedForm);
+                      }}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          size="small"
+                          label="GL Account"
+                        />
+                      )}
+                    />
+                  </TableCell>
+
+                  <TableCell>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      value={item.shortText}
+                      onChange={(e) =>
+                        handleItemChange(index, 'shortText', e.target.value)
+                      }
+                    />
+                  </TableCell>
+
+                  <TableCell>
+                    <TextField
+                      select
+                      size="small"
+                      fullWidth
+                      label="Debit/Credit"
+                      value={item.debitCreditIndicator}
+                      onChange={(e) =>
+                        handleItemChange(
+                          index,
+                          'debitCreditIndicator',
+                          e.target.value
+                        )
+                      }
+                    >
+                      <MenuItem value="D">Debit</MenuItem>
+                      <MenuItem value="C">Credit</MenuItem>
+                    </TextField>
+                  </TableCell>
+
+                  <TableCell>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      type="number"
+                      value={item.amountInDocCurrency}
+                      onChange={(e) =>
+                        handleItemChange(
+                          index,
+                          'amountInDocCurrency',
+                          e.target.value
+                        )
+                      }
+                    />
+                  </TableCell>
+
+                  <TableCell>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      type="number"
+                      value={item.localCurrencyAmount}
+                      onChange={(e) =>
+                        handleItemChange(
+                          index,
+                          'localCurrencyAmount',
+                          e.target.value
+                        )
+                      }
+                    />
+                  </TableCell>
+
+                  <TableCell>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      value={item.taxJurisdictionCode}
+                      onChange={(e) =>
+                        handleItemChange(
+                          index,
+                          'taxJurisdictionCode',
+                          e.target.value
+                        )
+                      }
+                    />
+                  </TableCell>
+
+                  <TableCell>
+                    <TextField
+                      size="small"
+                      fullWidth
+                      value={item.assignment}
+                      onChange={(e) =>
+                        handleItemChange(index, 'assignment', e.target.value)
+                      }
+                    />
+                  </TableCell>
+
+                  <TableCell>
+                    <IconButton onClick={() => removeItem(index)}>
+                      <Delete />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </>
       ) : (
         <Typography mt={2}>Loading GL master data...</Typography>
       )}
