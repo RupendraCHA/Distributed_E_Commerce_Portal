@@ -3606,7 +3606,7 @@ app.delete("/api/v1/gldocuments/:id", async (req, res) => {
   }
 });
 
-app.post("/api/v1/gldocumentdata", async (req, res) => {
+app.get("/api/v1/gldocumentdata", async (req, res) => {
   try {
     const results = await GLDocumentDataModel.find({});
     res.json(results);
