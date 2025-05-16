@@ -27,7 +27,7 @@ const AccountReceivableList = () => {
   return (
     <Container>
       <Box mb={2}>
-        <Typography variant="h5">Account Payable Entries</Typography>
+        <Typography variant="h5">Account Receivable Entries</Typography>
       </Box>
 
       <Table>
