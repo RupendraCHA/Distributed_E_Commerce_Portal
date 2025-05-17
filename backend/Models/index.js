@@ -20,6 +20,8 @@ const ProductionOrderModel = require("./ProductionOrder.js");
 const ProductionPlanModel = require("./ProductionPlan.js");
 const RecipeModel = require("./Recipe.js");
 const ProductionOrderSettlementModel = require("./ProductionOrderSettlement.js");
+const GLDocumentModel = require("./GLDocumentSchema");
+const GLDocumentDataModel = require("./GLDocumentDataSchema");
 module.exports = {
   EmployeeModel,
   AddressModel,
@@ -43,4 +45,6 @@ module.exports = {
   ProductionPlanModel,
   RecipeModel,
   ProductionOrderSettlementModel,
+  GLDocumentModel,
+  GLDocumentDataModel,
 };

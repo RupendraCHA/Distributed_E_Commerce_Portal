@@ -31,6 +31,8 @@ const {
   ProductionPlanModel,
   RecipeModel,
   ProductionOrderSettlementModel,
+  GLDocumentDataModel,
+  GLDocumentModel,
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -3527,6 +3529,90 @@ app.post("/api/v1/inventories", authenticateToken, async (req, res) => {
     res
       .status(500)
       .json({ message: "Failed to update inventory", error: error.message });
+  }
+});
+
+app.post("/api/v1/gldocuments/", async (req, res) => {
+  try {
+    const newDocument = new GLDocumentModel(req.body);
+    const savedDoc = await newDocument.save();
+    res.status(201).json(savedDoc);
+  } catch (error) {
+    console.error("Error creating GL Document:", error);
+    res.status(400).json({ message: "Failed to create document", error });
+  }
+});
+
+// @route   GET /api/gldocuments
+// @desc    Get all GL Documents
+app.get("/api/v1/gldocuments/", async (req, res) => {
+  try {
+    const documents = await GLDocumentModel.find();
+    res.status(200).json(documents);
+  } catch (error) {
+    console.error("Error fetching GL Documents:", error);
+    res.status(500).json({ message: "Failed to fetch documents" });
+  }
+});
+
+// @route   GET /api/gldocuments/:id
+// @desc    Get a GL Document by ID
+app.get("/api/v1/gldocuments/:id", async (req, res) => {
+  try {
+    const document = await GLDocumentModel.findById(req.params.id);
+    if (!document) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+    res.status(200).json(document);
+  } catch (error) {
+    console.error("Error fetching GL Document:", error);
+    res.status(500).json({ message: "Error retrieving document" });
+  }
+});
+
+// @route   PUT /api/gldocuments/:id
+// @desc    Update a GL Document
+app.put("/api/v1/gldocuments/:id", async (req, res) => {
+  try {
+    const updatedDoc = await GLDocumentModel.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      {
+        new: true,
+      }
+    );
+    if (!updatedDoc) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+    res.status(200).json(updatedDoc);
+  } catch (error) {
+    console.error("Error updating GL Document:", error);
+    res.status(400).json({ message: "Failed to update document", error });
+  }
+});
+
+// @route   DELETE /api/gldocuments/:id
+// @desc    Delete a GL Document
+app.delete("/api/v1/gldocuments/:id", async (req, res) => {
+  try {
+    const deletedDoc = await GLDocumentModel.findByIdAndDelete(req.params.id);
+    if (!deletedDoc) {
+      return res.status(404).json({ message: "Document not found" });
+    }
+    res.status(200).json({ message: "Document deleted" });
+  } catch (error) {
+    console.error("Error deleting GL Document:", error);
+    res.status(500).json({ message: "Failed to delete document" });
+  }
+});
+
+app.get("/api/v1/gldocumentdata", async (req, res) => {
+  try {
+    const results = await GLDocumentDataModel.find({});
+    res.json(results);
+  } catch (err) {
+    console.error("Failed to fetch GL data:", err);
+    res.status(500).json({ message: "Server error" });
   }
 });
 

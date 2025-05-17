@@ -313,6 +313,27 @@ const ProductionOrderSettlementList = React.lazy(() =>
   )
 );
 
+const CreateGeneralLedger = React.lazy(() =>
+  import('../components/Accounting/GeneralLedger/CreateGeneralLedger.jsx')
+);
+
+const EditGeneralLedger = React.lazy(() =>
+  import('../components/Accounting/GeneralLedger/EditGeneralLedger.jsx')
+);
+
+const GeneralLedgerList = React.lazy(() =>
+  import('../components/Accounting/GeneralLedger/GeneralLedgerList.jsx')
+);
+
+const AccountPayableList = React.lazy(() =>
+  import('../components/Accounting/AccountsPayable/AccountsPayable.jsx')
+);
+
+const AccountReceivableList = React.lazy(() =>
+  import(
+    '../components/Accounting/AccountsReceivable/AccountsReceivableList.jsx'
+  )
+);
 import {
   productsData,
   solutionsData,
@@ -687,6 +708,26 @@ export const privateRoutes = [
   {
     path: '/manufacturing/production-order-settlement/edit/:id',
     element: EditProductionOrderSettlement,
+  },
+  {
+    path: '/accounting/gldocuments/create',
+    element: CreateGeneralLedger,
+  },
+  {
+    path: '/accounting/gldocuments',
+    element: GeneralLedgerList,
+  },
+  {
+    path: '/accounting/gldocuments/edit/:id',
+    element: EditGeneralLedger,
+  },
+  {
+    path: '/accounting/accounts-payable',
+    element: AccountPayableList,
+  },
+  {
+    path: '/accounting/accounts-receivable',
+    element: AccountReceivableList,
   },
 ];
 
