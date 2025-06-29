@@ -325,6 +325,16 @@ const GeneralLedgerList = React.lazy(() =>
   import('../components/Accounting/GeneralLedger/GeneralLedgerList.jsx')
 );
 
+// const UserGLAccountSetup = React.lazy(() =>
+//   import('../components/Accounting/GeneralLedger/UserGLAccountSetup.jsx')
+// );
+
+// const EcommercePurchase = React.lazy(() =>
+//   import('../components/Accounting/GeneralLedger/EcommercePurchase.jsx')
+// );
+
+
+
 const AccountPayableList = React.lazy(() =>
   import('../components/Accounting/AccountsPayable/AccountsPayable.jsx')
 );
@@ -334,13 +344,37 @@ const AccountReceivableList = React.lazy(() =>
     '../components/Accounting/AccountsReceivable/AccountsReceivableList.jsx'
   )
 );
+const InventoryLedger = React.lazy(() =>
+  import(
+    '../components/Accounting/InventoryLedger/InventoryLedger.jsx'
+  )
+);
+
+const Invoice = React.lazy(() =>
+  import(
+    '../components/Accounting/Invoice/InvoiceReceipt.jsx'
+  )
+);
+
+const Quotation = React.lazy(() =>
+  import('../components/Quotations/Quotation.jsx')
+);
+
+const ConsumerAccounts = React.lazy(() =>
+  import(
+    '../components/Quotations/ConsumerAccounts.jsx')
+);
+
+
+
+
 import {
   productsData,
   solutionsData,
   SourcingData,
   pricingData,
   InventoryData,
-  QuotationData,
+  // QuotationData,
   OrderData,
   ShipData,
   InvoiceData,
@@ -364,7 +398,8 @@ export const pirvateSections = [
     section: 'Inventory',
     element: Inventory,
   },
-  { path: '/quotation', data: QuotationData, section: 'Quotation' },
+  // { path: '/quotation', data: QuotationData, section: 'Quotation' },
+
   { path: '/order', data: OrderData, section: 'Order' },
   { path: '/ship', data: ShipData, section: 'Ship', element: Ship },
   { path: '/invoice', data: InvoiceData, section: 'Invoice' },
@@ -455,6 +490,7 @@ export const privateRoutes = [
     path: '/product/materials',
     element: SAPDataDetails,
   },
+
   {
     path: '/sourcing/purchase-requisitions',
     element: PurchaseRequisition,
@@ -551,7 +587,6 @@ export const privateRoutes = [
     path: '/sourcing/item-info-records/edit/:id',
     element: EditItemInfoRecords,
   },
-
   {
     path: '/manufacturing/goods-issue/create',
     element: CreateGoodIssueForProcessOrder,
@@ -592,7 +627,6 @@ export const privateRoutes = [
     path: '/manufacturing/goods-receipt/edit/:id',
     element: EditGoodsReceiptForTable,
   },
-
   {
     path: '/sourcing/vendor-agreements/create',
     element: CreateVendorAgreement,
@@ -721,6 +755,14 @@ export const privateRoutes = [
     path: '/accounting/gldocuments/edit/:id',
     element: EditGeneralLedger,
   },
+  // {
+  //   path: '/accounting/user-gl-account-setup',
+  //   element: UserGLAccountSetup,
+  // },
+  // {
+  //   path: '/accounting/ecommerce-purchase',
+  //   element: EcommercePurchase,
+  // },
   {
     path: '/accounting/accounts-payable',
     element: AccountPayableList,
@@ -729,6 +771,20 @@ export const privateRoutes = [
     path: '/accounting/accounts-receivable',
     element: AccountReceivableList,
   },
+  {
+    path: '/accounting/InventoryLedger',
+    element: InventoryLedger,
+  },
+
+  {
+    path: '/quotations',
+    element: Quotation,
+  },
+  {
+    path: '/quotations/consumer-accounts',
+    element: ConsumerAccounts,
+  },
+
 ];
 
 export const adminRoutes = [

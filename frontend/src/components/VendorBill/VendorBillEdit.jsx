@@ -1,18 +1,102 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Tabs, Tab, Button, Paper } from '@mui/material';
-import BasicData from './tabs/BasicData';
-import Payment from './tabs/Payment';
-import Details from './tabs/Details';
-import Tax from './tabs/Tax';
-import Contacts from './tabs/Contacts';
-import Note from './tabs/Note';
-import POReference from './tabs/POReference';
+import BasicData from './tabs/BasicData'; // Updated path
+import Payment from './tabs/Payment'; // Updated path
+import Details from './tabs/Details'; // Updated path
+import Tax from './tabs/Tax'; // Updated path
+import Contacts from './tabs/Contacts'; // Updated path
+import Note from './tabs/Note'; // Updated path
+import POReference from './tabs/POReference'; // Updated path
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 
-const VendorBillEdit = () => {
+// Helper function to update or create a GL document based on vendor bill data
+const updateGLDocumentForVendorBill = async (vendorBillData, token) => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
 
+  // Extract relevant data from the vendor bill
+  const { _id, basicData, details, payment } = vendorBillData;
+  const amount = parseFloat(basicData?.amount) || 0;
+  const taxAmount = parseFloat(basicData?.taxAmount) || 0;
+  const totalAmount = amount + taxAmount;
+
+  // Construct GL document
+  const glDocument = {
+    documentDate: basicData?.documentDate || new Date().toISOString().split('T')[0],
+    postingDate: basicData?.postingDate || new Date().toISOString().split('T')[0],
+    currency: details?.currency || 'INR',
+    reference: `VB_${_id}`, // Link GL document to vendor bill via reference
+    documentHeaderText: 'Auto-generated from Vendor Bill',
+    crossCCNumber: '',
+    companyCode: basicData?.companyCode || 'EC01',
+    companyName: 'Eco store banglore',
+    totalDebit: totalAmount,
+    totalCredit: totalAmount,
+    items: [
+      {
+        glAccount: details?.glAccount || 'EXPENSE_DEFAULT',
+        shortText: 'Vendor Bill Expense',
+        debitCreditIndicator: 'D',
+        amountInDocCurrency: totalAmount,
+        localCurrencyAmount: totalAmount,
+        taxJurisdictionCode: '',
+        assignment: '',
+      },
+      {
+        glAccount: 'ACCOUNTS_PAYABLE',
+        shortText: 'Vendor Bill Payable',
+        debitCreditIndicator: 'C',
+        amountInDocCurrency: totalAmount,
+        localCurrencyAmount: totalAmount,
+        taxJurisdictionCode: '',
+        assignment: '',
+      },
+    ],
+  };
+
+  try {
+    // Check if a GL document already exists for this vendor bill
+    const glResponse = await axios.get(
+      `${server_Url}/api/v1/gldocuments?reference=VB_${_id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    if (glResponse.data && glResponse.data.length > 0) {
+      // Update existing GL document
+      const glDocId = glResponse.data[0]._id;
+      await axios.put(
+        `${server_Url}/api/v1/gldocuments/${glDocId}`,
+        glDocument,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } else {
+      // Create new GL document
+      await axios.post(
+        `${server_Url}/api/v1/gldocuments`,
+        glDocument,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    }
+  } catch (err) {
+    console.error('Error updating/creating GL document:', err);
+    throw err;
+  }
+};
+
+const VendorBillEdit = () => {
+  const server_Url = import.meta.env.VITE_API_SERVER_URL;
   const { id } = useParams();
   const [tabIndex, setTabIndex] = useState(0);
   const [formData, setFormData] = useState({});
@@ -28,14 +112,28 @@ const VendorBillEdit = () => {
       .then((res) => setFormData(res.data));
   }, [id]);
 
-  const handleSubmit = () => {
-    axios
-      .put(server_Url + `/api/v1/vendor-bill/${id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
-      .then(() => navigate('/sourcing/vendor-bills'));
+  const handleSubmit = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      // Step 1: Update the Vendor Bill
+      await axios.put(
+        server_Url + `/api/v1/vendor-bill/${id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Step 2: Update or create the corresponding GL Document
+      await updateGLDocumentForVendorBill(formData, token);
+
+      // Step 3: Navigate back to the Vendor Bill list
+      navigate('/sourcing/vendor-bills');
+    } catch (err) {
+      console.error('Error updating vendor bill or GL document:', err);
+    }
   };
 
   return (
@@ -49,7 +147,6 @@ const VendorBillEdit = () => {
           onChange={(_, newIndex) => setTabIndex(newIndex)}
           variant="fullWidth"
           textColor="inherit"
-          // TabIndicatorProps={{ style: { background: '#000' } }}
           sx={{
             '& .Mui-selected': {
               borderRadius: '8px',

@@ -1,14 +1,77 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Tabs, Tab, Button, Paper, Box } from '@mui/material';
-import BasicData from './tabs/BasicData';
-import Payment from './tabs/Payment';
-import Details from './tabs/Details';
-import Tax from './tabs/Tax';
-import Contacts from './tabs/Contacts';
-import Note from './tabs/Note';
-import POReference from './tabs/POReference';
+import BasicData from './tabs/BasicData'; // Updated path
+import Payment from './tabs/Payment'; // Updated path
+import Details from './tabs/Details'; // Updated path
+import Tax from './tabs/Tax'; // Updated path
+import Contacts from './tabs/Contacts'; // Updated path
+import Note from './tabs/Note'; // Updated path
+import POReference from './tabs/POReference'; // Updated path
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+
+// Helper function to create a GL document based on vendor bill data
+const createGLDocumentFromVendorBill = async (vendorBillData, token) => {
+  const server_Url = import.meta.env.VITE_API_SERVER_URL;
+
+  // Extract relevant data from the vendor bill
+  const { basicData, details, payment } = vendorBillData;
+  const amount = parseFloat(basicData?.amount) || 0;
+  const taxAmount = parseFloat(basicData?.taxAmount) || 0;
+  const totalAmount = amount + taxAmount;
+
+  // Construct GL document
+  const glDocument = {
+    documentDate: basicData?.documentDate || new Date().toISOString().split('T')[0],
+    postingDate: basicData?.postingDate || new Date().toISOString().split('T')[0],
+    currency: details?.currency || 'INR',
+    reference: basicData?.reference || '',
+    documentHeaderText: 'Auto-generated from Vendor Bill',
+    crossCCNumber: '',
+    companyCode: basicData?.companyCode || 'EC01',
+    companyName: 'Eco store banglore',
+    totalDebit: totalAmount,
+    totalCredit: totalAmount,
+    items: [
+      // Debit: Expense Account (using the GL Account specified in Details)
+      {
+        glAccount: details?.glAccount || 'EXPENSE_DEFAULT', // Fallback to a default GL account
+        shortText: 'Vendor Bill Expense',
+        debitCreditIndicator: 'D', // Debit
+        amountInDocCurrency: totalAmount,
+        localCurrencyAmount: totalAmount, // Assuming same currency for simplicity
+        taxJurisdictionCode: '',
+        assignment: '',
+      },
+      // Credit: Accounts Payable
+      {
+        glAccount: 'ACCOUNTS_PAYABLE', // Hardcoded for demo; should come from config
+        shortText: 'Vendor Bill Payable',
+        debitCreditIndicator: 'C', // Credit
+        amountInDocCurrency: totalAmount,
+        localCurrencyAmount: totalAmount,
+        taxJurisdictionCode: '',
+        assignment: '',
+      },
+    ],
+  };
+
+  try {
+    const response = await axios.post(
+      `${server_Url}/api/v1/gldocuments`,
+      glDocument,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (err) {
+    console.error('Error creating GL document:', err);
+    throw err;
+  }
+};
 
 const VendorBillCreate = () => {
   const server_Url = import.meta.env.VITE_API_SERVER_URL;
@@ -35,17 +98,29 @@ const VendorBillCreate = () => {
       .catch((err) => console.error('Error fetching POs:', err));
   }, []);
 
-  const handleSubmit = () => {
-    axios
-      .post(server_Url + '/api/v1/vendor-bill', formData, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
-      .then(() => navigate('/sourcing/vendor-bills'))
-      .catch((err) => console.error('Error creating vendor bill:', err));
+  const handleSubmit = async () => {
+    const token = localStorage.getItem('token');
+    try {
+      // Step 1: Save the Vendor Bill
+      const vendorBillResponse = await axios.post(
+        server_Url + '/api/v1/vendor-bill',
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Step 2: Create the corresponding GL Document
+      await createGLDocumentFromVendorBill(formData, token);
+
+      // Step 3: Navigate back to the Vendor Bill list
+      navigate('/sourcing/vendor-bills');
+    } catch (err) {
+      console.error('Error creating vendor bill or GL document:', err);
+    }
   };
-  console.log({ formData });
 
   return (
     <Container>
@@ -53,14 +128,12 @@ const VendorBillCreate = () => {
         Create Vendor Bill
       </h1>
 
-      {/* Paper wraps tabs to keep them behind the content */}
       <Paper elevation={3} sx={{ padding: 2, marginTop: 2, borderRadius: 2 }}>
         <Tabs
           value={tabIndex}
           onChange={(_, newIndex) => setTabIndex(newIndex)}
           variant="fullWidth"
           textColor="inherit"
-          // TabIndicatorProps={{ style: { background: '#000' } }}
           sx={{
             '& .Mui-selected': {
               borderRadius: '8px',
@@ -79,7 +152,6 @@ const VendorBillCreate = () => {
           <Tab label="Note" />
         </Tabs>
 
-        {/* Content Box */}
         <Box sx={{ marginTop: 2 }}>
           {tabIndex === 0 && (
             <BasicData formData={formData} setFormData={setFormData} />
@@ -102,14 +174,12 @@ const VendorBillCreate = () => {
         </Box>
       </Paper>
 
-      {/* PO Reference Section */}
       <POReference
         formData={formData}
         setFormData={setFormData}
         purchaseOrders={purchaseOrders}
       />
 
-      {/* Submit Button */}
       <Button
         variant="contained"
         color="primary"

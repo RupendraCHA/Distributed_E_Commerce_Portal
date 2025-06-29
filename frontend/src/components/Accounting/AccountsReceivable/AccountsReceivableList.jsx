@@ -7,61 +7,134 @@ import {
   TableBody,
   TableRow,
   TableCell,
+  CircularProgress,
   Box,
+  Alert,
+  Button,
 } from '@mui/material';
 import axios from 'axios';
 
 const AccountReceivableList = () => {
-  const [documents, setDocuments] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [clearing, setClearing] = useState({}); // To track which transaction is being cleared
+
+  const fetchTransactions = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_SERVER_URL}/api/v1/accounts-receivable`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setTransactions(res.data || []);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to load receivable transactions');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_API_SERVER_URL}/api/v1/gldocuments`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-        },
-      })
-      .then((res) => setDocuments(res.data));
+    fetchTransactions();
   }, []);
+
+  const handleClearAR = async (transactionId) => {
+    try {
+      setClearing((prev) => ({ ...prev, [transactionId]: true }));
+
+      const token = localStorage.getItem('token');
+      await axios.post(
+        `${import.meta.env.VITE_API_SERVER_URL}/api/v1/accounts-receivable/clear`,
+        { orderId: transactionId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      // Refresh data after clearing
+      fetchTransactions();
+    } catch (err) {
+      console.error("Error clearing AR:", err);
+      alert("Failed to clear AR for this order.");
+    } finally {
+      setClearing((prev) => ({ ...prev, [transactionId]: false }));
+    }
+  };
+
+  const totalAmount = transactions.reduce((sum, tx) => {
+    const amount = typeof tx.amount === "string" ? parseFloat(tx.amount.replace("$", "")) : tx.amount || 0;
+    return sum + (isNaN(amount) ? 0 : amount);
+  }, 0);
 
   return (
     <Container>
-      <Box mb={2}>
-        <Typography variant="h5">Account Receivable Entries</Typography>
-      </Box>
+      <Typography variant="h5" gutterBottom>
+        Accounts Receivable Entries
+      </Typography>
 
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Company Code</TableCell>
-            <TableCell>Item</TableCell>
-            <TableCell>Key</TableCell>
-            <TableCell>GL Account</TableCell>
-            <TableCell>Description</TableCell>
-            <TableCell>Amount</TableCell>
-            <TableCell>Currency</TableCell>
-            <TableCell>Tx</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {documents.map((doc) =>
-            doc.items
-              ?.filter((item) => item.debitCreditIndicator === 'D')
-              .map((item, index) => (
-                <TableRow key={`${doc._id}-${index}`}>
-                  <TableCell>{doc.companyCode}</TableCell>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{item.debitCreditIndicator}</TableCell>
-                  <TableCell>{item.glAccount}</TableCell>
-                  <TableCell>{item.shortText}</TableCell>
-                  <TableCell>{item.amountInDocCurrency}</TableCell>
-                  <TableCell>{doc.currency}</TableCell>
-                  <TableCell>{item.taxJurisdictionCode || '—'}</TableCell>
-                </TableRow>
-              ))
-          )}
-        </TableBody>
-      </Table>
+      {loading ? (
+        <Box display="flex" justifyContent="center" my={4}>
+          <CircularProgress />
+        </Box>
+      ) : error ? (
+        <Alert severity="error">{error}</Alert>
+      ) : (
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>User</TableCell>
+              <TableCell>Transaction ID</TableCell>
+              <TableCell>Product</TableCell>
+              <TableCell>Qty</TableCell>
+              <TableCell>Unit Price</TableCell>
+              <TableCell>Total</TableCell>
+              <TableCell>Date</TableCell>
+              <TableCell>Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {transactions.map((tx) => (
+              // <TableRow key={`${tx.transactionId}-${tx.itemIndex}`}>
+              // <TableRow key={`${tx.transactionId || tx.orderId || 'unknown'}-${tx.itemIndex}`}>
+              <TableRow key={`${tx.transactionId || tx.orderId || 'row'}-${tx.itemIndex}`}>
+
+
+                <TableCell>{tx.name}</TableCell>
+                <TableCell>{tx.transactionId}</TableCell>
+                <TableCell>{tx.product}</TableCell>
+                <TableCell>{tx.quantity}</TableCell>
+                <TableCell>{tx.price || "$0.00"}</TableCell>
+                <TableCell>{tx.amount || "$0.00"}</TableCell>
+                <TableCell>{tx.date}</TableCell>
+                <TableCell>
+                  <Button
+                    size="small"
+                    variant="contained"
+                    color="success"
+                    disabled={clearing[tx.transactionId]}
+                    // onClick={() => handleClearAR(tx.transactionId)}
+                    onClick={() => handleClearAR(tx.orderId)}
+
+                  >
+                    {clearing[tx.transactionId] ? "Clearing..." : "Clear AR"}
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+            <TableRow>
+              <TableCell colSpan={5} align="right">
+                <strong>Total Receivable</strong>
+              </TableCell>
+              <TableCell>
+                <strong>${totalAmount.toFixed(2)}</strong>
+              </TableCell>
+              <TableCell colSpan={2} />
+            </TableRow>
+          </TableBody>
+        </Table>
+      )}
     </Container>
   );
 };

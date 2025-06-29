@@ -18,7 +18,7 @@ const PurchOrgData2 = ({ formData, setFormData }) => {
   return (
     <Grid container spacing={2}>
       {/* References */}
-      <Grid item xs={12} sm={6} md={4}>
+      {/* <Grid item xs={12} sm={6} md={4}>
         <TextField
           fullWidth
           label="Quotation"
@@ -35,7 +35,7 @@ const PurchOrgData2 = ({ formData, setFormData }) => {
           value={data.quotationFrom || ''}
           onChange={handleChange}
         />
-      </Grid>
+      </Grid> */}
       <Grid item xs={12} sm={6} md={4}>
         <TextField
           fullWidth

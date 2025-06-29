@@ -8,30 +8,13 @@ const OrderSchema = new mongoose.Schema({
   },
   items: [
     {
-      product: {
-        type: String,
-        required: true,
-      },
-      name: {
-        type: String,
-        required: true,
-        default: "schema changed",
-      },
-      quantity: {
-        type: Number,
-        required: true,
-        default: 1,
-      },
-      price: {
-        type: String,
-        required: true,
-      },
+      product: { type: String, required: true },
+      name: { type: String, required: true, default: "schema changed" },
+      quantity: { type: Number, required: true, default: 1 },
+      price: { type: String, required: true }, // $ prefixed string
     },
   ],
-  total: {
-    type: Number,
-    required: true,
-  },
+  total: { type: Number, required: true },
   address: {
     addressLine1: String,
     addressLine2: String,
@@ -63,6 +46,14 @@ const OrderSchema = new mongoose.Schema({
     enum: ["standard", "premium", "airMail"],
     default: "standard",
   },
+  isFulfilled: {
+    type: Boolean,
+    default: false,
+  },
+  isCleared: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -70,5 +61,4 @@ const OrderSchema = new mongoose.Schema({
 });
 
 const OrderModel = mongoose.model("Order", OrderSchema);
-
 module.exports = OrderModel;

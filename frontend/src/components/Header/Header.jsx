@@ -329,7 +329,7 @@ const Header = () => {
                   </li>
                   <li>
                     <Link
-                      to="/quotation"
+                      to="/quotations"
                       className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
                     >
                       Quotation
@@ -361,16 +361,56 @@ const Header = () => {
                   </li>
                 </>
               )}
-              {userRole === 'user' && (
-                <li className="">
-                  <Link
-                    to="/distributors/products"
-                    className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+              {['user', 'consumer'].includes(userRole) && (
+                <>
+                  {/* ✅ Accounting with only AR */}
+                  <li>
+                    <Link
+                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                      onClick={handleAccounting}
+                    >
+                      Accounting
+                    </Link>
+                  </li>
+                  <Popper
+                    open={Boolean(anchorElForAccounting)}
+                    anchorEl={anchorElForAccounting}
+                    placement="bottom-start"
+                    disablePortal={false}
+                    modifiers={[{ name: 'offset', options: { offset: [0, 10] } }]}
+                    sx={{ zIndex: 10000 }}
                   >
-                    Products
-                  </Link>
-                </li>
+                    <ClickAwayListener onClickAway={handleAccountingPopperClose}>
+                      <Paper>
+                        <MenuList>
+                          {AccountingData
+                            .filter(item => item.title === 'Accounts Receivable')
+                            .map(({ title, path }) => (
+                              <MenuItem
+                                key={path}
+                                className="text-blue-500"
+                                onClick={() => handleAccountingPopperClose(path)}
+                              >
+                                {title}
+                              </MenuItem>
+                            ))}
+                        </MenuList>
+                      </Paper>
+                    </ClickAwayListener>
+                  </Popper>
+
+                  {/* ✅ Products Link */}
+                  <li>
+                    <Link
+                      to="/distributors/products"
+                      className="text-0.9xl text-whiteColor border-solid hover:border-b-4 pb-1"
+                    >
+                      Products
+                    </Link>
+                  </li>
+                </>
               )}
+
 
               {/* Add Distributor Icon and Dropdown if user is a distributor */}
               {userRole === 'distributor' && (

@@ -28,7 +28,26 @@ export const AccountingData = [
     title: 'General Ledger',
     path: '/accounting/gldocuments',
   },
+
+  {
+    title: 'InventoryLedger',
+    path: '/accounting/InventoryLedger',
+  },
+
 ];
+
+export const QuotationData = [
+  {
+    title: 'Quotation',
+    path: '/quotations',
+  },
+  {
+    title: 'Consumer Accounts',
+    path: '/quotations/consumer-accounts',
+  }
+];
+
+
 export const SourcingData = [
   {
     title: 'Purchase Requisition',
@@ -67,6 +86,7 @@ export const SourcingData = [
     path: '/sourcing/vendor-agreements',
   },
 ];
+
 export const ManufacturingData = [
   {
     title: 'Product Master',
@@ -130,12 +150,15 @@ export const InventoryData = [
   'Returns',
   'Stock Transfers',
 ];
-export const QuotationData = [
-  'Price',
-  'Discounts',
-  'Validity Period',
-  'Status',
-];
+// src/data/QuotationData.js
+// export const QuotationData = [
+//   'User Data',
+//   'Price',
+//   'Discounts',
+//   'Validity Period',
+//   'Status',
+
+// ];
 export const OrderData = [
   'Line Items',
   'Prices',

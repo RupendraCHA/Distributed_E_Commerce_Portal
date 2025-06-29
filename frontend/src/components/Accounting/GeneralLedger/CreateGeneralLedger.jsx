@@ -18,6 +18,9 @@ import { Add, Delete } from '@mui/icons-material';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
+
+
+
 const CreateGLDocument = ({
   form: externalForm,
   setForm: setExternalForm,
@@ -27,6 +30,19 @@ const CreateGLDocument = ({
   const isEdit = !!externalForm;
   const [glMasterData, setGlMasterData] = useState([]);
   const [glDataLoaded, setGlDataLoaded] = useState(false);
+  const [consumers, setConsumers] = useState([]);
+
+  useEffect(() => {
+    axios
+      .get(`${import.meta.env.VITE_API_SERVER_URL}/api/v1/consumers`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((res) => setConsumers(res.data))
+      .catch((err) => console.error("Error fetching consumers:", err));
+  }, []);
+
 
   const [form, setForm] = useState(
     externalForm || {
@@ -151,6 +167,22 @@ const CreateGLDocument = ({
             />
           </Grid>
         ))}
+
+        <Grid item xs={6}>
+          <Autocomplete
+            options={consumers}
+            getOptionLabel={(option) => `${option.name} (${option.email})`}
+            value={consumers.find((c) => c._id === form.consumerId) || null}
+            onChange={(_, value) => {
+              const updated = { ...form, consumerId: value?._id || '' };
+              setForm(updated);
+              if (setExternalForm) setExternalForm(updated);
+            }}
+            renderInput={(params) => <TextField {...params} label="Consumer" />}
+          />
+        </Grid>
+
+
       </Grid>
 
       <Typography variant="h6" mt={3}>

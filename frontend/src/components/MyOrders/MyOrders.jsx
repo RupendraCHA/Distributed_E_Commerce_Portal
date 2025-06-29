@@ -17,7 +17,7 @@ const Orders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const userRole = useSelector((state) => state.auth.user?.role);
-  const user = useSelector((state)=>state.auth.user)
+  const user = useSelector((state) => state.auth.user)
 
   const server_Url = import.meta.env.VITE_API_SERVER_URL
 
@@ -45,7 +45,7 @@ const Orders = () => {
           setTimeout(() => {
             updateOrderStatus(order._id, 'processing');
           }, 3000); // 10 seconds
-        } 
+        }
         // else if (order.status === 'processing') {
         //   setTimeout(() => {
         //     updateOrderStatus(order._id, 'delivered');
@@ -71,7 +71,7 @@ const Orders = () => {
         // headers: { Authorization: `Bearer ${token}` },
         responseType: "blob", // Important for handling files
       });
-  
+
       // Create a URL for the file and trigger download
       // const url = window.URL.createObjectURL(new Blob([response.data]));
       const url = window.URL.createObjectURL(response.data);
@@ -82,129 +82,129 @@ const Orders = () => {
       link.click();
       document.body.removeChild(link);
     } catch (error) {
-      console.log({error})
+      console.log({ error })
       console.error("Error downloading invoice:", error);
     }
   };
 
 
-const downloadOrderInvoice = (order, createdAt) => {
-  const doc = new jsPDF();
+  const downloadOrderInvoice = (order, createdAt) => {
+    const doc = new jsPDF();
 
-  // Image & Title Setup
-  const logoUrl =
-    "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738926639/Posetra_Logo1_bcwdlt.jpg";
-  const imgWidth = 15;
-  const imgHeight = 15;
-  const marginLeft = 15;
-  const titleText = `Order Invoice`;
-  const titleFontSize = 18;
-  const titleX = marginLeft + 15;
+    // Image & Title Setup
+    const logoUrl =
+      "https://res.cloudinary.com/dvxkeeeqs/image/upload/v1738926639/Posetra_Logo1_bcwdlt.jpg";
+    const imgWidth = 15;
+    const imgHeight = 15;
+    const marginLeft = 15;
+    const titleText = `Order Invoice`;
+    const titleFontSize = 18;
+    const titleX = marginLeft + 15;
 
-  // Add Image & Title
-  doc.addImage(logoUrl, "PNG", marginLeft, 10, imgWidth, imgHeight);
-  doc.setFontSize(titleFontSize);
-  doc.setTextColor(44, 62, 80);
-  doc.setFont("helvetica", "bold");
-  doc.text(titleText, titleX, 18);
+    // Add Image & Title
+    doc.addImage(logoUrl, "PNG", marginLeft, 10, imgWidth, imgHeight);
+    doc.setFontSize(titleFontSize);
+    doc.setTextColor(44, 62, 80);
+    doc.setFont("helvetica", "bold");
+    doc.text(titleText, titleX, 18);
 
-  let startY = 35; // Position after title
+    let startY = 35; // Position after title
 
-  // Delivery Charge Calculation
-  let deliveryCharge = 0;
-  if (order.deliveryType === "premium") deliveryCharge = 10;
-  if (order.deliveryType === "airMail") deliveryCharge = 100;
+    // Delivery Charge Calculation
+    let deliveryCharge = 0;
+    if (order.deliveryType === "premium") deliveryCharge = 10;
+    if (order.deliveryType === "airMail") deliveryCharge = 100;
 
-  let deliveryType = "Standard";
-  if (order.deliveryType === "premium") deliveryType = "Premium";
-  if (order.deliveryType === "airMail") deliveryType = "Air";
+    let deliveryType = "Standard";
+    if (order.deliveryType === "premium") deliveryType = "Premium";
+    if (order.deliveryType === "airMail") deliveryType = "Air";
 
-  // Calculate Total Amount
-  const subTotal = order.items.reduce(
-    (acc, item) => acc + Number(item.price.slice(1)) * item.quantity,
-    0
-  );
-  const totalAmount = subTotal + deliveryCharge;
+    // Calculate Total Amount
+    const subTotal = order.items.reduce(
+      (acc, item) => acc + Number(item.price.slice(1)) * item.quantity,
+      0
+    );
+    const totalAmount = subTotal + deliveryCharge;
 
-  // Table Headers
-  // "Product Code",
-  const columns = ["Product Name", "Quantity", "Price"];
-  const rows = order.items.map((item) => [
-    // item.product,
-    item.name,
-    item.quantity,
-    `$${Number(item.price.slice(1)) * item.quantity}`,
-  ]);
+    // Table Headers
+    // "Product Code",
+    const columns = ["Product Name", "Quantity", "Price"];
+    const rows = order.items.map((item) => [
+      // item.product,
+      item.name,
+      item.quantity,
+      `$${Number(item.price.slice(1)) * item.quantity}`,
+    ]);
 
-  rows.push(["", "", ""]);
-  // Add Delivery Charge Row (Bold)
-  rows.push(["", "Delivery Charge", { content: `$${deliveryCharge}`, styles: { fontStyle: "bold" } }]);
+    rows.push(["", "", ""]);
+    // Add Delivery Charge Row (Bold)
+    rows.push(["", "Delivery Charge", { content: `$${deliveryCharge}`, styles: { fontStyle: "bold" } }]);
 
-  // Add Total Amount Row (Bold)
-  rows.push([
-    // "", // Empty cell
-    { content: "", styles: {fillColor: [225, 255, 225] } }, // "Total Amount" text
-    { content: "Total Amount", styles: { fontStyle: "bold",fillColor: [225, 255, 225] } }, // "Total Amount" text
-    // { content: "", styles: {fillColor: [225, 255, 225] } }, // "Total Amount" text
-    { content: `$${totalAmount}`, styles: { fontStyle: "bold",fillColor: [225, 255, 225] } }, // Total amount value
-  ]);
+    // Add Total Amount Row (Bold)
+    rows.push([
+      // "", // Empty cell
+      { content: "", styles: { fillColor: [225, 255, 225] } }, // "Total Amount" text
+      { content: "Total Amount", styles: { fontStyle: "bold", fillColor: [225, 255, 225] } }, // "Total Amount" text
+      // { content: "", styles: {fillColor: [225, 255, 225] } }, // "Total Amount" text
+      { content: `$${totalAmount}`, styles: { fontStyle: "bold", fillColor: [225, 255, 225] } }, // Total amount value
+    ]);
 
-  // Product Table with grid lines
-  doc.autoTable({
-    startY,
-    head: [columns],
-    body: rows,
-    theme: "grid", // Adds lines to the table
-    styles: { fontSize: 10, halign: "left" },
-    headStyles: { fillColor: [26, 35, 126], textColor: [255, 255, 255] },
-  });
+    // Product Table with grid lines
+    doc.autoTable({
+      startY,
+      head: [columns],
+      body: rows,
+      theme: "grid", // Adds lines to the table
+      styles: { fontSize: 10, halign: "left" },
+      headStyles: { fillColor: [26, 35, 126], textColor: [255, 255, 255] },
+    });
 
-  let finalY = doc.autoTable.previous.finalY + 10;
+    let finalY = doc.autoTable.previous.finalY + 10;
 
-  // Order Details & Billing Address in One Table
-  const combinedDetails = [
-    [{ content: "Order Details", colSpan: 2, styles: { fontStyle: "bold", textColor: [255, 255, 255], fillColor: [26, 35, 126] } }],
-    ["Order ID", order._id],
-    ["Date", new Date(order.createdAt).toLocaleDateString()],
-    ["Payment Status", order.paymentMethod !== "" ? "Paid" : "Pending"],
-    // ["Payment Status", order.paymentMethod !== "" ? "Paid" : "Pending"],
-    ["Delivery Type", deliveryType],
-    ["", ""],
-    [{ content: "Billing Address", colSpan: 2, styles: { fontStyle: "bold", fillColor: [225, 255, 225], color: "red" } }],
-    ["Address", order.address.addressLine1],
-    ["", `${order.address.city}, ${order.address.state} - ${order.address.zipCode}`],
-  ];
+    // Order Details & Billing Address in One Table
+    const combinedDetails = [
+      [{ content: "Order Details", colSpan: 2, styles: { fontStyle: "bold", textColor: [255, 255, 255], fillColor: [26, 35, 126] } }],
+      ["Order ID", order._id],
+      ["Date", new Date(order.createdAt).toLocaleDateString()],
+      ["Payment Status", order.paymentMethod !== "" ? "Paid" : "Pending"],
+      // ["Payment Status", order.paymentMethod !== "" ? "Paid" : "Pending"],
+      ["Delivery Type", deliveryType],
+      ["", ""],
+      [{ content: "Billing Address", colSpan: 2, styles: { fontStyle: "bold", fillColor: [225, 255, 225], color: "red" } }],
+      ["Address", order.address.addressLine1],
+      ["", `${order.address.city}, ${order.address.state} - ${order.address.zipCode}`],
+    ];
 
-  doc.autoTable({
-    startY: finalY,
-    body: combinedDetails,
-    theme: "grid",
-    styles: { fontSize: 9, halign: "left" },
-    columnStyles: { 0: { fontStyle: "bold" } },
-  });
+    doc.autoTable({
+      startY: finalY,
+      body: combinedDetails,
+      theme: "grid",
+      styles: { fontSize: 9, halign: "left" },
+      columnStyles: { 0: { fontStyle: "bold" } },
+    });
 
-  finalY = doc.autoTable.previous.finalY + 10;
+    finalY = doc.autoTable.previous.finalY + 10;
 
-  finalY += 20; // Space before gratitude note
+    finalY += 20; // Space before gratitude note
 
-  // Gratitude Note (Centered & Semi-Bold)
-  doc.setFontSize(11);
-  doc.setTextColor(60, 60, 60);
-  doc.setFont("helvetica", "bolditalic");
-  doc.text(
-    "Thank you for shopping with us! We appreciate your presence and looking forward to serving you again.",
-    doc.internal.pageSize.width / 2,
-    finalY,
-    { align: "center" }
-  );
+    // Gratitude Note (Centered & Semi-Bold)
+    doc.setFontSize(11);
+    doc.setTextColor(60, 60, 60);
+    doc.setFont("helvetica", "bolditalic");
+    doc.text(
+      "Thank you for shopping with us! We appreciate your presence and looking forward to serving you again.",
+      doc.internal.pageSize.width / 2,
+      finalY,
+      { align: "center" }
+    );
 
-  // Save PDF
-  doc.save(`OrderInvoice.pdf`);
-  toast.success("Invoice Downloading!");
+    // Save PDF
+    doc.save(`OrderInvoice.pdf`);
+    toast.success("Invoice Downloading!");
 
-};
+  };
 
-const handleDownloadInvoice = async (orderId) => {
+  const handleDownloadInvoice = async (orderId) => {
     console.log("UserID", orderId)
 
     const token = localStorage.getItem('token');
@@ -246,9 +246,9 @@ const handleDownloadInvoice = async (orderId) => {
   };
 
   const getDeliveryPrice = (type) => {
-    if (type === "standard"){
+    if (type === "standard") {
       return "$0.00"
-    }else if (type === "premium"){
+    } else if (type === "premium") {
       return "$10.00"
     }
     return "$100.00"
@@ -265,16 +265,16 @@ const handleDownloadInvoice = async (orderId) => {
             Placed on {format(new Date(order.createdAt), 'MMM dd, yyyy')}
           </p>
         </div>
-          <div className='flex  flex-row items-center justify-center gap-10'>
-            <div className='flex flex-col items-center justify-center'>
-              <p className={`status-badge ${order.status.toLowerCase()}`}>{order.status}</p>
-              <p style={{fontWeight: "600", fontSize: "12px"}}>{new Date(order.createdAt).toLocaleString()}</p>
-            </div>
-            {order.status === "Shipped on" && <div className='flex flex-col items-center justify-center' onClick={() => handleDownloadInvoice(order._id, order.createdAt)}>
-              {order.status === "Shipped on" && <p className={`status-badge invoice`}>Invoice</p>}
-              <FaRegFilePdf className='w-6 h-6 pdf-icon' />
-            </div>}
+        <div className='flex  flex-row items-center justify-center gap-10'>
+          <div className='flex flex-col items-center justify-center'>
+            <p className={`status-badge ${order.status.toLowerCase()}`}>{order.status}</p>
+            <p style={{ fontWeight: "600", fontSize: "12px" }}>{new Date(order.createdAt).toLocaleString()}</p>
           </div>
+          {order.status === "Shipped on" && <div className='flex flex-col items-center justify-center' onClick={() => handleDownloadInvoice(order._id, order.createdAt)}>
+            {order.status === "Shipped on" && <p className={`status-badge invoice`}>Invoice</p>}
+            <FaRegFilePdf className='w-6 h-6 pdf-icon' />
+          </div>}
+        </div>
       </div>
 
       <div className="order-content">
@@ -294,33 +294,38 @@ const handleDownloadInvoice = async (orderId) => {
                   $
                   {item.price
                     ? (
-                        parseFloat(item.price.replace(/[^0-9.]/g, '')) *
-                        item.quantity
-                      ).toFixed(2)
+                      parseFloat(item.price.replace(/[^0-9.]/g, '')) *
+                      item.quantity
+                    ).toFixed(2)
                     : 'N/A'}
                 </p>
               </div>
             ))}
           </div>
           <div className="order-item my-2">
-                <div className="item-details">
-                  <p className="item-name">{order.deliveryType === "airMail" ? "Air" :order.deliveryType.slice(0,1).toUpperCase() + order.deliveryType.slice(1,order.deliveryType.length)} Delivery</p>
-                </div>
-                <p className="item-price">
-                {getDeliveryPrice(order.deliveryType)}
-                </p>
+            <div className="item-details">
+              <p className="item-name">{order.deliveryType === "airMail" ? "Air" : order.deliveryType.slice(0, 1).toUpperCase() + order.deliveryType.slice(1, order.deliveryType.length)} Delivery</p>
+            </div>
+            <p className="item-price">
+              {getDeliveryPrice(order.deliveryType)}
+            </p>
           </div>
         </div>
-        
+
 
         {/* Delivery Address */}
         <div className="order-section">
           <h4 className="font-bold mb-2 text-blue-500 text-xl">Delivery Address</h4>
           <div className="address-details font-medium">
-            <p>{order.address.addressLine1}</p>
-            {order.address.addressLine2 && <p>{order.address.addressLine2}</p>}
-            <p>{`${order.address.city}, ${order.address.state} ${order.address.zipCode}`}</p>
+            <p>{order.address?.addressLine1 || "No address provided"}</p>
+            {order.address?.addressLine2 && <p>{order.address.addressLine2}</p>}
+            <p>
+              {order.address
+                ? `${order.address.city}, ${order.address.state} ${order.address.zipCode}`
+                : ""}
+            </p>
           </div>
+
         </div>
         {/* Delivery Type */}
         <div className="order-section">
@@ -328,20 +333,20 @@ const handleDownloadInvoice = async (orderId) => {
           <p className="delivery-type font-medium">
             {order.deliveryType === 'standard'
               ? `Order will be delivered on ${getDeliveryDate(
-                  order.createdAt,
-                  6
-                )}`
+                order.createdAt,
+                6
+              )}`
               : order.deliveryType === 'premium'
-              ?  `Order will be delivered on ${getDeliveryDate(
+                ? `Order will be delivered on ${getDeliveryDate(
                   order.createdAt,
                   3
                 )}`
-              : order.deliveryType === 'airWalk'
-              ? `Order will be delivered on ${getDeliveryDate(
-                  order.createdAt,
-                  1
-                )}`
-              : 'Invalid delivery type'}
+                : order.deliveryType === 'airWalk'
+                  ? `Order will be delivered on ${getDeliveryDate(
+                    order.createdAt,
+                    1
+                  )}`
+                  : 'Invalid delivery type'}
           </p>
 
           {userRole === 'user' && (
@@ -354,7 +359,9 @@ const handleDownloadInvoice = async (orderId) => {
         <div className="order-summary">
           <div className="total-row">
             <span>Total</span>
-            <span>${order.total.toFixed(2)}</span>
+            {/* <span>${order.total.toFixed(2)}</span> */}
+            <span>${Number(order.total || 0).toFixed(2)}</span>
+
           </div>
           <p className="payment-method font-medium">Paid via {order.paymentMethod}</p>
         </div>

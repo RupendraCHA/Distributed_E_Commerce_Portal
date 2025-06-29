@@ -1,0 +1,88 @@
+.quotation-page {
+    padding: 20px;
+    background-color: #fdfdfd;
+}
+
+.quotation-header {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+}
+
+.quotation-tab {
+    background-color: black;
+    color: white;
+    padding: 10px 30px;
+    font-weight: bold;
+    font-size: 16px;
+    border: none;
+    border-radius: 8px;
+}
+
+.quotation-search-wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.quotation-search {
+    padding: 10px 15px;
+    font-size: 14px;
+    border-radius: 6px;
+    border: 2px solid black;
+    color: #aaa;
+    font-style: italic;
+}
+
+.quotation-search-icon {
+    position: absolute;
+    right: 10px;
+    font-size: 16px;
+    color: black;
+}
+
+.quotation-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.quotation-card {
+    background-color: #7a88ff;
+    color: white;
+    width: 200px;
+    height: 250px;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    font-weight: bold;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.quotation-card h3 {
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+.view-btn {
+    margin-top: 40px;
+    background-color: white;
+    color: #7a88ff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.quotation-details {
+    margin-top: 30px;
+    padding: 20px;
+}
+
+
+.view-btn:hover {
+    background-color: #f0f0f0;
+}

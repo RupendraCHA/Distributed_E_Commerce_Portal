@@ -30,7 +30,7 @@ const Orders = () => {
 
   const dispatch = useDispatch()
   const isUpdated = useSelector((state) => state.userOrders.isUpdated)
-  
+
 
   const server_Url = import.meta.env.VITE_API_SERVER_URL
 
@@ -51,7 +51,7 @@ const Orders = () => {
       const response = await axios.get(server_Url + "/api/v1/allorders", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
 
       const sortedOrders = response.data.sort(
         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -61,14 +61,14 @@ const Orders = () => {
         if (order.status === 'confirmed') {
           setTimeout(() => {
             updateOrderStatus(order._id, 'processing');
-          }, 800); 
-        // 10 seconds
-        // } else if (order.status === 'processing') {
-        //   setTimeout(() => {
-        //     updateOrderStatus(order._id, 'delivered');
-        //   }, 3600000); // 1 hour (3600000 milliseconds)
+          }, 800);
+          // 10 seconds
+          // } else if (order.status === 'processing') {
+          //   setTimeout(() => {
+          //     updateOrderStatus(order._id, 'delivered');
+          //   }, 3600000); // 1 hour (3600000 milliseconds)
         }
-      
+
         return order;
       });
       const ownOrders = await axios.get(
@@ -95,54 +95,65 @@ const Orders = () => {
     }
   };
 
-const getOtherUsersOrdersOnly = async () => {
-  const {consumerOrders, InventoryOrders, distributorWarehouses} = await getInventoryOrdersAndConsumerOrdersOnly()
-  setConsumerOrders(consumerOrders)
-  setInventoryOrders(InventoryOrders)
-  setDisWarehouses(distributorWarehouses)
-  const token = localStorage.getItem('token');
+  const getOtherUsersOrdersOnly = async () => {
+    const { consumerOrders, InventoryOrders, distributorWarehouses } = await getInventoryOrdersAndConsumerOrdersOnly()
+    setConsumerOrders(consumerOrders)
+    setInventoryOrders(InventoryOrders)
+    setDisWarehouses(distributorWarehouses)
+    const token = localStorage.getItem('token');
 
-  const response = await axios.get(server_Url + "/api/v1/inventories", {
-    headers: { Authorization: `Bearer ${token}` },
-  })
-  // const response = await axios.get("http://localhost:3002/inventories", {
-  //   headers: { Authorization: `Bearer ${token}` },
-  // })
-}
+    const response = await axios.get(server_Url + "/api/v1/inventories", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+    // const response = await axios.get("http://localhost:3002/inventories", {
+    //   headers: { Authorization: `Bearer ${token}` },
+    // })
+  }
 
   const handleOrderFullfillment = async (id, order) => {
     try {
-    dispatch(setUserOrders(order.items))
-        const response = await axios.put(server_Url + `/api/v1/order/${id}/status`)
-        // const response = await axios.put(`http://localhost:3002/order/${id}/status`)
-        setShippedStatus(response.data.status)
-        const orderedItems = response.data.orderedItems
+      dispatch(setUserOrders(order.items))
+      const response = await axios.put(server_Url + `/api/v1/order/${id}/status`)
+      // const response = await axios.put(`http://localhost:3002/order/${id}/status`)
+      setShippedStatus(response.data.status)
+      const orderedItems = response.data.orderedItems
       const token = localStorage.getItem('token');
 
-        const inventoryResponse = await axios.post(server_Url + "/api/v1/inventories",{inventoryOrders, orderedItems, disWarehouses}, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        // const inventoryResponse = await axios.post("http://localhost:3002/inventories",{inventoryOrders, orderedItems, disWarehouses}, {
-        //   headers: { Authorization: `Bearer ${token}` },
-        // })
+      const inventoryResponse = await axios.post(server_Url + "/api/v1/inventories", { inventoryOrders, orderedItems, disWarehouses }, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      // const inventoryResponse = await axios.post("http://localhost:3002/inventories",{inventoryOrders, orderedItems, disWarehouses}, {
+      //   headers: { Authorization: `Bearer ${token}` },
+      // })
+      // Clear AR after order is fulfilled
+      await axios.post(
+        `${server_Url}/api/v1/accounts-receivable/clear`,
+        { orderId: id },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`
+          }
+        }
+      );
 
-        console.log(inventoryResponse.data)
 
-        if (inventoryResponse.data.success === true) {
-          dispatch(setUpdated(true))
-          dispatch(setDeductedOrderDetails(inventoryResponse.data.deductedProducts))
-          dispatch(setInsufficientOrderDetails(inventoryResponse.data.insufficientStockProducts))
-          toast.success('Order Fullfilled successfully!');
-          setTimeout(() => {
+      console.log(inventoryResponse.data)
+
+      if (inventoryResponse.data.success === true) {
+        dispatch(setUpdated(true))
+        dispatch(setDeductedOrderDetails(inventoryResponse.data.deductedProducts))
+        dispatch(setInsufficientOrderDetails(inventoryResponse.data.insufficientStockProducts))
+        toast.success('Order Fullfilled successfully!');
+        setTimeout(() => {
           window.location.reload()
 
-          }, 1000)
+        }, 1000)
 
-        }
-        const result = inventoryResponse.data
+      }
+      const result = inventoryResponse.data
 
     } catch (error) {
-        console.log("Error Occured", error)
+      console.log("Error Occured", error)
     }
   }
 
@@ -179,23 +190,23 @@ const getOtherUsersOrdersOnly = async () => {
   }
 
   const handleOrderDetails = () => {
-      navigate("/inventoryOrders")
-      dispatch(setUpdated(false))
+    navigate("/inventoryOrders")
+    dispatch(setUpdated(false))
+  }
+
+  const getDeliveryPrice = (type) => {
+    if (type === "standard") {
+      return "$0.00"
+    } else if (type === "premium") {
+      return "$10.00"
     }
-  
-    const getDeliveryPrice = (type) => {
-      if (type === "standard"){
-        return "$0.00"
-      }else if (type === "premium"){
-        return "$10.00"
-      }
-      return "$100.00"
-    }
+    return "$100.00"
+  }
 
   const OrderDetails = ({ order }) => {
-      const navigate = useNavigate();
-    
-    
+    const navigate = useNavigate();
+
+
     return (<div className="order-card">
       <div className="order-header">
         <div>
@@ -210,13 +221,13 @@ const getOtherUsersOrdersOnly = async () => {
         {/* {order.status === "shipped" && <span className={`status-badge ${order.status.toLowerCase()}`}>
           shipped
         </span>} */}
-        {order.status === "processing" && userRole === "distributor" && shippedStatus === "" ? <button className='fullfill-order-btn' onClick={() => handleOrderFullfillment(order._id, order)}>Fullfill Order</button> : 
-        <div style={{display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",}}>
-          <span className={`status-badge1 ${order.status.toLowerCase()}`}>
-            Shipped on
-          </span>
-          <p style={{fontSize: "13px", fontWeight: "600"}}>{new Date(order.createdAt).toLocaleString()}</p>
-        </div>
+        {order.status === "processing" && userRole === "distributor" && shippedStatus === "" ? <button className='fullfill-order-btn' onClick={() => handleOrderFullfillment(order._id, order)}>Fullfill Order</button> :
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", }}>
+            <span className={`status-badge1 ${order.status.toLowerCase()}`}>
+              Shipped on
+            </span>
+            <p style={{ fontSize: "13px", fontWeight: "600" }}>{new Date(order.createdAt).toLocaleString()}</p>
+          </div>
         }
         {/* {shippedStatus === "" ? "" : } */}
       </div>
@@ -238,33 +249,38 @@ const getOtherUsersOrdersOnly = async () => {
                   $
                   {item.price
                     ? (
-                        parseFloat(item.price.replace(/[^0-9.]/g, '')) *
-                        item.quantity
-                      ).toFixed(2)
+                      parseFloat(item.price.replace(/[^0-9.]/g, '')) *
+                      item.quantity
+                    ).toFixed(2)
                     : 'N/A'}
                 </p>
               </div>
             ))}
           </div>
           <div className="order-item my-2">
-                <div className="item-details">
-                  <p className="item-name">{order.deliveryType === "airMail" ? "Air" :order.deliveryType.slice(0,1).toUpperCase() + order.deliveryType.slice(1,order.deliveryType.length)} Delivery</p>
-                </div>
-                <p className="item-price">
-                {getDeliveryPrice(order.deliveryType)}
-                </p>
+            <div className="item-details">
+              <p className="item-name">{order.deliveryType === "airMail" ? "Air" : order.deliveryType.slice(0, 1).toUpperCase() + order.deliveryType.slice(1, order.deliveryType.length)} Delivery</p>
+            </div>
+            <p className="item-price">
+              {getDeliveryPrice(order.deliveryType)}
+            </p>
           </div>
         </div>
-        
+
 
         {/* Delivery Address */}
         <div className="order-section">
           <h4 className="font-bold mb-2 text-xl text-blue-500">Delivery Address</h4>
           <div className="address-details font-medium">
-            <p>{order.address.addressLine1}</p>
-            {order.address.addressLine2 && <p>{order.address.addressLine2}</p>}
-            <p>{`${order.address.city}, ${order.address.state} ${order.address.zipCode}`}</p>
+            <p>{order.address?.addressLine1 || "No address provided"}</p>
+            {order.address?.addressLine2 && <p>{order.address.addressLine2}</p>}
+            <p>
+              {order.address
+                ? `${order.address.city}, ${order.address.state} ${order.address.zipCode}`
+                : ""}
+            </p>
           </div>
+
         </div>
 
         {/* Delivery Type */}
@@ -273,20 +289,20 @@ const getOtherUsersOrdersOnly = async () => {
           <p className="delivery-type font-medium text-0.2xl">
             {order.deliveryType === 'standard'
               ? `Order will be delivered on ${getDeliveryDate(
-                  order.createdAt,
-                  6
-                )}`
+                order.createdAt,
+                6
+              )}`
               : order.deliveryType === 'premium'
-              ?  `Order will be delivered on ${getDeliveryDate(
+                ? `Order will be delivered on ${getDeliveryDate(
                   order.createdAt,
                   3
                 )}`
-              : order.deliveryType === 'airWalk'
-              ? `Order will be delivered on ${getDeliveryDate(
-                  order.createdAt,
-                  1
-                )}`
-              : 'Invalid delivery type'}
+                : order.deliveryType === 'airWalk'
+                  ? `Order will be delivered on ${getDeliveryDate(
+                    order.createdAt,
+                    1
+                  )}`
+                  : 'Invalid delivery type'}
           </p>
 
           {userRole === 'user' && (
@@ -299,13 +315,15 @@ const getOtherUsersOrdersOnly = async () => {
         <div className="order-summary">
           <div className="total-row">
             <span>Total</span>
-            <span>${order.total.toFixed(2)}</span>
+            {/* <span>${order.total.toFixed(2)}</span> */}
+            <span>${order.total != null ? order.total.toFixed(2) : "0.00"}</span>
+
           </div>
           <p className="payment-method font-medium">Paid via {order.paymentMethod}</p>
         </div>
       </div>
     </div>)
-};
+  };
 
   if (loading) {
     return (
@@ -368,7 +386,7 @@ const getOtherUsersOrdersOnly = async () => {
       </div>
       <ToastContainer position="top-right" autoClose={3000} />
     </div>
-    </>
+  </>
   );
 };
 

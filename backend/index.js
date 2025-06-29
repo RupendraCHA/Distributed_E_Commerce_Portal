@@ -33,17 +33,23 @@ const {
   ProductionOrderSettlementModel,
   GLDocumentDataModel,
   GLDocumentModel,
+
 } = require("./Models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { isAdmin } = require("./authentication");
 const { authenticateToken } = require("./authentication");
 
+
+
 const posetraProducts = require("./data/posetraProducts");
 const RequisitionModel = require("./Models/RequisitionSchema");
 const MaterialModel = require("./Models/MaterialsModel");
 const PurchaseOrderModel = require("./Models/PurchaseOrderSchema");
 const ReceiptOrderModel = require("./Models/RecieptOrder");
+const { TransactionModel } = require('./Models/ConsumerAccountsModel');
+
+
 const app = express();
 app.use(express.json());
 app.use(
@@ -61,9 +67,9 @@ const Stripe_Key = process.env.Stripe_Key;
 const JWT_SECRET = process.env.JWT_SECRET;
 const PORT = process.env.PORT;
 
-const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com" // Visionsoft
-// const checkoutURLs = "https://distributed-e-commerce-portal-frontend.onrender.com";
-// const checkoutURLs = "http://localhost:5173";
+// const checkoutURLs = "https://posetra-e-commerce-portal-1.onrender.com" // Visionsoft
+//  const checkoutURLs = "https://distributed-e-commerce-portal-frontend.onrender.com";
+const checkoutURLs = "http://localhost:5173";
 
 const connectDB = async () => {
   try {
@@ -495,6 +501,110 @@ app.get("/api/v1/vendor-agreements", async (req, res) => {
   res.send(data);
 });
 
+app.get('/api/consumers', async (req, res) => {
+  try {
+    const userIds = await TransactionModel.distinct('userId');
+    const consumers = await EmployeeModel.find(
+      { _id: { $in: userIds } },
+      '_id name email role' // 👈 include role here
+    ).lean();
+
+    res.json(consumers);
+  } catch (err) {
+    console.error('Error fetching consumers:', err);
+    res.status(500).json({ message: 'Failed to fetch consumers', error: err.message });
+  }
+});
+// Get Accounts Receivable for a specific user
+app.get('/api/v1/accountsreceivables', async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'Missing userId parameter' });
+    }
+
+    const allDocs = await GLDocumentModel.find().lean();
+
+    // Filter debit (D) entries by userId/companyCode match
+    const filtered = allDocs.filter(doc =>
+      doc.companyCode === userId &&
+      doc.items.some(item => item.debitCreditIndicator === 'D')
+    );
+
+    res.json(filtered);
+  } catch (err) {
+    console.error('Error fetching accounts receivables:', err);
+    res.status(500).json({ message: 'Failed to fetch accounts receivables', error: err.message });
+  }
+});
+// Get Accounts Receivable for a specific user
+app.get('/api/v1/accountsreceivables', async (req, res) => {
+  try {
+    const { userId } = req.query;
+
+    if (!userId) {
+      return res.status(400).json({ message: 'Missing userId parameter' });
+    }
+
+    const allDocs = await GLDocumentModel.find().lean();
+
+    // Filter debit (D) entries by userId/companyCode match
+    const filtered = allDocs.filter(doc =>
+      doc.companyCode === userId &&
+      doc.items.some(item => item.debitCreditIndicator === 'D')
+    );
+
+    res.json(filtered);
+  } catch (err) {
+    console.error('Error fetching accounts receivables:', err);
+    res.status(500).json({ message: 'Failed to fetch accounts receivables', error: err.message });
+  }
+});
+
+// Accounts Payable & Accounts Receivable
+app.get('/api/transactions/all', async (req, res) => {
+  try {
+    const transactions = await TransactionModel.find().lean();
+
+    const userIds = [...new Set(transactions.map(tx => tx.userId))];
+
+    const users = await EmployeeModel.find({ _id: { $in: userIds } })
+      .select('_id name email role')
+      .lean();
+
+    const userMap = {};
+    users.forEach(user => {
+      userMap[user._id.toString()] = user;
+    });
+
+    const enrichedTransactions = transactions.map(tx => {
+      const user = userMap[tx.userId.toString()];
+      return {
+        ...tx,
+        userName: user?.name || '',
+        userEmail: user?.email || '',
+        userRole: user?.role || 'user',
+      };
+    });
+
+    res.json(enrichedTransactions);
+  } catch (err) {
+    console.error('Error fetching all transactions:', err);
+    res.status(500).json({ message: 'Failed to fetch transactions', error: err.message });
+  }
+});
+
+app.get('/api/transactions/:consumerId', async (req, res) => {
+  try {
+    const transactions = await TransactionModel.find({ userId: req.params.consumerId }).lean();
+    res.json(transactions);
+  } catch (err) {
+    console.error('Error fetching transactions:', err);
+    res.status(500).json({ message: 'Failed to fetch transactions', error: err.message });
+  }
+});
+
 app.get("/api/v1/vendor-agreements/:id", async (req, res) => {
   const data = await VendorAgreementModel.findById(req.params.id);
   res.send(data);
@@ -844,12 +954,12 @@ app.get("/distributors/products", async (req, res) => {
         );
         return product
           ? {
-              ...product.toObject(),
-              quantity: productInfo.quantity,
-              price: `$${productInfo.price || product.price || 0}`,
-              distributorIds: Array.from(productInfo.distributors),
-              warehouseDetails: productInfo.warehouseDetails,
-            }
+            ...product.toObject(),
+            quantity: productInfo.quantity,
+            price: `$${productInfo.price || product.price || 0}`,
+            distributorIds: Array.from(productInfo.distributors),
+            warehouseDetails: productInfo.warehouseDetails,
+          }
           : null;
       })
       .filter((product) => product !== null);
@@ -973,6 +1083,7 @@ app.put("/api/v1/user/markup", authenticateToken, async (req, res) => {
   }
 });
 
+// addresses
 app.get("/api/v1/addresses", authenticateToken, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -1088,71 +1199,7 @@ app.delete("/api/v1/addresses/:id", authenticateToken, async (req, res) => {
   }
 });
 
-app.post("/orders", authenticateToken, async (req, res) => {
-  const userId = req.user.id; // Extract user ID from the token
-  const {
-    items,
-    total,
-    address,
-    paymentMethod,
-    debitCardDetails,
-    checkDetails,
-  } = req.body;
 
-  // Validate required fields
-  if (!items || items.length === 0) {
-    return res.status(400).json({ error: "Cart items are required." });
-  }
-  if (
-    !address ||
-    !address.addressLine1 ||
-    !address.city ||
-    !address.state ||
-    !address.zipCode
-  ) {
-    return res.status(400).json({ error: "Address is required." });
-  }
-  if (!paymentMethod) {
-    return res.status(400).json({ error: "Payment method is required." });
-  }
-
-  // Validate payment details based on the payment method
-  if (paymentMethod === "debit card") {
-    if (
-      !debitCardDetails ||
-      !debitCardDetails.cardNumber ||
-      !debitCardDetails.expiryDate ||
-      !debitCardDetails.cvv
-    ) {
-      return res
-        .status(400)
-        .json({ error: "Debit card details are required." });
-    }
-  } else if (paymentMethod === "check") {
-    if (!checkDetails || !checkDetails.checkNumber || !checkDetails.bankName) {
-      return res.status(400).json({ error: "Check details are required." });
-    }
-  }
-
-  try {
-    const newOrder = new OrderModel({
-      userId,
-      items,
-      total,
-      address,
-      paymentMethod,
-      debitCardDetails:
-        paymentMethod === "debit card" ? debitCardDetails : null,
-      checkDetails: paymentMethod === "check" ? checkDetails : null,
-    });
-
-    const savedOrder = await newOrder.save();
-    res.status(201).json(savedOrder);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Internal server error" });
-  }
-});
 
 // GET /orders - Fetch orders for the authenticated user
 app.get("/api/v1/orders", authenticateToken, async (req, res) => {
@@ -1285,6 +1332,438 @@ app.put("/api/v1/order/:id/status", async (req, res) => {
     createdAt: updateOrderData.createdAt,
   });
 });
+
+
+app.get("/api/v1/accounts-payable", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const currentUser = await EmployeeModel.findById(userId).select("role name email");
+    if (!currentUser) return res.status(404).json({ message: "User not found" });
+
+    const payableRoles = ["reseller", "distributor", "manufacturer"];
+
+    // 🔐 Admin: see all payable entries
+    if (currentUser.role === "admin") {
+      const payables = await EmployeeModel.find({
+        role: { $in: payableRoles },
+      }).select("_id name email").lean();
+
+      const payableUserIds = payables.map((u) => u._id.toString());
+      const txs = await TransactionModel.find().lean();
+
+      const userMap = Object.fromEntries(payables.map((u) => [u._id.toString(), u]));
+
+      const result = txs
+        .filter((tx) => payableUserIds.includes(tx.userId.toString()))
+        .flatMap((tx) => {
+          const user = userMap[tx.userId.toString()];
+          return tx.items.map((item, index) => ({
+            transactionId: tx._id,
+            userId: tx.userId,
+            name: user?.name || user?.email,
+            product: item.name,
+            quantity: item.quantity,
+            price: parseFloat(item.price.replace("$", "")),
+            amount: item.quantity * parseFloat(item.price.replace("$", "")),
+            date: new Date(tx.createdAt).toISOString().split("T")[0],
+            itemIndex: index,
+          }));
+        });
+
+      return res.json(result);
+    }
+
+    // ✅ Normal distributor/reseller/manufacturer — own AP only
+    if (!payableRoles.includes(currentUser.role)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    const transactions = await TransactionModel.find({ userId }).lean();
+
+    const result = transactions.flatMap((tx) =>
+      tx.items.map((item, index) => ({
+        transactionId: tx._id,
+        userId: tx.userId,
+        name: currentUser.name || currentUser.email,
+        product: item.name,
+        quantity: item.quantity,
+        price: parseFloat(item.price.replace("$", "")),
+        amount: item.quantity * parseFloat(item.price.replace("$", "")),
+        date: new Date(tx.createdAt).toISOString().split("T")[0],
+        itemIndex: index,
+      }))
+    );
+
+    res.json(result);
+  } catch (err) {
+    console.error("Error fetching AP transactions:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+// app.get("/api/v1/accounts-receivable", authenticateToken, async (req, res) => {
+//   try {
+//     const userId = req.user.id;
+
+//     const currentUser = await EmployeeModel.findById(userId).select("role name email");
+//     if (!currentUser) return res.status(404).json({ message: "User not found" });
+
+//     const isPrivileged = ["reseller", "distributor", "manufacturer", "admin"].includes(currentUser.role);
+
+//     const orders = isPrivileged
+//       ? await OrderModel.find().lean()
+//       : await OrderModel.find({ userId }).lean();
+
+//     const users = await EmployeeModel.find().select("name email role _id").lean();
+//     const userMap = Object.fromEntries(users.map((u) => [u._id.toString(), u]));
+
+//     const result = orders.flatMap((order) => {
+//       const user = userMap[order.userId.toString()];
+//       if (!user || (user.role !== "consumer" && user.role !== "user")) return [];
+
+//       return order.items.map((item, index) => {
+//         const price = parseFloat(item.price.replace("$", "")) || 0;
+//         const amount = item.quantity * price;
+
+//         return {
+//           orderId: order._id,
+//           userId: order.userId,
+//           name: user.name || user.email,
+//           product: item.name,
+//           quantity: item.quantity,
+//           price: price,
+//           amount: price === 0 ? "$0.00" : `-$${Math.abs(amount).toFixed(2)}`,
+//           date: new Date(order.createdAt).toISOString().split("T")[0],
+//           itemIndex: index,
+//         };
+//       });
+//     });
+
+//     res.json(result);
+//   } catch (err) {
+//     console.error("Error fetching AR entries:", err);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });
+
+
+// old values is zero
+
+
+
+
+
+app.get("/api/v1/accounts-receivable", authenticateToken, async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    const currentUser = await EmployeeModel.findById(userId).select("role name email");
+    if (!currentUser) return res.status(404).json({ message: "User not found" });
+
+    const privilegedRoles = ["reseller", "distributor", "manufacturer", "admin"];
+    const consumerRoles = ["consumer", "user"];
+    const isPrivileged = privilegedRoles.includes(currentUser.role);
+    const isConsumer = consumerRoles.includes(currentUser.role);
+
+    if (!isPrivileged && !isConsumer) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    // Fetch transactions based on role
+    const transactions = isPrivileged
+      ? await TransactionModel.find().lean()
+      : await TransactionModel.find({ userId }).lean();
+
+    // Fetch user details
+    const users = await EmployeeModel.find().select("name email role _id").lean();
+    const userMap = Object.fromEntries(users.map((u) => [u._id.toString(), u]));
+
+    const result = transactions.flatMap((tx) => {
+      const user = userMap[tx.userId.toString()];
+      if (!user || !consumerRoles.includes(user.role)) return [];
+
+      return tx.items.map((item, index) => {
+        const price = parseFloat(item.price.replace("$", ""));
+        const amount = item.quantity * price;
+
+        return {
+          transactionId: tx._id,
+          userId: tx.userId,
+          name: user.name || user.email,
+          product: item.name,
+          quantity: item.quantity,
+          price: price,
+          amount: price === 0 ? 0 : -Math.abs(amount), // Negative until fulfilled
+          date: new Date(tx.createdAt).toISOString().split("T")[0],
+          itemIndex: index,
+        };
+      });
+    });
+
+    res.json(result);
+  } catch (err) {
+    console.error("Error fetching AR transactions:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+
+
+
+// app.get("/api/v1/accounts-receivable", authenticateToken, async (req, res) => {
+//   try {
+//     const userId = req.user.id;
+
+//     const currentUser = await EmployeeModel.findById(userId).select("role name email");
+//     if (!currentUser) return res.status(404).json({ message: "User not found" });
+
+//     const allowedRoles = ["reseller", "distributor", "manufacturer", "admin"];
+//     if (!allowedRoles.includes(currentUser.role)) {
+//       return res.status(403).json({ message: "Access denied" });
+//     }
+
+//     const transactions = await TransactionModel.find().lean();
+//     const users = await EmployeeModel.find().select("name email role _id").lean();
+
+//     const userMap = Object.fromEntries(users.map((u) => [u._id.toString(), u]));
+
+//     const result = transactions.flatMap((tx) => {
+//       const user = userMap[tx.userId.toString()];
+//       if (!user || (user.role !== "consumer" && user.role !== "user")) return [];
+
+//       return tx.items
+//         .map((item, index) => {
+//           const price = parseFloat(item.price.replace("$", ""));
+//           const amount = item.quantity * price;
+
+//           return {
+//             transactionId: tx._id,
+//             userId: tx.userId,
+//             name: user.name || user.email,
+//             product: item.name,
+//             quantity: item.quantity,
+//             price,
+//             amount: item.isFulfilled ? -amount : amount, // ✅ Negative if fulfilled
+//             date: new Date(tx.createdAt).toISOString().split("T")[0],
+//             itemIndex: index,
+//             isPaid: item.isPaid || false,
+//             isFulfilled: item.isFulfilled || false,
+//           };
+//         })
+//         .filter(entry => !entry.isPaid); // ✅ Only unpaid entries
+//     });
+
+//     res.json(result);
+//   } catch (err) {
+//     console.error("Error fetching AR transactions:", err);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });
+
+
+
+// In your backend routes file
+
+app.post("/api/v1/accounts-receivable/clear", authenticateToken, async (req, res) => {
+  try {
+    const { orderId } = req.body;
+    if (!orderId) return res.status(400).json({ message: "Order ID is required" });
+
+    const order = await OrderModel.findById(orderId); // ✅ FIXED
+    if (!order) return res.status(404).json({ message: "Order not found" });
+
+    if (order.isCleared) {
+      return res.status(400).json({ message: "AR already cleared for this order" });
+    }
+
+    order.items = order.items.map(item => ({
+      ...item,
+      price: "$0.00",
+    }));
+    order.isCleared = true;
+    await order.save();
+
+    res.status(200).json({
+      message: "Accounts receivable cleared",
+      clearedOrderId: order._id,
+    });
+  } catch (err) {
+    console.error("Error clearing AR:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+
+
+// app.post("/api/v1/accounts-receivable/clear", authenticateToken, async (req, res) => {
+//   try {
+//     const { orderId } = req.body;
+
+//     if (!orderId) {
+//       return res.status(400).json({ message: "Order ID is required" });
+//     }
+
+//     const transaction = await TransactionModel.findById(orderId);
+//     if (!transaction) {
+//       return res.status(404).json({ message: "Transaction not found" });
+//     }
+
+//     // ✅ Mark items as fulfilled (not paid yet)
+//     transaction.items = transaction.items.map(item => ({
+//       ...item,
+//       isFulfilled: true
+//     }));
+
+//     await transaction.save();
+
+//     res.status(200).json({
+//       message: "Order marked as fulfilled, AR will now be negative",
+//       clearedTransactionId: transaction._id,
+//     });
+//   } catch (err) {
+//     console.error("Error clearing AR:", err);
+//     res.status(500).json({ message: "Internal server error" });
+//   }
+// });
+
+app.post("/api/v1/accounts-receivable/clear-all", authenticateToken, async (req, res) => {
+  try {
+    const orders = await OrderModel.find({ isFulfilled: true, isCleared: false }); // ✅ FIXED
+
+    for (const order of orders) {
+      order.items = order.items.map(item => ({
+        ...item,
+        price: "$0.00",
+      }));
+      order.isCleared = true;
+      await order.save();
+    }
+
+    res.status(200).json({
+      message: "All fulfilled orders cleared from AR",
+      clearedCount: orders.length,
+    });
+  } catch (err) {
+    console.error("Bulk AR clear error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+
+
+
+
+
+app.post("/api/v1/orders/fulfill/:orderId", authenticateToken, async (req, res) => {
+  try {
+    const { orderId } = req.params;
+
+    const order = await OrderModel.findById(orderId);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    if (order.isFulfilled && order.isCleared) {
+      return res.status(400).json({ message: "Order already fulfilled and AR cleared" });
+    }
+
+    // ✅ Mark fulfilled
+    order.isFulfilled = true;
+
+    // ✅ Clear AR
+    order.items = order.items.map(item => ({
+      ...item,
+      price: "$0.00",
+    }));
+    order.isCleared = true;
+
+    await order.save();
+
+    res.status(200).json({ message: "Order fulfilled and AR cleared", orderId: order._id });
+  } catch (err) {
+    console.error("Error fulfilling order:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+
+
+app.post("/orders", authenticateToken, async (req, res) => {
+  const userId = req.user.id; // Extract user ID from the token
+  const {
+    items,
+    total,
+    address,
+    paymentMethod,
+    debitCardDetails,
+    checkDetails,
+  } = req.body;
+
+  // Validate required fields
+  if (!items || items.length === 0) {
+    return res.status(400).json({ error: "Cart items are required." });
+  }
+  if (
+    !address ||
+    !address.addressLine1 ||
+    !address.city ||
+    !address.state ||
+    !address.zipCode
+  ) {
+    return res.status(400).json({ error: "Address is required." });
+  }
+  if (!paymentMethod) {
+    return res.status(400).json({ error: "Payment method is required." });
+  }
+
+  // Validate payment details based on the payment method
+  if (paymentMethod === "debit card") {
+    if (
+      !debitCardDetails ||
+      !debitCardDetails.cardNumber ||
+      !debitCardDetails.expiryDate ||
+      !debitCardDetails.cvv
+    ) {
+      return res
+        .status(400)
+        .json({ error: "Debit card details are required." });
+    }
+  } else if (paymentMethod === "check") {
+    if (!checkDetails || !checkDetails.checkNumber || !checkDetails.bankName) {
+      return res.status(400).json({ error: "Check details are required." });
+    }
+  }
+
+  try {
+    const newOrder = new OrderModel({
+      userId,
+      items,
+      total,
+      address,
+      paymentMethod,
+      debitCardDetails:
+        paymentMethod === "debit card" ? debitCardDetails : null,
+      checkDetails: paymentMethod === "check" ? checkDetails : null,
+    });
+
+    const savedOrder = await newOrder.save();
+    res.status(201).json(savedOrder);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+
+
+
+
 
 app.post("/api/v1/register", async (req, res) => {
   // console.log(req.body);
